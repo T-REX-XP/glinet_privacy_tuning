@@ -21,6 +21,10 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 - **README.md** — project overview, install and SDK pointers, link to [github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning).
 
+### Changed
+
+- **CI** (`.github/workflows/openwrt-packages.yml`): `concurrency.cancel-in-progress` only for **`pull_request`** (branch/tag pushes no longer abort in-flight SDK jobs); `actions/checkout@v6`, `actions/upload-artifact@v6` (Node.js 24–compatible actions per GitHub guidance).
+
 ---
 
 ## 1.1.8 (2026-04-08)
