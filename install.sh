@@ -24,6 +24,7 @@
 # Env: GLINET_PRIVACY_SRC, GLINET_PRIVACY_GIT_URL, GLINET_PRIVACY_TARBALL_URL,
 #      GLINET_PRIVACY_BRANCH (default main)
 #      GLINET_PRIVACY_SKIP_OPKG_UPDATE=1 — skip opkg update (faster re-runs; install may fail if feeds stale)
+# opkg: uses "iptables-nft" as satisfying the iptables stack when present; tor-fw-helper is optional (not in all feeds).
 #      GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1 — re-apply installer telemetry UCI defaults (normally once only)
 #
 # Package version: package/version.mk
@@ -176,6 +177,18 @@ pkg_installed() {
 	opkg list-installed "$_p" 2>/dev/null | grep -q "^${_p} "
 }
 
+# iptables userland: OpenWrt 22+ often has iptables-nft only (no separate iptables-mod-*).
+iptables_stack_ok() {
+	if pkg_installed iptables-nft; then
+		return 0
+	fi
+	pkg_installed iptables || return 1
+	pkg_installed iptables-mod-nat || return 1
+	pkg_installed iptables-mod-extra || return 1
+	pkg_installed iptables-mod-comment || return 1
+	return 0
+}
+
 # WireGuard is built-in, loaded, or kmod package already installed — skip kmod-wireguard opkg.
 wireguard_kernel_ok() {
 	[ -d /sys/module/wireguard ] && return 0
@@ -184,12 +197,34 @@ wireguard_kernel_ok() {
 	return 1
 }
 
-# Install one package if missing; log failures (non-fatal except when opkg missing).
+# Global options (e.g. -V) must precede the subcommand; "opkg install -V 0 pkg" makes opkg treat "0" as a package name.
+opkg_install_quiet() {
+	opkg -V 0 install "$@" 2>/dev/null || return 1
+	return 0
+}
+
+# Install one package if missing; log failures (non-fatal).
 opkg_install_one() {
 	_pkg="$1"
 	pkg_installed "$_pkg" && return 0
 	log "opkg: installing $_pkg"
-	opkg install -V 0 "$_pkg" 2>/dev/null || log "opkg install failed (optional): $_pkg"
+	opkg_install_quiet "$_pkg" || log "opkg install failed (optional): $_pkg"
+}
+
+# Install several missing packages in one opkg invocation (less feed reload / duplicate log lines).
+opkg_install_missing_from_list() {
+	_batch=""
+	for _p in "$@"; do
+		pkg_installed "$_p" && continue
+		if [ -z "$_batch" ]; then
+			_batch="$_p"
+		else
+			_batch="$_batch $_p"
+		fi
+	done
+	[ -n "$_batch" ] || return 0
+	log "opkg: installing $_batch"
+	opkg_install_quiet $_batch || log "opkg install failed (optional): $_batch"
 }
 
 install_opkg_packages() {
@@ -197,7 +232,8 @@ install_opkg_packages() {
 	command -v opkg >/dev/null 2>&1 || { log "opkg not found; skip package installs"; return 0; }
 
 	_needs_install=0
-	for _p in iptables iptables-mod-nat iptables-mod-extra iptables-mod-comment tor tor-fw-helper ca-bundle wireguard-tools; do
+	iptables_stack_ok || _needs_install=1
+	for _p in tor ca-bundle wireguard-tools; do
 		pkg_installed "$_p" || _needs_install=1
 	done
 	if ! wireguard_kernel_ok && ! pkg_installed kmod-wireguard; then
@@ -218,9 +254,16 @@ install_opkg_packages() {
 		log "opkg: dependencies satisfied; skipping opkg update"
 	fi
 
-	for _p in iptables iptables-mod-nat iptables-mod-extra iptables-mod-comment tor tor-fw-helper ca-bundle; do
-		opkg_install_one "$_p"
-	done
+	if iptables_stack_ok; then
+		log "opkg: iptables stack already present (iptables-nft or iptables + modules)"
+	else
+		opkg_install_missing_from_list iptables iptables-mod-nat iptables-mod-extra iptables-mod-comment
+	fi
+
+	opkg_install_missing_from_list tor ca-bundle
+
+	# Optional helper; not in all feeds — do not force opkg update if only this is missing.
+	opkg_install_one tor-fw-helper
 
 	opkg_install_one wireguard-tools
 

@@ -47,7 +47,7 @@ sh install.sh
 
 Useful flags: `--without-luci` (skip LuCI files; default is to install them), `--minimal` (files + firewall/profile only), `--with-imei-boot`, `--with-imei-cron` (enables scheduled IMEI rotation; default 6h, set **`cron_interval_hours`** in LuCI → IMEI rotation). Full options and environment variables are documented in the [install.sh](install.sh) header.
 
-**Re-running `install.sh`** is safe: **`opkg update`** runs only when at least one dependency is missing; **`kmod-wireguard`** is skipped if the WireGuard module is already present; telemetry defaults are seeded **once** (see **`/etc/glinet-privacy/.telemetry-seeded`**); **`dhcp` `confdir`** is not duplicated. **`GLINET_PRIVACY_SKIP_OPKG_UPDATE=1`** skips the feed update (faster repeat installs; may fail offline if a package is missing). **`GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1`** re-applies the installer telemetry UCI toggles.
+**Re-running `install.sh`** is safe: **`opkg update`** runs only when at least one dependency is missing (including **`iptables-nft`** as the iptables stack on current OpenWrt); **`kmod-wireguard`** is skipped if the WireGuard module is already present; telemetry defaults are seeded **once** (see **`/etc/glinet-privacy/.telemetry-seeded`**); **`dhcp` `confdir`** is not duplicated. **`GLINET_PRIVACY_SKIP_OPKG_UPDATE=1`** skips the feed update (faster repeat installs; may fail offline if a package is missing). **`GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1`** re-applies the installer telemetry UCI toggles.
 
 **Piping the script** (`curl … | sh`) requires **`GLINET_PRIVACY_TARBALL_URL`** pointing at a **source tree** archive (must contain **`package/glinet-privacy/files`**), or **`GLINET_PRIVACY_SRC`**.
 

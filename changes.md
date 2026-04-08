@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.5 (2026-04-08)
+
+### Fixed
+
+- **`install.sh` / opkg** — **`opkg install -V 0 pkg`** was invalid: **`0`** was parsed as a package (**Unknown package '0'**). Use **`opkg -V 0 install …`** (global options before the subcommand). **iptables-nft** (OpenWrt 22+) now counts as the iptables stack so **`opkg update`** is skipped when other deps are satisfied (previously **`iptables`** alone was checked and never matched nft-only images). **`tor-fw-helper`** is no longer required for the “needs install” gate (optional; absent on some feeds). Multiple packages are installed in **one** **`opkg install`** where possible to reduce repeated **`pkg_hash_load_feeds`**-style output.
+
+---
+
 ## 1.2.4 (2026-04-08)
 
 ### Added
