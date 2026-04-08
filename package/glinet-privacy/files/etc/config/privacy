@@ -1,0 +1,10 @@
+# privacy — paths for killswitch / Tor helper scripts (copy to /etc/config/privacy)
+
+config privacy 'main'
+	option enabled '1'
+	option wg_if 'wg0'
+	option require_tor '1'
+	option require_wg '1'
+	# Logical interfaces (see ip link); often br-lan and eth0 / wwan0
+	option lan_dev 'br-lan'
+	option wan_dev 'wwan0'

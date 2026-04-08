@@ -1,0 +1,10 @@
+# rotate_imei UCI — copy to /etc/config/rotate_imei on the router
+
+config rotate_imei 'main'
+	option enabled '0'
+	# Optional 8-digit TAC; empty = fully random 14-digit body + Luhn check digit
+	option imei_tac ''
+	# Optional explicit modem device, e.g. /dev/ttyUSB2
+	option modem_tty ''
+	# Optional wwan logical interface name (uci network section)
+	option wwan_if ''

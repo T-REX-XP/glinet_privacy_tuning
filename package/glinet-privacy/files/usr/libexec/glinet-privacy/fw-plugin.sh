@@ -4,7 +4,7 @@
 
 set -eu
 
-TOR_EN="$(uci -q get glinet_privacy.firewall.tor_transparent 2>/dev/null || echo 0)"
+TOR_EN="$(uci -q get glinet_privacy.tor.tor_transparent 2>/dev/null || echo 0)"
 case "$TOR_EN" in
 	1|true|yes|on)
 		/etc/firewall.privacy-tor.sh

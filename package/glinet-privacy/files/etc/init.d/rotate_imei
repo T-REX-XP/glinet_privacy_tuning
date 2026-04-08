@@ -1,0 +1,36 @@
+#!/bin/sh /etc/rc.common
+# rotate_imei — optional boot-time IMEI rotation (disabled by default).
+
+START=99
+
+EXTRA_COMMANDS="status"
+EXTRA_HELP="	status	Show whether boot rotation is enabled"
+
+ENABLED=0
+IMEI_TAC=""
+MODEM_TTY=""
+WWAN_IF=""
+
+load_config() {
+	[ -f /etc/config/rotate_imei ] || return 0
+	ENABLED="$(uci -q get rotate_imei.main.enabled 2>/dev/null || echo 0)"
+	IMEI_TAC="$(uci -q get rotate_imei.main.imei_tac 2>/dev/null || echo "")"
+	MODEM_TTY="$(uci -q get rotate_imei.main.modem_tty 2>/dev/null || echo "")"
+	WWAN_IF="$(uci -q get rotate_imei.main.wwan_if 2>/dev/null || echo "")"
+	export IMEI_TAC MODEM_TTY
+	[ -n "$WWAN_IF" ] && export WWAN_IF
+}
+
+start() {
+	load_config
+	case "$ENABLED" in
+		1|true|yes|on) ;;
+		*) return 0 ;;
+	esac
+	/usr/bin/rotate_imei.sh
+}
+
+status() {
+	load_config
+	echo "rotate_imei boot enabled: $ENABLED"
+}
