@@ -1,0 +1,82 @@
+{
+	"admin/services/glinet_privacy": {
+		"title": "GL.iNet Privacy",
+		"order": 60,
+		"action": {
+			"type": "firstchild"
+		},
+		"depends": {
+			"acl": [ "luci-app-glinet-privacy" ]
+		}
+	},
+	"admin/services/glinet_privacy/overview": {
+		"title": "Overview",
+		"order": 1,
+		"action": {
+			"type": "call",
+			"module": "luci.controller.glinet_privacy",
+			"function": "action_overview"
+		},
+		"depends": {
+			"acl": [ "luci-app-glinet-privacy" ]
+		}
+	},
+	"admin/services/glinet_privacy/killswitch": {
+		"title": "Kill switch",
+		"order": 2,
+		"action": {
+			"type": "call",
+			"module": "luci.controller.glinet_privacy",
+			"function": "action_killswitch"
+		},
+		"depends": {
+			"acl": [ "luci-app-glinet-privacy" ]
+		}
+	},
+	"admin/services/glinet_privacy/imei": {
+		"title": "IMEI rotation",
+		"order": 3,
+		"action": {
+			"type": "call",
+			"module": "luci.controller.glinet_privacy",
+			"function": "action_imei"
+		},
+		"depends": {
+			"acl": [ "luci-app-glinet-privacy" ]
+		}
+	},
+	"admin/services/glinet_privacy/plugins": {
+		"title": "Tor, DNS & telemetry",
+		"order": 4,
+		"action": {
+			"type": "call",
+			"module": "luci.controller.glinet_privacy",
+			"function": "action_tor_dns"
+		},
+		"depends": {
+			"acl": [ "luci-app-glinet-privacy" ]
+		}
+	},
+	"admin/services/glinet_privacy/verify": {
+		"title": "Verify",
+		"order": 5,
+		"action": {
+			"type": "call",
+			"module": "luci.controller.glinet_privacy",
+			"function": "action_verify"
+		},
+		"depends": {
+			"acl": [ "luci-app-glinet-privacy" ]
+		}
+	},
+	"admin/services/glinet_privacy/verify_ip": {
+		"action": {
+			"type": "call",
+			"module": "luci.controller.glinet_privacy",
+			"function": "action_verify_ip"
+		},
+		"depends": {
+			"acl": [ "luci-app-glinet-privacy" ]
+		}
+	}
+}

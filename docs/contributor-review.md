@@ -1,6 +1,6 @@
 # GL.iNet Privacy — Contributor review
 
-**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, **`csrf.lua`**, `net_probe.lua`, **`vpn_probe.lua`** (ifstatus / ubus VPN), **`vendor_ubus.lua`** (opt-in documented ubus readout), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`, `vendor_ubus_card`, `csrf_field`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
+**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, **`csrf.lua`**, `net_probe.lua`, **`vpn_probe.lua`** (ifstatus / ubus VPN), **`vendor_ubus.lua`** (opt-in documented ubus readout), **`root/usr/share/luci/menu.d/luci-app-glinet-privacy.json`** (OpenWrt 22.03+ pagetree), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`, `vendor_ubus_card`, `csrf_field`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
 **Perspectives:** security hardening, OpenWrt packaging / upstream norms, maintainability / best practices, **composition with GL.iNet stock (OOTB) features**.  
 **Companion backlog:** epic-level tasks live in **`docs/backlog.md`**; this file adds reviewer lens, security notes, and the **P0–P3** feature backlog.
 
@@ -82,7 +82,7 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 | Topic | Current state | Upstream expectation |
 |-------|---------------|----------------------|
 | **Package layout** | Install via `install.sh` copying sources | Feed package: `Makefile` with `PKG_NAME`, `PKG_LICENSE`, `PKG_MAINTAINER`, **SPDX** file headers, split `luci-app-*` vs `glinet-privacy` **core** packages |
-| **LuCI controller style** | Lua `module("…", package.seeall)` | Moving toward **ucode / JavaScript** controllers in modern OpenWrt LuCI; Lua still accepted in many feeds but is legacy |
+| **LuCI controller style** | Lua `module("…", package.seeall)` + optional **`menu.d` JSON** | Installer auto when **`openwrt_release`** ≥ **22.03** **or** stock **`menu.d/*.json`** exists (GL.iNet **`DISTRIB_RELEASE`** may be **4.x**). Marker **`luci-use-menu-d`** → Lua **`index()`** skipped. Actions stay Lua **`call()`** until a full ucode/JS port. |
 | **Menu path** | `admin/services/glinet_privacy` | Acceptable; ensure no collision with core `services` naming |
 | **Route alias** | `plugins` used for Tor/DNS page | Confusing for contributors — consider renaming internal route to `tor_dns` with redirect from old URL |
 | **i18n** | Custom `luci.glinet_privacy.i18n` + POT | Prefer integration with **standard LuCI lmo** workflow and **Weblate** if targeting upstream |
@@ -153,7 +153,7 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 #### LuCI / routing hygiene
 
 - [ ] Rename route **`plugins` → `tor_dns`** (+ compatibility alias).  
-- [ ] Migrate controller toward **ucode** when minimum OpenWrt version allows.
+- [x] Migrate controller toward **ucode** when minimum OpenWrt version allows — **`menu.d`** tree on **OpenWrt 22.03+** (see `install.sh` **`install_luci_menu_json`** / **`GLINET_PRIVACY_LUCI_MENU_JSON`**); Lua **`call()`** handlers unchanged.
 
 ---
 
@@ -182,4 +182,4 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
 
-*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.17** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.18** (`package/version.mk`). Re-check **`changes.md`** on each release.*

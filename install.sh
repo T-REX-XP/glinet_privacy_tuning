@@ -26,6 +26,7 @@
 #      GLINET_PRIVACY_SKIP_OPKG_UPDATE=1 — skip opkg update (faster re-runs; install may fail if feeds stale)
 # opkg: uses "iptables-nft" as satisfying the iptables stack when present; tor-fw-helper is optional (not in all feeds).
 #      GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1 — re-apply installer telemetry UCI defaults (normally once only)
+#      GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0 — menu.d for ucode LuCI (default auto: OpenWrt 22.03+ per /etc/openwrt_release)
 #
 # Package version: package/version.mk
 #
@@ -63,7 +64,7 @@ Remote: GLINET_PRIVACY_TARBALL_URL=... or GLINET_PRIVACY_GIT_URL=...
 
 Re-runs: safe (skips opkg update when deps satisfied; telemetry seed once; dhcp confdir not duplicated).
 
-Env: GLINET_PRIVACY_SKIP_OPKG_UPDATE=1  GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1
+Env: GLINET_PRIVACY_SKIP_OPKG_UPDATE=1  GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1  GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0
 EOF
 }
 
@@ -440,6 +441,63 @@ install_file() {
 	chmod "$_mode" "$_dst"
 }
 
+# OpenWrt DISTRIB_RELEASE major.minor >= need_maj.need_min (e.g. 22.03.5-rc3 → 22.03)
+openwrt_release_ge() {
+	_need_maj="$1"
+	_need_min="$2"
+	[ -f /etc/openwrt_release ] || return 1
+	# shellcheck disable=SC1091
+	. /etc/openwrt_release
+	_rel="${DISTRIB_RELEASE%%-*}"
+	_maj="${_rel%%.*}"
+	_rest="${_rel#*.}"
+	_min="${_rest%%.*}"
+	case "$_maj" in '' | *[!0-9]*) return 1 ;; esac
+	case "$_min" in '' | *[!0-9]*) _min=0 ;; esac
+	if [ "$_maj" -gt "$_need_maj" ] 2>/dev/null; then
+		return 0
+	fi
+	if [ "$_maj" -eq "$_need_maj" ] 2>/dev/null && [ "$_min" -ge "$_need_min" ] 2>/dev/null; then
+		return 0
+	fi
+	return 1
+}
+
+# LuCI ucode dispatcher: /usr/share/luci/menu.d/*.json merged into pagetree (see OpenWrt luci-base dispatcher.uc).
+install_luci_menu_json() {
+	_LUCI="$REPO_ROOT/package/luci-app-glinet-privacy"
+	_json="$_LUCI/root/usr/share/luci/menu.d/luci-app-glinet-privacy.json"
+	[ -f "$_json" ] || return 0
+
+	_use=0
+	if [ "${GLINET_PRIVACY_LUCI_MENU_JSON:-auto}" = "1" ]; then
+		_use=1
+	elif [ "${GLINET_PRIVACY_LUCI_MENU_JSON:-auto}" = "0" ]; then
+		log "LuCI menu.d: skipped (GLINET_PRIVACY_LUCI_MENU_JSON=0)"
+		rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json 2>/dev/null || true
+		rm -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null || true
+		return 0
+	elif openwrt_release_ge 22 3; then
+		_use=1
+	elif ls /usr/share/luci/menu.d/*.json >/dev/null 2>&1; then
+		# GL.iNet etc.: DISTRIB_RELEASE may be vendor "4.x" while ucode LuCI merges menu.d from stock JSON.
+		_use=1
+	fi
+
+	if [ "$_use" -eq 0 ]; then
+		rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json 2>/dev/null || true
+		rm -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null || true
+		log "LuCI menu.d: skipped (no OpenWrt 22.03+ in /etc/openwrt_release and no stock menu.d JSON; use GLINET_PRIVACY_LUCI_MENU_JSON=1 to force)"
+		return 0
+	fi
+
+	mkdir -p /usr/share/luci/menu.d
+	install_file "$_json" /usr/share/luci/menu.d/luci-app-glinet-privacy.json 0644
+	mkdir -p /usr/share/glinet-privacy
+	: > /usr/share/glinet-privacy/luci-use-menu-d
+	log "LuCI menu.d installed (OpenWrt 22.03+ / forced); Lua controller index() skipped. Clear /tmp/luci-indexcache* if menu is stale."
+}
+
 install_luci() {
 	_LUCI="$REPO_ROOT/package/luci-app-glinet-privacy"
 	[ -d "$_LUCI/luasrc" ] || { log "LuCI sources missing; skip"; return 0; }
@@ -486,6 +544,7 @@ install_luci() {
 		install_file "$_LUCI/root/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json" \
 			/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json 0644
 	fi
+	install_luci_menu_json
 }
 
 restart_services() {

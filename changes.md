@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.18 (2026-04-09)
+
+### Changed
+
+- **LuCI — ucode / `menu.d` migration** — New **`root/usr/share/luci/menu.d/luci-app-glinet-privacy.json`** (same routes as legacy **`index()`**, **`call()`** targets unchanged). **`install.sh`** runs **`install_luci_menu_json`**: auto when **`/etc/openwrt_release`** ≥ **22.03** **or** stock **`/usr/share/luci/menu.d/*.json`** exists (vendor **`DISTRIB_RELEASE`** may be `4.x`); **`GLINET_PRIVACY_LUCI_MENU_JSON=1|0|auto`**. Marker **`/usr/share/glinet-privacy/luci-use-menu-d`** skips Lua **`index()`**. **`remove.sh`** drops **`menu.d`** file + marker. See **`openwrt/INSTALL.txt`**.
+
+---
+
 ## 1.2.17 (2026-04-09)
 
 ### Security / Changed

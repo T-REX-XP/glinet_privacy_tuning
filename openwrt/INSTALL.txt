@@ -30,7 +30,11 @@ What install.sh does by default (not --minimal)
 - Telemetry: uci glinet_privacy.tel.block_domains=1 and disable_vendor_cloud=1; apply-telemetry.sh
   (dnsmasq.d black-holes for goodcloud.xyz / gldns.com, glconfig.cloud.enable=0, gl_cloud stop/disable);
   optional remove_cloud_packages removes gl-cloud via opkg; dhcp dnsmasq confdir /etc/dnsmasq.d when possible
-- LuCI: copies luci-app-glinet-privacy into /usr/lib/lua/luci/... (Services → GL.iNet Privacy), unless --without-luci
+- LuCI: copies luci-app-glinet-privacy into /usr/lib/lua/luci/... (Services → GL.iNet Privacy), unless --without-luci.
+  When /etc/openwrt_release parses as OpenWrt 22.03+ or stock LuCI already ships JSON under /usr/share/luci/menu.d/,
+  also installs /usr/share/luci/menu.d/luci-app-glinet-privacy.json
+  and marker /usr/share/glinet-privacy/luci-use-menu-d so the ucode pagetree registers the menu (Lua index() skipped).
+  Override: GLINET_PRIVACY_LUCI_MENU_JSON=1|0|auto. After install, delete /tmp/luci-indexcache* if the menu is stale.
 - Restarts network, firewall, dnsmasq, rpcd, uhttpd
 
 Optional flags

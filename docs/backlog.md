@@ -59,3 +59,4 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 - [x] **LuCI CSRF (v1.2.17)** — Custom POST forms include session **`token`**; **`csrf.verify_post()`** in controller (see **`docs/contributor-review.md`** §4).
 - [x] **LuCI Overview VPN ifstatus (v1.2.14)** — **`vpn_probe.lua`**: **`ifstatus`** / **`ubus`** for **`wg_if`** and **`network`** OpenVPN/WireGuard sections; enriches **WireGuard** Overview row (see **`changes.md`**).
 - [x] **LuCI optional vendor ubus (v1.2.16)** — **`vendor_ubus.lua`** + **`docs/vendor-ubus.md`**: read-only **`ubus`** whitelist, UCI opt-in / **`min_release_substr`**; UI on Overview / Kill switch / Tor-DNS.
+- [x] **LuCI `menu.d` / ucode pagetree (v1.2.18)** — **`luci-app-glinet-privacy.json`** when **OpenWrt ≥ 22.03** (or **`GLINET_PRIVACY_LUCI_MENU_JSON=1`**); Lua **`index()`** skipped via **`luci-use-menu-d`** marker; **`call()`** handlers still Lua (see **`changes.md`**).

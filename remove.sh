@@ -253,6 +253,8 @@ rmdir_empty() {
 
 remove_luci() {
 	log "Removing LuCI app files"
+	rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json
+	rm -f /usr/share/glinet-privacy/luci-use-menu-d
 	rm -f /usr/lib/lua/luci/controller/glinet_privacy.lua
 	rm -rf /usr/lib/lua/luci/model/cbi/glinet_privacy
 	rm -rf /usr/lib/lua/luci/view/glinet_privacy
