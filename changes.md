@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.11 (2026-04-08)
+
+### Changed
+
+- **LuCI Verify** — Redesigned **`verify.htm`** to match Overview / Tor-DNS styling: intro strip with **status badge**, **Quick IP check** card (**Check my IP** runs browser-side **ipify** + optional **ipwho.is** geo; shows VPN/Tor routing hint), **External verification tools** as **responsive cards** with category badges (**New tab**, WebRTC / DNS / Path / Tor). Mobile-friendly stacking.
+
+---
+
 ## 1.2.10 (2026-04-08)
 
 ### Changed

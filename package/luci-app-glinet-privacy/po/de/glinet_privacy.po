@@ -479,33 +479,84 @@ msgstr ""
 msgid "Drops forwarded TCP/853 from LAN (can break DoT to public resolvers)."
 msgstr ""
 
-msgid "Verify connection"
+msgid "Ready"
 msgstr ""
 
-msgid "Open these in a new tab from a client that uses this router. Results reflect that client’s path (VPN/Tor/DNS), not the router admin session alone."
+msgid "Checking…"
+msgstr ""
+
+msgid "Result loaded"
+msgstr ""
+
+msgid "Lookup failed (offline or blocked)"
+msgstr ""
+
+msgid "If this IP is not your VPN/Tor exit, the client may not be routed through the router."
+msgstr ""
+
+msgid "Verify from this browser"
+msgstr ""
+
+msgid "Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path. This page runs checks in the browser you are using now, not on the router itself."
+msgstr ""
+
+msgid "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."
+msgstr ""
+
+msgid "Quick IP check"
+msgstr ""
+
+msgid "Public IP &amp; location hint"
+msgstr ""
+
+msgid "Click the button to fetch your current public IP as seen from this browser. You can compare it with your expected VPN or Tor exit."
+msgstr ""
+
+msgid "Check my IP"
+msgstr ""
+
+msgid "External verification tools"
+msgstr ""
+
+msgid "Open in a new tab for more thorough leak and routing checks."
+msgstr ""
+
+msgid "New tab"
+msgstr ""
+
+msgid "WebRTC"
 msgstr ""
 
 msgid "IP leak / WebRTC checks"
 msgstr ""
 
-msgid "Public IP and basic leak hints."
+msgid "Public IP, DNS hints, and WebRTC leak tests."
+msgstr ""
+
+msgid "DNS"
 msgstr ""
 
 msgid "DNS leak test"
 msgstr ""
 
-msgid "Use extended test when possible."
+msgid "Extended test recommended when you have time."
+msgstr ""
+
+msgid "Path"
 msgstr ""
 
 msgid "Cloudflare trace"
 msgstr ""
 
-msgid "IP and path as seen by Cloudflare."
+msgid "IP and network path as seen by Cloudflare’s edge."
+msgstr ""
+
+msgid "Tor"
 msgstr ""
 
 msgid "Tor check"
 msgstr ""
 
-msgid "Whether this browser appears to use Tor."
+msgid "Whether this browser’s traffic appears to use Tor."
 msgstr ""
 

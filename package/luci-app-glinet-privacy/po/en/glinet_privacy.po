@@ -479,33 +479,84 @@ msgstr "Block LAN DNS-over-TLS (port 853)"
 msgid "Drops forwarded TCP/853 from LAN (can break DoT to public resolvers)."
 msgstr "Drops forwarded TCP/853 from LAN (can break DoT to public resolvers)."
 
-msgid "Verify connection"
-msgstr "Verify connection"
+msgid "Ready"
+msgstr "Ready"
 
-msgid "Open these in a new tab from a client that uses this router. Results reflect that client’s path (VPN/Tor/DNS), not the router admin session alone."
-msgstr "Open these in a new tab from a client that uses this router. Results reflect that client’s path (VPN/Tor/DNS), not the router admin session alone."
+msgid "Checking…"
+msgstr "Checking…"
+
+msgid "Result loaded"
+msgstr "Result loaded"
+
+msgid "Lookup failed (offline or blocked)"
+msgstr "Lookup failed (offline or blocked)"
+
+msgid "If this IP is not your VPN/Tor exit, the client may not be routed through the router."
+msgstr "If this IP is not your VPN/Tor exit, the client may not be routed through the router."
+
+msgid "Verify from this browser"
+msgstr "Verify from this browser"
+
+msgid "Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path. This page runs checks in the browser you are using now, not on the router itself."
+msgstr "Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path. This page runs checks in the browser you are using now, not on the router itself."
+
+msgid "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."
+msgstr "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."
+
+msgid "Quick IP check"
+msgstr "Quick IP check"
+
+msgid "Public IP &amp; location hint"
+msgstr "Public IP &amp; location hint"
+
+msgid "Click the button to fetch your current public IP as seen from this browser. You can compare it with your expected VPN or Tor exit."
+msgstr "Click the button to fetch your current public IP as seen from this browser. You can compare it with your expected VPN or Tor exit."
+
+msgid "Check my IP"
+msgstr "Check my IP"
+
+msgid "External verification tools"
+msgstr "External verification tools"
+
+msgid "Open in a new tab for more thorough leak and routing checks."
+msgstr "Open in a new tab for more thorough leak and routing checks."
+
+msgid "New tab"
+msgstr "New tab"
+
+msgid "WebRTC"
+msgstr "WebRTC"
 
 msgid "IP leak / WebRTC checks"
 msgstr "IP leak / WebRTC checks"
 
-msgid "Public IP and basic leak hints."
-msgstr "Public IP and basic leak hints."
+msgid "Public IP, DNS hints, and WebRTC leak tests."
+msgstr "Public IP, DNS hints, and WebRTC leak tests."
+
+msgid "DNS"
+msgstr "DNS"
 
 msgid "DNS leak test"
 msgstr "DNS leak test"
 
-msgid "Use extended test when possible."
-msgstr "Use extended test when possible."
+msgid "Extended test recommended when you have time."
+msgstr "Extended test recommended when you have time."
+
+msgid "Path"
+msgstr "Path"
 
 msgid "Cloudflare trace"
 msgstr "Cloudflare trace"
 
-msgid "IP and path as seen by Cloudflare."
-msgstr "IP and path as seen by Cloudflare."
+msgid "IP and network path as seen by Cloudflare’s edge."
+msgstr "IP and network path as seen by Cloudflare’s edge."
+
+msgid "Tor"
+msgstr "Tor"
 
 msgid "Tor check"
 msgstr "Tor check"
 
-msgid "Whether this browser appears to use Tor."
-msgstr "Whether this browser appears to use Tor."
+msgid "Whether this browser’s traffic appears to use Tor."
+msgstr "Whether this browser’s traffic appears to use Tor."
 
