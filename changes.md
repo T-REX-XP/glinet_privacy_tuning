@@ -15,6 +15,14 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.9 (2026-04-08)
+
+### Added
+
+- **README.md** — project overview, install and SDK pointers, link to [github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning).
+
+---
+
 ## 1.1.8 (2026-04-08)
 
 ### Added
