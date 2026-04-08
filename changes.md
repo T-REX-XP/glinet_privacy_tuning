@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.8 (2026-04-08)
+
+### Changed
+
+- **LuCI Kill switch** — Replaced CBI map with **template + `action_killswitch`**: status bar (**Watchdog disabled** / **Watchdog active** / **Blocking traffic**) with colored badge + hint, **card sections** (watchdog, LAN/WAN, vendor glvpn), **inline iOS-style switches** for enable / require WG / require Tor, full-width text inputs on small screens, vendor **dropdown** unchanged semantically. **`install.sh`** ships **`killswitch.htm`** only (removed **`killswitch.lua`** from install list). Post-save runs vendor apply script, watchdog, and **firewall reload**.
+
+---
+
 ## 1.2.7 (2026-04-08)
 
 ### Changed

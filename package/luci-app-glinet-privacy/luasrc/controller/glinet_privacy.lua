@@ -19,7 +19,7 @@ function index()
 	entry({"admin", "services", "glinet_privacy", "overview"},
 		call("action_overview"), translate("Overview"), 1)
 	entry({"admin", "services", "glinet_privacy", "killswitch"},
-		cbi("glinet_privacy/killswitch"), translate("Kill switch"), 2)
+		call("action_killswitch"), translate("Kill switch"), 2)
 	entry({"admin", "services", "glinet_privacy", "imei"},
 		cbi("glinet_privacy/imei"), translate("IMEI rotation"), 3)
 	entry({"admin", "services", "glinet_privacy", "plugins"},
@@ -233,6 +233,88 @@ function action_overview()
 	luci.template.render("glinet_privacy/overview", {
 		status = st,
 		form = form
+	})
+end
+
+function action_killswitch()
+	local http = require "luci.http"
+	local uci = require "luci.model.uci".cursor()
+	local disp = require "luci.dispatcher"
+	local sys = require "luci.sys"
+
+	local function yn(name)
+		local v = http.formvalue(name)
+		if type(v) == "table" then
+			v = v[#v]
+		end
+		return v == "1" and "1" or "0"
+	end
+
+	local function str1(name)
+		local v = http.formvalue(name)
+		if type(v) == "table" then
+			v = v[#v]
+		end
+		if type(v) ~= "string" then
+			return ""
+		end
+		return v:gsub("^%s+", ""):gsub("%s+$", "")
+	end
+
+	if http.formvalue("submit") == "1" then
+		uci:set("privacy", "main", "enabled", yn("enabled"))
+		local wg = str1("wg_if")
+		if wg == "" then
+			wg = "wg0"
+		end
+		uci:set("privacy", "main", "wg_if", wg)
+		uci:set("privacy", "main", "require_wg", yn("require_wg"))
+		uci:set("privacy", "main", "require_tor", yn("require_tor"))
+		uci:set("privacy", "main", "lan_dev", str1("lan_dev"))
+		uci:set("privacy", "main", "wan_dev", str1("wan_dev"))
+		local vk = str1("vendor_gl_vpn_killswitch")
+		if vk ~= "on" and vk ~= "off" and vk ~= "leave" then
+			vk = "leave"
+		end
+		uci:set("privacy", "main", "vendor_gl_vpn_killswitch", vk)
+		uci:commit("privacy")
+		sys.call("/usr/libexec/glinet-privacy/apply-vendor-vpn-killswitch.sh >/dev/null 2>&1")
+		sys.call("/usr/bin/privacy-killswitch-watchdog.sh >/dev/null 2>&1")
+		sys.call("/etc/init.d/firewall reload >/dev/null 2>&1")
+		luci.http.redirect(disp.build_url("admin/services/glinet_privacy/killswitch"))
+		return
+	end
+
+	local en = uci:get("privacy", "main", "enabled") or "1"
+	local badge_label = translate("Watchdog disabled")
+	local badge_class = "default"
+	local badge_hint = translate("Killswitch rules are flushed when watchdog is off.")
+	if en == "1" then
+		if sh_ok("iptables -L FORWARD -n 2>/dev/null | grep -q privacy-killswitch-drop") then
+			badge_label = translate("Blocking traffic")
+			badge_class = "warning"
+			badge_hint =
+				translate("FORWARD DROP is active — VPN or Tor health checks failed from the router’s view.")
+		else
+			badge_label = translate("Watchdog active")
+			badge_class = "success"
+			badge_hint = translate("No emergency DROP — path looks healthy.")
+		end
+	end
+
+	luci.template.render("glinet_privacy/killswitch", {
+		badge_label = badge_label,
+		badge_class = badge_class,
+		badge_hint = badge_hint,
+		form = {
+			enabled = en,
+			wg_if = uci:get("privacy", "main", "wg_if") or "wg0",
+			require_wg = uci:get("privacy", "main", "require_wg") or "1",
+			require_tor = uci:get("privacy", "main", "require_tor") or "1",
+			lan_dev = uci:get("privacy", "main", "lan_dev") or "",
+			wan_dev = uci:get("privacy", "main", "wan_dev") or "",
+			vendor_gl_vpn_killswitch = uci:get("privacy", "main", "vendor_gl_vpn_killswitch") or "leave",
+		},
 	})
 end
 

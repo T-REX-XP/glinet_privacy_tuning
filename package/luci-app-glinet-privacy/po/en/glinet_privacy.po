@@ -125,6 +125,24 @@ msgstr "Installed"
 msgid "Enabled on boot"
 msgstr "Enabled on boot"
 
+msgid "Watchdog disabled"
+msgstr "Watchdog disabled"
+
+msgid "Killswitch rules are flushed when watchdog is off."
+msgstr "Killswitch rules are flushed when watchdog is off."
+
+msgid "Blocking traffic"
+msgstr "Blocking traffic"
+
+msgid "FORWARD DROP is active — VPN or Tor health checks failed from the router’s view."
+msgstr "FORWARD DROP is active — VPN or Tor health checks failed from the router’s view."
+
+msgid "Watchdog active"
+msgstr "Watchdog active"
+
+msgid "No emergency DROP — path looks healthy."
+msgstr "No emergency DROP — path looks healthy."
+
 msgid "WireGuard (%s)"
 msgstr "WireGuard (%s)"
 
@@ -202,60 +220,6 @@ msgstr "Serial ports found: %s"
 
 msgid "Network interfaces (uci): %s"
 msgstr "Network interfaces (uci): %s"
-
-msgid "Privacy kill switch"
-msgstr "Privacy kill switch"
-
-msgid "Configure the glinet-privacy watchdog (iptables). <strong>VPN:</strong> set up WireGuard or OpenVPN in the GL.iNet admin first, then set <strong>WireGuard interface</strong> to the name of the tunnel when it is up (<em>Network → Interfaces</em> or <code>ip link</code>; often <code>wgclient</code> or <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. <strong>Overview</strong> shows interface status. Stock firmware may offer a separate VPN kill switch — see below."
-msgstr "Configure the glinet-privacy watchdog (iptables). <strong>VPN:</strong> set up WireGuard or OpenVPN in the GL.iNet admin first, then set <strong>WireGuard interface</strong> to the name of the tunnel when it is up (<em>Network → Interfaces</em> or <code>ip link</code>; often <code>wgclient</code> or <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. <strong>Overview</strong> shows interface status. Stock firmware may offer a separate VPN kill switch — see below."
-
-msgid "Privacy watchdog (glinet-privacy)"
-msgstr "Privacy watchdog (glinet-privacy)"
-
-msgid "Enable watchdog"
-msgstr "Enable watchdog"
-
-msgid "If disabled, killswitch rules are flushed."
-msgstr "If disabled, killswitch rules are flushed."
-
-msgid "WireGuard interface"
-msgstr "WireGuard interface"
-
-msgid "Must match the interface name when your stock VPN client has brought WireGuard up (e.g. wgclient, wg0). Preconfigure the VPN in the GL.iNet UI first."
-msgstr "Must match the interface name when your stock VPN client has brought WireGuard up (e.g. wgclient, wg0). Preconfigure the VPN in the GL.iNet UI first."
-
-msgid "Require WG interface UP"
-msgstr "Require WG interface UP"
-
-msgid "Require Tor running"
-msgstr "Require Tor running"
-
-msgid "LAN bridge / device"
-msgstr "LAN bridge / device"
-
-msgid "e.g. br-lan; leave empty to use network.lan.device"
-msgstr "e.g. br-lan; leave empty to use network.lan.device"
-
-msgid "Physical WAN device"
-msgstr "Physical WAN device"
-
-msgid "e.g. wwan0 or eth0; required for correct FORWARD match"
-msgstr "e.g. wwan0 or eth0; required for correct FORWARD match"
-
-msgid "GL.iNet vendor VPN kill switch (glvpn)"
-msgstr "GL.iNet vendor VPN kill switch (glvpn)"
-
-msgid "Stock firmware <em>Block Non-VPN Traffic</em> is often <code>glvpn.general.block_non_vpn</code>. Default <strong>Leave</strong> does not touch vendor UCI. Use On/Off only if that file exists. Prefer one strategy: this watchdog <em>or</em> vendor rules — both may overlap. v4.8+ may use VPN Dashboard instead; see docs/devices.md."
-msgstr "Stock firmware <em>Block Non-VPN Traffic</em> is often <code>glvpn.general.block_non_vpn</code>. Default <strong>Leave</strong> does not touch vendor UCI. Use On/Off only if that file exists. Prefer one strategy: this watchdog <em>or</em> vendor rules — both may overlap. v4.8+ may use VPN Dashboard instead; see docs/devices.md."
-
-msgid "Leave (do not change glvpn)"
-msgstr "Leave (do not change glvpn)"
-
-msgid "On (block_non_vpn=1)"
-msgstr "On (block_non_vpn=1)"
-
-msgid "Off (block_non_vpn=0)"
-msgstr "Off (block_non_vpn=0)"
 
 msgid "Tor transparent NAT uses the firewall plugin. Optional dnsmasq policy sends LAN DNS to Tor. Telemetry uses dnsmasq blocklists and optional vendor toggles. Device profile: apply-device-profile.sh."
 msgstr "Tor transparent NAT uses the firewall plugin. Optional dnsmasq policy sends LAN DNS to Tor. Telemetry uses dnsmasq blocklists and optional vendor toggles. Device profile: apply-device-profile.sh."
@@ -359,6 +323,75 @@ msgstr "Block LAN DNS-over-TLS (port 853)"
 msgid "Drop forwarded TCP/853 from LAN to non-router destinations. Can break DoT to public resolvers; use only if you accept that tradeoff."
 msgstr "Drop forwarded TCP/853 from LAN to non-router destinations. Can break DoT to public resolvers; use only if you accept that tradeoff."
 
+msgid "Privacy kill switch"
+msgstr "Privacy kill switch"
+
+msgid "The glinet-privacy watchdog schedules iptables FORWARD rules. Configure WireGuard or OpenVPN in the GL.iNet admin first, then set the tunnel interface name below (often <code>wgclient</code> or <code>wg0</code>). The <strong>Overview</strong> tab shows live interface status. Stock firmware may expose a separate VPN kill switch — see the vendor section at the bottom."
+msgstr "The glinet-privacy watchdog schedules iptables FORWARD rules. Configure WireGuard or OpenVPN in the GL.iNet admin first, then set the tunnel interface name below (often <code>wgclient</code> or <code>wg0</code>). The <strong>Overview</strong> tab shows live interface status. Stock firmware may expose a separate VPN kill switch — see the vendor section at the bottom."
+
+msgid "Privacy watchdog (glinet-privacy)"
+msgstr "Privacy watchdog (glinet-privacy)"
+
+msgid "Enable watchdog"
+msgstr "Enable watchdog"
+
+msgid "If disabled, killswitch rules are flushed."
+msgstr "If disabled, killswitch rules are flushed."
+
+msgid "WireGuard interface"
+msgstr "WireGuard interface"
+
+msgid "Must match the interface name when the stock VPN client has brought WireGuard up. Check <em>Network → Interfaces</em> or run <code>ip link</code>."
+msgstr "Must match the interface name when the stock VPN client has brought WireGuard up. Check <em>Network → Interfaces</em> or run <code>ip link</code>."
+
+msgid "Require WG interface UP"
+msgstr "Require WG interface UP"
+
+msgid "Turn off if you use only OpenVPN or no VPN."
+msgstr "Turn off if you use only OpenVPN or no VPN."
+
+msgid "Require Tor running"
+msgstr "Require Tor running"
+
+msgid "Kill switch also watches the Tor process when enabled."
+msgstr "Kill switch also watches the Tor process when enabled."
+
+msgid "LAN / WAN path"
+msgstr "LAN / WAN path"
+
+msgid "LAN bridge / device"
+msgstr "LAN bridge / device"
+
+msgid "e.g. br-lan; leave empty to use <code>network.lan.device</code>."
+msgstr "e.g. br-lan; leave empty to use <code>network.lan.device</code>."
+
+msgid "Physical WAN device"
+msgstr "Physical WAN device"
+
+msgid "e.g. wwan0 or eth0 — needed for a correct FORWARD match."
+msgstr "e.g. wwan0 or eth0 — needed for a correct FORWARD match."
+
+msgid "GL.iNet vendor VPN kill switch (glvpn)"
+msgstr "GL.iNet vendor VPN kill switch (glvpn)"
+
+msgid "Vendor block non-VPN traffic"
+msgstr "Vendor block non-VPN traffic"
+
+msgid "Stock <em>Block Non-VPN Traffic</em> maps to <code>glvpn.general.block_non_vpn</code> when <code>/etc/config/glvpn</code> exists. <strong>Leave</strong> does not change vendor UCI. Prefer one strategy: this watchdog <em>or</em> vendor rules. v4.8+ may use the VPN Dashboard instead."
+msgstr "Stock <em>Block Non-VPN Traffic</em> maps to <code>glvpn.general.block_non_vpn</code> when <code>/etc/config/glvpn</code> exists. <strong>Leave</strong> does not change vendor UCI. Prefer one strategy: this watchdog <em>or</em> vendor rules. v4.8+ may use the VPN Dashboard instead."
+
+msgid "Leave (do not change glvpn)"
+msgstr "Leave (do not change glvpn)"
+
+msgid "On (block_non_vpn=1)"
+msgstr "On (block_non_vpn=1)"
+
+msgid "Off (block_non_vpn=0)"
+msgstr "Off (block_non_vpn=0)"
+
+msgid "Save & apply"
+msgstr "Save & apply"
+
 msgid "GL.iNet Privacy — overview"
 msgstr "GL.iNet Privacy — overview"
 
@@ -385,9 +418,6 @@ msgstr "N/A"
 
 msgid "Toggle"
 msgstr "Toggle"
-
-msgid "Save & apply"
-msgstr "Save & apply"
 
 msgid "Verify connection"
 msgstr "Verify connection"
