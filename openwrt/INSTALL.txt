@@ -20,8 +20,9 @@ What install.sh does by default (not --minimal)
   dnsmasq-full, ca-bundle (best-effort if offline)
 - Tor: ensures %include /etc/tor/torrc.d/99-transparent.conf in /etc/tor/torrc; enables and starts tor
 - Kill switch: enables /etc/init.d/privacy-killswitch; adds cron */1 for privacy-killswitch-watchdog.sh
-- Telemetry: uci glinet_privacy.tel.block_domains=1, apply-telemetry.sh, disable-glinet-telemetry.sh,
-  dhcp dnsmasq confdir /etc/dnsmasq.d when possible
+- Telemetry: uci glinet_privacy.tel.block_domains=1 and disable_vendor_cloud=1; apply-telemetry.sh
+  (dnsmasq.d black-holes for goodcloud.xyz / gldns.com, glconfig.cloud.enable=0, gl_cloud stop/disable);
+  optional remove_cloud_packages removes gl-cloud via opkg; dhcp dnsmasq confdir /etc/dnsmasq.d when possible
 - Restarts network, firewall, dnsmasq, rpcd, uhttpd
 
 Optional flags

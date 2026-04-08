@@ -246,12 +246,10 @@ setup_telemetry() {
 	[ "$MINIMAL" -eq 0 ] || return 0
 	[ -f /etc/config/glinet_privacy ] || return 0
 	uci set glinet_privacy.tel.block_domains='1' 2>/dev/null || true
+	uci set glinet_privacy.tel.disable_vendor_cloud='1' 2>/dev/null || true
 	uci commit glinet_privacy 2>/dev/null || true
 	if [ -x /usr/libexec/glinet-privacy/apply-telemetry.sh ]; then
 		/usr/libexec/glinet-privacy/apply-telemetry.sh || true
-	fi
-	if [ -x /usr/bin/disable-glinet-telemetry.sh ]; then
-		/usr/bin/disable-glinet-telemetry.sh || true
 	fi
 	# dnsmasq reads /etc/dnsmasq.d when confdir lists it
 	if uci -q get dhcp.@dnsmasq[0] >/dev/null 2>&1; then
@@ -311,8 +309,11 @@ install_luci() {
 			"/usr/lib/lua/luci/model/cbi/glinet_privacy/$_f" 0644
 	done
 	mkdir -p /usr/lib/lua/luci/view/glinet_privacy
-	install_file "$_LUCI/luasrc/view/glinet_privacy/wireguard.htm" \
-		/usr/lib/lua/luci/view/glinet_privacy/wireguard.htm 0644
+	for _v in overview.htm wireguard.htm; do
+		[ -f "$_LUCI/luasrc/view/glinet_privacy/$_v" ] || continue
+		install_file "$_LUCI/luasrc/view/glinet_privacy/$_v" \
+			"/usr/lib/lua/luci/view/glinet_privacy/$_v" 0644
+	done
 	if [ -f "$_LUCI/root/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json" ]; then
 		mkdir -p /usr/share/rpcd/acl.d
 		install_file "$_LUCI/root/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json" \

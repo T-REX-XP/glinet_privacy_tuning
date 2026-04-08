@@ -17,3 +17,5 @@ config firewall 'tor'
 config telemetry 'tel'
 	option block_domains '0'
 	option disable_vendor_cloud '0'
+	# Best-effort opkg remove (gl-cloud, …) when disable_vendor_cloud runs; can break stock GL.iNet UI
+	option remove_cloud_packages '0'

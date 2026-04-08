@@ -26,8 +26,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Match docs/devices.md: Puli (ramips/mt7621), Slate AX + Flint (qualcommax/ipq60xx).
+        # Not x86_64 — that is the generic SDK host, not router feed arch.
         arch:
-          - x86_64
+          - mipsel_24kc
+          - aarch64_cortex-a53
 
     steps:
       - name: Checkout

@@ -33,8 +33,11 @@ t.addremove = false
 t:option(Flag, "block_domains", translate("Enable dnsmasq blocklist"),
 	translate("Symlinks /etc/glinet-privacy/glinet-block.conf into /etc/dnsmasq.d/.")).rmempty = false
 
-t:option(Flag, "disable_vendor_cloud", translate("Run vendor disable script"),
-	translate("Runs /usr/bin/disable-glinet-telemetry.sh on save.")).rmempty = false
+t:option(Flag, "disable_vendor_cloud", translate("Disable GL.iNet cloud (UCI + services)"),
+	translate("Sets glconfig.cloud.enable=0 where present, stops gl_cloud / goodcloud init scripts, and installs DNS black-holes via /etc/dnsmasq.d/glinet-block.conf (same as reference: goodcloud.xyz, gldns.com).")).rmempty = false
+
+t:option(Flag, "remove_cloud_packages", translate("Remove cloud packages (opkg)"),
+	translate("When saving telemetry settings, best-effort uninstall of gl-cloud and related packages (optional; may affect stock GL.iNet features).")).rmempty = false
 
 function m.on_commit(self)
 	sys.call("/etc/init.d/firewall reload >/dev/null 2>&1")

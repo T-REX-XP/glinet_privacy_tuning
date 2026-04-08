@@ -19,5 +19,5 @@
 
 ## Epic 4: De-bloating and Anti-Telemetry
 - [ ] Task 4.1: Disable GoodCloud service via `uci`.
-- [ ] Task 4.2: Disable remote support and tracking packages (e.g., `gl-cloud`, `gl-modem-tracking` if any).
-- [ ] Task 4.3: Add GL.iNet telemetry domains to `/etc/hosts` or `dnsmasq` pointing to `0.0.0.0`.
+- [x] Task 4.2: Disable remote support and tracking packages — `disable-glinet-telemetry.sh` + optional `remove_cloud_packages` (opkg).
+- [x] Task 4.3: GL.iNet telemetry domains — `/etc/glinet-privacy/glinet-block.conf` → `dnsmasq.d` (goodcloud.xyz, gldns.com, …).

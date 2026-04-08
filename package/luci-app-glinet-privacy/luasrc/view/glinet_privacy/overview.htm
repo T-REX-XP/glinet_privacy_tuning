@@ -1,0 +1,171 @@
+<%#
+ Copyright 2026, GL.iNet Privacy LuCI — onboarding overview
+-%>
+
+<%+header%>
+<% local st = status or self.status %>
+<% local form = form or self.form %>
+
+<style type="text/css">
+.gp-wrap { max-width: 56em; }
+.gp-progress {
+	background: #e8e8e8;
+	border-radius: 4px;
+	height: 1.25rem;
+	overflow: hidden;
+	margin: 0.5rem 0 1rem;
+}
+.gp-progress > div {
+	height: 100%;
+	background: linear-gradient(90deg, #2ea043, #56d364);
+	transition: width 0.35s ease;
+	min-width: 0;
+}
+.gp-progress.gp-partial > div {
+	background: linear-gradient(90deg, #d4a017, #f0b429);
+}
+.gp-progress.gp-bad > div {
+	background: linear-gradient(90deg, #cf222e, #ff7b72);
+}
+.gp-meta { color: #666; font-size: 0.9rem; margin-bottom: 1rem; }
+.gp-list { list-style: none; margin: 0; padding: 0; }
+.gp-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	padding: 0.65rem 0.75rem;
+	margin-bottom: 0.35rem;
+	border-radius: 4px;
+	border-left: 4px solid #ccc;
+	background: #fafafa;
+}
+.gp-item.gp-ok { border-left-color: #2ea043; }
+.gp-item.gp-bad { border-left-color: #cf222e; background: #fff5f5; }
+.gp-item.gp-warn { border-left-color: #d4a017; background: #fffbeb; }
+.gp-item.gp-skip { border-left-color: #8c959f; opacity: 0.92; }
+.gp-icon {
+	flex: 0 0 1.5rem;
+	font-weight: bold;
+	font-size: 1.1rem;
+	line-height: 1.4;
+}
+.gp-ok .gp-icon { color: #2ea043; }
+.gp-bad .gp-icon { color: #cf222e; }
+.gp-warn .gp-icon { color: #d4a017; }
+.gp-skip .gp-icon { color: #8c959f; }
+.gp-body { flex: 1; min-width: 0; }
+.gp-label { font-weight: 600; }
+.gp-detail { font-size: 0.88rem; color: #555; margin-top: 0.15rem; }
+.gp-form .cbi-section { margin-top: 1.5rem; }
+.gp-form .cbi-value { margin: 0.4rem 0; }
+</style>
+
+<div class="cbi-map gp-wrap">
+	<h2><%:GL.iNet Privacy — overview%></h2>
+	<p class="cbi-map-descr"><%:Status checklist and quick toggles. Detailed pages are linked from the menu.%></p>
+
+	<div class="cbi-section">
+		<h3><%:Setup progress%></h3>
+		<div class="gp-meta">
+			<%:Healthy checks:%> <%= st.ok_c %> / <%= st.denom %>
+			<% if st.skip_c and st.skip_c > 0 then %>
+				· <%:Skipped:%> <%= st.skip_c %>
+			<% end %>
+		</div>
+		<% local pw = st.pct > 100 and 100 or st.pct %>
+		<div class="gp-progress<% if st.pct < 50 then %> gp-bad<% elseif st.pct < 100 then %> gp-partial<% end %>">
+			<div style="width: <%= pw %>%;"></div>
+		</div>
+
+		<ul class="gp-list">
+		<% for _, it in ipairs(st.items) do %>
+			<li class="gp-item gp-<%= it.state %>">
+				<span class="gp-icon"><%
+					if it.state == "ok" then %>✓<%
+					elseif it.state == "bad" then %>✗<%
+					elseif it.state == "warn" then %>!<%
+					else %>–<% end %></span>
+				<div class="gp-body">
+					<div class="gp-label"><%= it.label %></div>
+					<% if it.detail and it.detail ~= "" then %>
+					<div class="gp-detail"><%= it.detail %></div>
+					<% end %>
+				</div>
+			</li>
+		<% end %>
+		</ul>
+	</div>
+
+	<form class="gp-form" method="post" action="">
+		<input type="hidden" name="submit_settings" value="1" />
+		<div class="cbi-section">
+			<h3><%:Quick settings%></h3>
+			<p class="cbi-map-descr"><%:Toggle core options here; use the other tabs for advanced fields.%></p>
+
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Kill switch enabled%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_privacy_enabled" value="0" />
+					<input type="checkbox" name="f_privacy_enabled" value="1" <% if form.f_privacy_enabled == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Require WireGuard interface up%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_require_wg" value="0" />
+					<input type="checkbox" name="f_require_wg" value="1" <% if form.f_require_wg == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Require Tor running%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_require_tor" value="0" />
+					<input type="checkbox" name="f_require_tor" value="1" <% if form.f_require_tor == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Tor transparent NAT%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_tor_transparent" value="0" />
+					<input type="checkbox" name="f_tor_transparent" value="1" <% if form.f_tor_transparent == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Telemetry DNS blocklist%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_block_domains" value="0" />
+					<input type="checkbox" name="f_block_domains" value="1" <% if form.f_block_domains == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Disable GL.iNet cloud (GoodCloud + DNS block)%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_disable_vendor" value="0" />
+					<input type="checkbox" name="f_disable_vendor" value="1" <% if form.f_disable_vendor == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Remove GL.iNet cloud packages (opkg)%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_remove_cloud_pkgs" value="0" />
+					<input type="checkbox" name="f_remove_cloud_pkgs" value="1" <% if form.f_remove_cloud_pkgs == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<% if form.has_rotate_imei then %>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:IMEI rotation enabled%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_rotate_imei" value="0" />
+					<input type="checkbox" name="f_rotate_imei" value="1" <% if form.f_rotate_imei == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<% end %>
+
+			<div class="cbi-page-actions">
+				<input class="cbi-button cbi-button-save" type="submit" value="<%:Save & apply%>" />
+			</div>
+		</div>
+	</form>
+</div>
+
+<%+footer%>
