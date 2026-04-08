@@ -1,11 +1,11 @@
 {
 	"luci-app-glinet-privacy": {
-		"description": "Grant UCI access to GL.iNet Privacy",
+		"description": "GL.iNet Privacy LuCI — UCI read/write scoped to packages this app commits; network/firewall/dhcp read-only for status probes.",
 		"read": {
 			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp", "glvpn"]
 		},
 		"write": {
-			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp", "glvpn"]
+			"uci": ["privacy", "rotate_imei", "glinet_privacy", "glvpn"]
 		}
 	}
 }

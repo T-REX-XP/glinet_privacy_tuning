@@ -3,6 +3,7 @@ Runtime + UCI network hints for LuCI (aligned with privacy-killswitch-watchdog.s
 ]]
 
 local sys = require "luci.sys"
+local san = require "luci.glinet_privacy.sanitize"
 
 local function trim(s)
 	if type(s) ~= "string" then
@@ -11,15 +12,15 @@ local function trim(s)
 	return (s:gsub("^%s+", ""):gsub("%s+$", ""))
 end
 
---- Prefer network.lan.device, then legacy ifname, else br-lan.
+--- Prefer network.lan.device, then legacy ifname, else br-lan (sanitized).
 local function uci_lan_device(uc)
 	local d = uc:get("network", "lan", "device")
 	if d and d ~= "" then
-		return d
+		return san.sanitize_ifname(d) or "br-lan"
 	end
 	d = uc:get("network", "lan", "ifname")
 	if d and d ~= "" then
-		return d
+		return san.sanitize_ifname(d) or "br-lan"
 	end
 	return "br-lan"
 end
@@ -27,19 +28,25 @@ end
 --- WAN device: saved privacy.main.wan_dev, else network.{wan,wwan,modem}.device, else default route dev.
 local function detect_wan_dev(uc, privacy_wan_saved)
 	if privacy_wan_saved and privacy_wan_saved ~= "" then
-		return privacy_wan_saved, "privacy.uci"
+		local pw = san.sanitize_ifname(privacy_wan_saved)
+		if pw then
+			return pw, "privacy.uci"
+		end
 	end
 	for _, n in ipairs({ "wan", "wwan", "modem" }) do
 		if uc:get("network", n) then
 			local d = uc:get("network", n, "device")
 			if d and d ~= "" then
-				return d, "network." .. n
+				local ds = san.sanitize_ifname(d)
+				if ds then
+					return ds, "network." .. n
+				end
 			end
 		end
 	end
 	local out = trim(sys.exec("ip -4 route show default 2>/dev/null | head -1") or "")
 	local dev = out:match("%sdev%s+(%S+)")
-	if dev then
+	if dev and san.valid_ifname(dev) then
 		return dev, "route.default"
 	end
 	return "", ""
@@ -47,7 +54,7 @@ end
 
 --- First IPv4 CIDR on device (host/prefix), e.g. 192.168.8.1/24
 local function ip_addr_on_dev(dev)
-	if not dev or dev == "" then
+	if not dev or dev == "" or not san.valid_ifname(dev) then
 		return nil, nil
 	end
 	local out = sys.exec("ip -o -f inet addr show dev " .. dev .. " 2>/dev/null | head -1") or ""
@@ -64,7 +71,7 @@ end
 
 --- Connected LAN subnet from kernel route (prefix-accurate, any mask).
 local function lan_subnet_route(dev)
-	if not dev or dev == "" then
+	if not dev or dev == "" or not san.valid_ifname(dev) then
 		return nil
 	end
 	local out = trim(
@@ -80,7 +87,7 @@ local function list_wireguard_ifaces()
 	local seen = {}
 	for line in out:gmatch("[^\r\n]+") do
 		local ifname = line:match("^%d+:%s+([^:@%s]+)")
-		if ifname and not seen[ifname] then
+		if ifname and san.valid_ifname(ifname) and not seen[ifname] then
 			seen[ifname] = true
 			table.insert(list, ifname)
 		end
@@ -94,7 +101,7 @@ local function uci_wan_hint_list(uc)
 	for _, n in ipairs({ "wan", "wan6", "wwan", "modem", "4g", "tethering" }) do
 		if uc:get("network", n) then
 			local d = uc:get("network", n, "device")
-			if d and d ~= "" then
+			if d and d ~= "" and san.valid_ifname(d) then
 				table.insert(rows, { dev = d, iface = n })
 			end
 		end
@@ -129,9 +136,17 @@ local function snapshot()
 	local lan_uci = uci_lan_device(uc)
 	local privacy_lan = uc:get("privacy", "main", "lan_dev") or ""
 	local privacy_wan = uc:get("privacy", "main", "wan_dev") or ""
-	local wan_dev, wan_src = detect_wan_dev(uc, privacy_wan)
+	local pl_use = san.sanitize_ifname_or_empty(privacy_lan)
+	if pl_use == nil then
+		pl_use = ""
+	end
+	local pw_use = san.sanitize_ifname_or_empty(privacy_wan)
+	if pw_use == nil then
+		pw_use = ""
+	end
+	local wan_dev, wan_src = detect_wan_dev(uc, pw_use)
 
-	local lan_eff = privacy_lan ~= "" and privacy_lan or lan_uci
+	local lan_eff = pl_use ~= "" and pl_use or lan_uci
 	local hostip, ipcidr = ip_addr_on_dev(lan_eff)
 	local lan_cidr_guess = lan_subnet_route(lan_eff) or ""
 	local router_ip_uci = uc:get("network", "lan", "ipaddr") or ""

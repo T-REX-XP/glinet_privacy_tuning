@@ -6,6 +6,7 @@ module("luci.controller.glinet_privacy", package.seeall)
 
 -- ucode-based LuCI does not inject translate/translatef; load catalog and bind from luci.i18n.
 local i18n = require "luci.glinet_privacy.i18n"
+local san = require "luci.glinet_privacy.sanitize"
 local translate = i18n.translate
 local translatef = i18n.translatef or function(fmt, ...)
 	return i18n.translate(string.format(fmt, ...))
@@ -26,6 +27,8 @@ function index()
 		call("action_tor_dns"), translate("Tor, DNS & telemetry"), 4)
 	entry({"admin", "services", "glinet_privacy", "verify"},
 		call("action_verify"), translate("Verify"), 5)
+	entry({"admin", "services", "glinet_privacy", "verify_ip"},
+		call("action_verify_ip")).leaf = true
 end
 
 local function sh_ok(cmd)
@@ -56,6 +59,9 @@ function build_status()
 	end
 
 	local slug = uci:get("glinet_privacy", "hw", "slug") or "?"
+	if type(slug) ~= "string" or not slug:match("^[%w._-]+$") or #slug > 48 then
+		slug = "?"
+	end
 	add("profile", translate("Device profile"), slug, "ok")
 
 	if uci:get("firewall", "glinet_privacy", "path") then
@@ -64,14 +70,24 @@ function build_status()
 		add("fw_inc", translate("Firewall plugin"), translate("Missing UCI firewall.glinet_privacy"), "bad")
 	end
 
-	local wg_if = uci:get("privacy", "main", "wg_if") or "wg0"
+	local wg_raw = uci:get("privacy", "main", "wg_if") or "wg0"
+	local wg_safe = san.sanitize_ifname(wg_raw)
+	local wg_shell = wg_safe or "wg0"
 	local req_wg = uci:get("privacy", "main", "require_wg") or "1"
-	if req_wg == "0" then
-		add("wg", translatef("WireGuard (%s)", wg_if), translate("Not required"), "skip", "f_require_wg")
-	elseif sh_ok("ip link show " .. wg_if .. " 2>/dev/null | grep -q 'state UP'") then
-		add("wg", translatef("WireGuard (%s)", wg_if), translate("Interface up"), "ok", "f_require_wg")
+	if wg_safe == nil and wg_raw ~= "" then
+		add(
+			"wg",
+			translatef("WireGuard (%s)", wg_raw),
+			translate("Invalid interface name — fix on Kill switch (shell-safe check skipped)."),
+			"bad",
+			"f_require_wg"
+		)
+	elseif req_wg == "0" then
+		add("wg", translatef("WireGuard (%s)", wg_raw), translate("Not required"), "skip", "f_require_wg")
+	elseif sh_ok("ip link show " .. wg_shell .. " 2>/dev/null | grep -q 'state UP'") then
+		add("wg", translatef("WireGuard (%s)", wg_raw), translate("Interface up"), "ok", "f_require_wg")
 	else
-		add("wg", translatef("WireGuard (%s)", wg_if), translate("Down or missing"), "bad", "f_require_wg")
+		add("wg", translatef("WireGuard (%s)", wg_raw), translate("Down or missing"), "bad", "f_require_wg")
 	end
 
 	local req_tor = uci:get("privacy", "main", "require_tor") or "1"
@@ -270,11 +286,25 @@ function action_killswitch()
 		if wg == "" then
 			wg = "wg0"
 		end
+		local wgs = san.sanitize_ifname(wg)
+		if not wgs then
+			wg = "wg0"
+		else
+			wg = wgs
+		end
 		uci:set("privacy", "main", "wg_if", wg)
 		uci:set("privacy", "main", "require_wg", yn("require_wg"))
 		uci:set("privacy", "main", "require_tor", yn("require_tor"))
-		uci:set("privacy", "main", "lan_dev", str1("lan_dev"))
-		uci:set("privacy", "main", "wan_dev", str1("wan_dev"))
+		local ld = san.sanitize_ifname_or_empty(str1("lan_dev"))
+		if ld == nil then
+			ld = ""
+		end
+		local wd = san.sanitize_ifname_or_empty(str1("wan_dev"))
+		if wd == nil then
+			wd = ""
+		end
+		uci:set("privacy", "main", "lan_dev", ld)
+		uci:set("privacy", "main", "wan_dev", wd)
 		local vk = str1("vendor_gl_vpn_killswitch")
 		if vk ~= "on" and vk ~= "off" and vk ~= "leave" then
 			vk = "leave"
@@ -367,8 +397,16 @@ function action_imei()
 			tac = tac:sub(1, 8)
 		end
 		uci:set("rotate_imei", "main", "imei_tac", tac)
-		uci:set("rotate_imei", "main", "modem_tty", str1("modem_tty"))
-		uci:set("rotate_imei", "main", "wwan_if", str1("wwan_if"))
+		local mt = san.sanitize_modem_tty(str1("modem_tty"))
+		if mt == nil then
+			mt = ""
+		end
+		local wwi = san.sanitize_ifname_or_empty(str1("wwan_if"))
+		if wwi == nil then
+			wwi = ""
+		end
+		uci:set("rotate_imei", "main", "modem_tty", mt)
+		uci:set("rotate_imei", "main", "wwan_if", wwi)
 		uci:commit("rotate_imei")
 		sys.call("/etc/init.d/rotate_imei enable 2>/dev/null")
 		sys.call("/usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh 2>/dev/null || true")
@@ -454,15 +492,27 @@ function action_tor_dns()
 	if http.formvalue("submit") == "1" then
 		uci:set("glinet_privacy", "hw", "auto_wan", yn("auto_wan"))
 		uci:set("glinet_privacy", "tor", "tor_transparent", yn("tor_transparent"))
-		uci:set("glinet_privacy", "tor", "lan_cidr", str1("lan_cidr"))
-		uci:set("glinet_privacy", "tor", "router_lan_ip", str1("router_lan_ip"))
-		uci:set("glinet_privacy", "tor", "lan_dev", str1("lan_dev"))
-		local ttp = str1("tor_trans_port")
-		if ttp == "" then
+		local cidr = str1("lan_cidr")
+		if not san.valid_lan_cidr(cidr) then
+			cidr = "192.168.8.0/24"
+		end
+		uci:set("glinet_privacy", "tor", "lan_cidr", cidr)
+		local rip = str1("router_lan_ip")
+		if not san.valid_ipv4(rip) then
+			rip = "192.168.8.1"
+		end
+		uci:set("glinet_privacy", "tor", "router_lan_ip", rip)
+		local tld = san.sanitize_ifname_or_empty(str1("lan_dev"))
+		if tld == nil then
+			tld = ""
+		end
+		uci:set("glinet_privacy", "tor", "lan_dev", tld)
+		local ttp = san.sanitize_port_str(str1("tor_trans_port"), 9040)
+		if not ttp then
 			ttp = "9040"
 		end
-		local tdp = str1("tor_dns_port")
-		if tdp == "" then
+		local tdp = san.sanitize_port_str(str1("tor_dns_port"), 9053)
+		if not tdp then
 			tdp = "9053"
 		end
 		uci:set("glinet_privacy", "tor", "tor_trans_port", ttp)
@@ -566,8 +616,31 @@ function action_tor_dns()
 end
 
 function action_verify()
+	local disp = require "luci.dispatcher"
 	local net = require("luci.glinet_privacy.net_probe").snapshot()
 	luci.template.render("glinet_privacy/verify", {
 		net = net,
+		verify_ip_url = disp.build_url("admin", "services", "glinet_privacy", "verify_ip"),
 	})
+end
+
+--- JSON: public IP as seen from the router WAN (HTTPS to api.ipify.org). Admin session required.
+function action_verify_ip()
+	local http = require "luci.http"
+	local sys = require "luci.sys"
+	http.prepare_content("application/json")
+	local attempts = {
+		"uclient-fetch -q -O- 'https://api.ipify.org?format=json' 2>/dev/null",
+		"wget -qO- 'https://api.ipify.org?format=json' 2>/dev/null",
+		"curl -fsS -m 12 'https://api.ipify.org?format=json' 2>/dev/null",
+	}
+	for _, cmd in ipairs(attempts) do
+		local body = sys.exec(cmd)
+		if type(body) == "string" and body:match('"ip"%s*:%s*"[^"]+"') then
+			http.write(body)
+			return
+		end
+	end
+	http.status(503, "Unavailable")
+	http.write('{"error":"router_fetch_failed"}')
 end

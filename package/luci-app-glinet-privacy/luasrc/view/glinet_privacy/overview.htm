@@ -125,7 +125,7 @@
 				<div class="glp-main-col">
 					<p class="glp-title"><%= it.label %></p>
 					<% if it.detail and it.detail ~= "" then %>
-					<p class="glp-detail"><%= it.detail %></p>
+					<p class="glp-detail"><%= pcdata(it.detail) %></p>
 					<% end %>
 				</div>
 				<div class="glp-toggle-col">
