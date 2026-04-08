@@ -1,13 +1,14 @@
 # GL.iNet Privacy — Contributor review
 
-**Scope:** `luci-app-glinet-privacy`, `net_probe.lua`, controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`), `install.sh`, rpcd ACL.  
-**Perspectives:** security hardening, OpenWrt packaging / upstream norms, maintainability / best practices, **composition with GL.iNet stock (OOTB) features**.
+**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, `net_probe.lua`, controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
+**Perspectives:** security hardening, OpenWrt packaging / upstream norms, maintainability / best practices, **composition with GL.iNet stock (OOTB) features**.  
+**Companion backlog:** epic-level tasks live in **`docs/backlog.md`**; this file adds reviewer lens, security notes, and the **P0–P3** feature backlog.
 
 ---
 
 ## Executive summary
 
-The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). The stack already integrates several **GL.iNet stock** touchpoints (`glvpn`, cloud / GoodCloud disable paths, `firewall.user` include for upgrades, **wgclient** naming guidance in copy) but does **not yet fully surface** modern firmware extras such as **Network → DNS** (*Encrypted DNS* / DoH / DoT modes), **VPN Dashboard** (*Global* vs *policy-based* VPN), or a single **privacy checkpoint** aligned with the vendor admin. Main gaps for an upstream-quality package are: **shell command construction from UCI strings** (command injection class), **rpcd ACL broader than proven need**, **iptables-centric health checks** on **nft-first** systems, **legacy LuCI Lua patterns** (`module()`, `package.seeall`), **no in-tree OpenWrt `Makefile` feed layout**, and **third-party network calls** from the **Verify** tab admin session.
+The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). As of **v1.2.13**, **`sanitize.lua`** and a **narrowed rpcd write ACL** address the earlier **command-injection** and **over-broad UCI write** concerns for this app’s LuCI layer. Remaining gaps for an upstream-quality package include: **iptables-centric** status checks on **nft-first** images (see **`docs/backlog.md`** Epic 3 follow-up), **optional third-party calls** on **Verify** (browser geo / router→ipify; fully offline mode still open), **legacy LuCI Lua** (`module()`, `package.seeall`), **no in-tree OpenWrt `Makefile` feed layout**, and **composition** with stock **Network → DNS** / **VPN Dashboard** (OOTB checklist — P1 backlog below). **CSRF** tokens for custom forms remain **deferred** (stock LuCI session model).
 
 ---
 
@@ -18,8 +19,8 @@ The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared sty
 | **Separation of concerns** | Firewall / watchdog logic lives in shell under `/usr/libexec` and `/usr/bin`; LuCI mostly edits UCI and triggers apply — easier to audit than embedding `iptables` in pages. |
 | **UCI as contract** | `privacy`, `glinet_privacy`, `rotate_imei` are clear configuration boundaries; templates align with apply scripts. |
 | **GL.iNet coexistence (partial)** | Vendor **VPN kill switch** via `glvpn`; telemetry scripts target vendor cloud UCI; **Tor** firewall path survives some stock upgrade resets via **`/etc/firewall.user`** (see `docs/devices.md`). |
-| **Input narrowing (partial)** | `vendor_gl_vpn_killswitch` restricted to `on`/`off`/`leave`; IMEI TAC digits stripped and length-capped. |
-| **Template escaping** | Dynamic interface names use `pcdata()` in several views; Verify JS escapes `<`/`>` before `innerHTML`. |
+| **Input narrowing** | **`sanitize.lua`**: ifnames, modem **`/dev/tty…`**, IPv4, LAN CIDR, ports on POST + probes; `vendor_gl_vpn_killswitch` enum; IMEI TAC digits + length. |
+| **Template escaping** | **`pcdata()`** on Overview **`it.detail`**; **Verify** builds HTML with **`esc()`** (`&`, `<`, `>`, `"`); several views use **`pcdata()`** for interface strings. |
 | **Runtime hints** | `net_probe.lua` uses kernel **`ip`** output and UCI — appropriate for OpenWrt. |
 | **External links** | Verify / tools use `rel="noopener noreferrer"` where applicable. |
 
@@ -35,7 +36,7 @@ Stock **GL.iNet 4.x** (and related docs) emphasises **VPN Dashboard** (client/se
 | **VPN client (WireGuard / OpenVPN)** | Kill switch **wg_if** + **datalist**; docs mention **wgclient** | No read-only **sync** with VPN Dashboard state (tunnel up, policy mode); add probes + links to stock UI. |
 | **Secure / Encrypted DNS** | Our **Tor forward** / DoT drop options touch **dnsmasq** | Risk of **fighting** stock Encrypted DNS stack; need **conflict hints** and a **recommended modes** matrix in docs + LuCI. |
 | **GoodCloud / telemetry** | `disable_vendor_cloud`, blocklist, `remove_cloud_packages` | Could add explicit **checkpoint** “Stock cloud disabled?” aligned with **glconfig** / services. |
-| **Privacy / leak checks** | **Verify** tab + external links | Add **router-side** checks compatible with stock (optional) + clearer **“complete checklist in vendor UI + here”**. |
+| **Privacy / leak checks** | **Verify** tab: external link cards + **Browser** / **Router WAN** IP check (**`verify_ip`** → ipify from router) | **Fully offline** check mode; vendor UI **checklist** copy; optional deeper **router-local** probes (backlog). |
 
 Reference material for wording and menu paths: [GL.iNet firmware features](https://www.gl-inet.com/support/firmware-features/), [DNS interface (docs)](https://docs.gl-inet.com/router/en/4/interface_guide/dns/), [VPN Dashboard (docs)](https://docs.gl-inet.com/router/en/4/interface_guide/vpn_dashboard_v4.7/).
 
@@ -46,16 +47,14 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 ### High priority
 
 1. **Command injection via UCI-sourced strings in shell one-liners**  
-   - **Controller:** `build_status()` runs `ip link show " .. wg_if .. "` — `wg_if` comes from UCI (`privacy.main.wg_if`). A value containing shell metacharacters could alter the command (admin-only, still violates defense-in-depth).  
-   - **`net_probe.lua`:** `ip … show dev " .. dev` — `dev` is derived from UCI / composed LAN name; same class of issue.  
-   - **Recommendation:** Validate against a strict pattern (e.g. Linux iface: `^[a-zA-Z0-9._-]+$`, length cap ~15–32) before any `sys.call` / `sys.exec` that interpolates the value; reject or strip invalid input on **save** and **before probes**.  
-   - **Status:** Implemented — `luci/glinet_privacy/sanitize.lua` (ifnames, modem tty path, IPv4, LAN CIDR, ports); used in **`glinet_privacy.lua`** (all relevant POST handlers + `build_status` WG check), **`net_probe.lua`** (all `ip` invocations, WAN hint list). **`install.sh`** installs **`sanitize.lua`**.
+   - **Risk (historical):** `build_status()` used `ip link show .. wg_if ..`; **`net_probe`** used `ip .. dev ..` with UCI-derived names — shell metacharacters in UCI could alter the command (admin-only; still defense-in-depth issue).  
+   - **Mitigation:** Validate with a strict pattern (Linux ifname length / charset) before **`sys.call` / `sys.exec`**; reject or normalize on **save** and **before probes**.  
+   - **Status (v1.2.13+):** Implemented — **`luci/glinet_privacy/sanitize.lua`**; wired in **`glinet_privacy.lua`** (POST + `build_status`) and **`net_probe.lua`**. **`install.sh`** installs **`sanitize.lua`**.
 
 2. **rpcd ACL grants wide UCI write** (`luci-app-glinet-privacy.json`)  
-   - **Write** access includes **`network`**, **`firewall`**, **`dhcp`** in addition to `privacy` / `glinet_privacy` / `rotate_imei` / `glvpn`.  
-   - If this ACL is attached to roles beyond the intended admin surface, impact is large.  
-   - **Recommendation:** Restrict to the packages this app actually **commits**; add **read-only** where sufficient (e.g. `network` read for probes if your stack enforces ACL on UBI). Document why each stanza is needed.  
-   - **Status:** Implemented — **write** UCI limited to `privacy`, `rotate_imei`, `glinet_privacy`, `glvpn`; **read** still includes `network`, `firewall`, `dhcp`, `glvpn` for probes and status. Description field documents rationale.
+   - **Risk (historical):** **Write** on **`network`**, **`firewall`**, **`dhcp`** was broader than packages this LuCI app **commits** via its forms.  
+   - **Mitigation:** **Write** only packages actually modified; keep **read** for probes where the stack enforces rpcd ACL.  
+   - **Status (v1.2.13+):** Implemented — **write:** `privacy`, `rotate_imei`, `glinet_privacy`, `glvpn`; **read:** adds **`network`**, **`firewall`**, **`dhcp`**, **`glvpn`** for status/probes. JSON **description** explains the split.
 
 ### Medium priority
 
@@ -103,7 +102,7 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 
 ## Feature backlog
 
-Items are ordered by **priority band** (P0 → P3). **Themes** under each band group related work without changing the severity of the band.
+Items are ordered by **priority band** (P0 → P3). **Themes** under each band group related work without changing the severity of the band. **Epic-style** delivery items (cellular, Tor, kill switch, telemetry) are tracked in **`docs/backlog.md`**; the list below is **contributor / security / OOTB** oriented and should stay in sync when priorities shift.
 
 ### P0 — Critical
 
@@ -183,4 +182,4 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
 
-*Document version: 2026-04-09 — backlog synced to `GLINET_PRIVACY_VERSION` **1.2.13** (`package/version.mk`).*
+*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.13** (`package/version.mk`). Re-check **`changes.md`** on each release.*
