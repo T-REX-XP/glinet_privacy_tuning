@@ -1,7 +1,25 @@
-Privacy router artifacts (GL-XE300 / OpenWrt)
+Privacy router artifacts (GL-XE300 Puli, GL-AXT1800 Slate AX / OpenWrt)
 =============================================
 
-Copy files to the router root (scp/rsync), then chmod +x scripts and merge configs.
+Fastest on a running router (replace USER/REPO with your fork):
+
+  curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
+    GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s -- --with-luci
+
+Or: clone repo on the router and run: sh install.sh --with-luci
+
+---
+
+Recommended: build or install the OpenWrt packages (firewall plugin + LuCI UI):
+
+  package/glinet-privacy/          — core scripts, UCI, /usr/libexec/glinet-privacy/fw-plugin.sh
+  package/luci-app-glinet-privacy/ — LuCI: Services → GL.iNet Privacy
+  package/BUILDING.txt             — SDK build / opkg install notes
+
+The postinst registers firewall.glinet_privacy → fw-plugin.sh (Tor NAT when enabled in
+uci glinet_privacy.tor.tor_transparent).
+
+Manual install (without ipk): copy files to the router root (scp/rsync), chmod +x scripts.
 
 Packages (opkg)
 ---------------
@@ -56,7 +74,7 @@ Tune LAN_CIDR / ROUTER_LAN_IP for your LAN (defaults suit GL.iNet 192.168.8.x).
 -----------------------
   chmod +x /usr/bin/privacy-killswitch-watchdog.sh /etc/init.d/privacy-killswitch
   cp etc/config/privacy /etc/config/
-  uci set privacy.main.wan_dev='wwan0'   # adjust: ip route show default
+  uci set privacy.main.wan_dev='wwan0'   # Puli cellular; Slate AX: leave empty or eth0 — see docs/devices.md
   uci commit privacy
   /etc/init.d/privacy-killswitch enable
   /etc/init.d/privacy-killswitch start

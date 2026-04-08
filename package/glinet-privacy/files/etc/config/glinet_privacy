@@ -1,4 +1,10 @@
 # GL.iNet Privacy — Tor / firewall / telemetry (LuCI + CLI)
+# Device profile: apply-device-profile.sh sets hw.slug (puli_xe300, slate_ax1800, …)
+
+config device 'hw'
+	option slug 'auto'
+	option auto_wan '1'
+	option board_hint ''
 
 config firewall 'tor'
 	option tor_transparent '0'

@@ -51,7 +51,7 @@ uci set "network.${PEER_SECTION}.persistent_keepalive='25'"
 
 # Attach ${WG_IF} to firewall wan zone
 WAN_ZONE="$(uci show firewall 2>/dev/null | sed -n "s/^firewall\.\([^.]*\)\.name='wan'$/\1/p" | head -1)"
-	if [ -n "$WAN_ZONE" ]; then
+if [ -n "$WAN_ZONE" ]; then
 	_netlist="$(uci -q get "firewall.${WAN_ZONE}.network" 2>/dev/null || true)"
 	case " ${_netlist} " in
 		*" ${WG_IF} "*) ;;

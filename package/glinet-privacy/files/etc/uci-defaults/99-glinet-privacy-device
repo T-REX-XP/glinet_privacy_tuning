@@ -1,0 +1,4 @@
+#!/bin/sh
+[ -x /usr/libexec/glinet-privacy/apply-device-profile.sh ] && \
+	/usr/libexec/glinet-privacy/apply-device-profile.sh
+exit 0

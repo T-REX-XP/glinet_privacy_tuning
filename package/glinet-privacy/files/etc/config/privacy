@@ -5,6 +5,6 @@ config privacy 'main'
 	option wg_if 'wg0'
 	option require_tor '1'
 	option require_wg '1'
-	# Logical interfaces (see ip link); often br-lan and eth0 / wwan0
+	# Logical interfaces (see ip link); Puli: wwan0 set by apply-device-profile on first boot
 	option lan_dev 'br-lan'
-	option wan_dev 'wwan0'
+	option wan_dev ''

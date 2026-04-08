@@ -1,0 +1,54 @@
+Building glinet-privacy and luci-app-glinet-privacy
+=====================================================
+
+One-command install on the router (replace USER/REPO):
+
+  curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
+    GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh
+
+Add LuCI UI and optional opkg deps:
+
+  curl -fsSL ... | GLINET_PRIVACY_TARBALL_URL=... sh -s -- --with-luci --with-opkg-deps
+
+From a git clone on the device:
+
+  sh install.sh --with-luci
+
+See install.sh header for GLINET_PRIVACY_SRC / GLINET_PRIVACY_GIT_URL.
+
+---
+
+These are standard OpenWrt packages. Copy this repository into your OpenWrt SDK or
+buildroot `package/` tree (or add as a feed), then:
+
+  ./scripts/feeds update -a
+  ./scripts/feeds install glinet-privacy luci-app-glinet-privacy
+
+Or from this repo:
+
+  cp -a package/glinet-privacy /path/to/openwrt/package/
+  cp -a package/luci-app-glinet-privacy /path/to/openwrt/package/
+
+  make menuconfig
+    Network  --->
+      <*> glinet-privacy
+    LuCI  --->
+      Applications  --->
+        <*> luci-app-glinet-privacy
+
+  make package/glinet-privacy/compile V=s
+  make package/luci-app-glinet-privacy/compile V=s
+
+Install on the router:
+
+  opkg install glinet-privacy_*.ipk luci-app-glinet-privacy_*.ipk
+
+After install, open LuCI: Services → GL.iNet Privacy.
+
+If the menu entry is missing, run: /etc/init.d/rpcd restart; /etc/init.d/uhttpd restart
+
+ACL: ensure your LuCI login role can access the new app (rpcd acl
+/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json).
+
+Firewall plugin: package postinst registers firewall.glinet_privacy pointing at
+/usr/libexec/glinet-privacy/fw-plugin.sh (OpenWrt firewall include).

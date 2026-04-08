@@ -1,0 +1,23 @@
+<%#
+ Copyright 2026, GL.iNet Privacy LuCI
+-%>
+
+<%+header%>
+
+<h2><%:WireGuard / Mullvad%></h2>
+
+<div class="cbi-map">
+	<div class="cbi-section">
+		<p><%:Install WireGuard tools and add an interface under Network → Interfaces, or apply Mullvad using the helper script:%></p>
+		<pre style="white-space:pre-wrap">export MULLVAD_PRIVATE_KEY='...'
+export MULLVAD_ADDRESS='10.x.x.x/32'
+export MULLVAD_PUBLIC_KEY='...'
+export MULLVAD_ENDPOINT='x.x.x.x:51820'
+/usr/bin/apply-mullvad-wireguard.sh
+/etc/init.d/network reload
+/etc/init.d/firewall reload</pre>
+		<p><%:Secrets are not stored in this UI; use SSH or edit UCI <code>network</code> manually.%></p>
+	</div>
+</div>
+
+<%+footer%>

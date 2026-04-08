@@ -1,4 +1,4 @@
-# Privacy-First Router Project Backlog (GL-XE300)
+# Privacy-First Router Project Backlog (GL-XE300 Puli, GL-AXT1800 Slate AX, …)
 
 ## Epic 1: Cellular Anonymity (EG25-G Module)
 - [ ] Task 1.1: Write a shell script to generate a valid IMEI (implement Luhn algorithm for the last digit).
