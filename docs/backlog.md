@@ -52,5 +52,5 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 
 ## Misc (cross-cutting)
 
-- [ ] Automated tests in CI (SDK already builds ipks; no on-device smoke tests).
-- [x] LuCI i18n `.po` files if translations are required beyond English strings in templates (`po/`, `tools/extract-luci-i18n-strings.py`, `tools/i18n-build-po-from-pot.py`, `Build/Compile` → `po2lmo` in `luci-app-glinet-privacy` Makefile).
+- [ ] Automated tests in CI (none yet; no on-device smoke tests).
+- [x] LuCI i18n `.po` files if translations are required beyond English strings in templates (`po/`, `tools/extract-luci-i18n-strings.py`, `tools/i18n-build-po-from-pot.py`; optional **`po2lmo`** on a host with LuCI tools, then copy **`glinet_privacy.<lang>.lmo`** to **`/usr/lib/lua/luci/i18n/`** — see `package/luci-app-glinet-privacy/po/README`).

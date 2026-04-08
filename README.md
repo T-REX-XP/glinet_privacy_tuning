@@ -1,6 +1,6 @@
 # GL.iNet Privacy tuning (OpenWrt)
 
-Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iNet routers running OpenWrt: kill switch watchdog, Tor transparent NAT, optional dnsmasq→Tor DNS policy, telemetry blocking, and optional Quectel IMEI rotation (cellular models). **VPN** is configured in **stock GL.iNet** (WireGuard/OpenVPN); this project only watches the tunnel interface you name in UCI.
+Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by default; **`install.sh --without-luci`** skips it) for GL.iNet routers running OpenWrt: kill switch watchdog, Tor transparent NAT, optional dnsmasq→Tor DNS policy, telemetry blocking, and optional Quectel IMEI rotation (cellular models). **VPN** is configured in **stock GL.iNet** (WireGuard/OpenVPN); this project only watches the tunnel interface you name in UCI.
 
 **Repository:** [https://github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning)
 
@@ -28,7 +28,7 @@ With **curl** (install `curl` with `opkg update && opkg install curl` if needed)
 ```sh
 curl -fsSL https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | \
   GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz \
-  sh -s -- --with-luci
+  sh -s --
 ```
 
 With **wget** (common on busybox systems):
@@ -36,16 +36,16 @@ With **wget** (common on busybox systems):
 ```sh
 wget -qO- https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | \
   GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz \
-  sh -s -- --with-luci
+  sh -s --
 ```
 
 From a git clone on the device:
 
 ```sh
-sh install.sh --with-luci
+sh install.sh
 ```
 
-Useful flags: `--minimal` (files + firewall/profile only), `--with-imei-boot`, `--with-imei-cron`. Full options and environment variables are documented in the [install.sh](install.sh) header.
+Useful flags: `--without-luci` (skip LuCI files; default is to install them), `--minimal` (files + firewall/profile only), `--with-imei-boot`, `--with-imei-cron` (enables scheduled IMEI rotation; default 6h, set **`cron_interval_hours`** in LuCI → IMEI rotation). Full options and environment variables are documented in the [install.sh](install.sh) header.
 
 **Re-running `install.sh`** is safe: **`opkg update`** runs only when at least one dependency is missing; **`kmod-wireguard`** is skipped if the WireGuard module is already present; telemetry defaults are seeded **once** (see **`/etc/glinet-privacy/.telemetry-seeded`**); **`dhcp` `confdir`** is not duplicated. **`GLINET_PRIVACY_SKIP_OPKG_UPDATE=1`** skips the feed update (faster repeat installs; may fail offline if a package is missing). **`GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1`** re-applies the installer telemetry UCI toggles.
 
@@ -61,10 +61,6 @@ sh remove.sh
 
 Option: **`--opkg`** — also run `opkg remove luci-app-glinet-privacy glinet-privacy` when those ipks are installed. The script always removes LuCI app files under `/usr/lib/lua/luci/...` when present. It stops the killswitch (flushes iptables rules), removes firewall UCI and `/etc/firewall.user` lines, cron lines, Tor include, dnsmasq blocklist symlink, project files, and `/etc/config/{privacy,glinet_privacy,rotate_imei}`. It does **not** remove unrelated opkg packages (e.g. `tor`) unless you use **`--opkg`** for our packages only.
 
-## Building `.ipk` packages (OpenWrt SDK)
-
-To compile **`glinet-privacy`** and **`luci-app-glinet-privacy`** as opkg packages, see [package/BUILDING.txt](package/BUILDING.txt). CI (`.github/workflows/openwrt-packages.yml`) builds against the official OpenWrt SDK with the LuCI feed.
-
 Version and changelog: [package/version.mk](package/version.mk), [changes.md](changes.md).
 
 ## Documentation
@@ -78,4 +74,4 @@ Version and changelog: [package/version.mk](package/version.mk), [changes.md](ch
 
 ## License
 
-SPDX: **MIT** (see `Makefile` headers under `package/`).
+SPDX: **MIT** (see file headers in `package/glinet-privacy/files/`, `install.sh`, and `remove.sh`).

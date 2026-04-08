@@ -5,21 +5,21 @@
 # optional opkg packages, merges Tor config, enables services, cron watchdog, telemetry.
 #
 #   sh install.sh
-#   sh install.sh --with-luci
+#   sh install.sh --without-luci
 #   sh install.sh --minimal
 #
 # Remote: you must fetch the script with curl or wget first — do not paste only the https URL
 #   (ash will report "not found" because the URL is not an executable).
 #   curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
-#     GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s -- --with-luci
+#     GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s --
 #   wget -qO- https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
-#     GLINET_PRIVACY_TARBALL_URL=... sh -s -- --with-luci
+#     GLINET_PRIVACY_TARBALL_URL=... sh -s --
 #
 # Optional flags:
 #   --minimal          Only copy files + firewall + device profile (no opkg/Tor/cron/telemetry)
-#   --with-luci        Install LuCI app files
+#   --without-luci     Skip installing LuCI app files (default is to install them)
 #   --with-imei-boot   Enable rotate_imei on boot (uci + init.d)
-#   --with-imei-cron    Add crontab: IMEI rotate every 6 hours
+#   --with-imei-cron    Enable UCI cron (default 6h); change interval in LuCI → IMEI rotation
 #
 # Env: GLINET_PRIVACY_SRC, GLINET_PRIVACY_GIT_URL, GLINET_PRIVACY_TARBALL_URL,
 #      GLINET_PRIVACY_BRANCH (default main)
@@ -33,7 +33,7 @@
 set -eu
 
 BRANCH="${GLINET_PRIVACY_BRANCH:-main}"
-INSTALL_LUCI=0
+INSTALL_LUCI=1
 MINIMAL=0
 IMEI_BOOT=0
 IMEI_CRON=0
@@ -47,15 +47,16 @@ print_help() {
 	cat <<'EOF'
 glinet_puli_privacy install.sh
 
-  sh install.sh [--with-luci] [--minimal] [--with-imei-boot] [--with-imei-cron]
+  sh install.sh [--without-luci] [--minimal] [--with-imei-boot] [--with-imei-cron]
 
 Default install applies: opkg deps (if available), Tor torrc merge, killswitch cron,
-telemetry blocklist + dnsmasq confdir, init.d services.
+telemetry blocklist + dnsmasq confdir, init.d services, LuCI UI files.
 
   --minimal           Skip opkg/Tor/cron/telemetry automation (files + firewall only)
-  --with-luci         Install LuCI UI files
+  --without-luci      Do not install LuCI UI files
+  --with-luci         Install LuCI UI files (default; kept for compatibility)
   --with-imei-boot    Enable IMEI rotation on boot (cellular routers; legal risk — see docs/devices.md)
-  --with-imei-cron    Add cron every 6h for rotate_imei.sh (same; optional ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 in crontab)
+  --with-imei-cron    Enable scheduled IMEI rotation (default every 6h; edit interval in LuCI)
 
 Remote: GLINET_PRIVACY_TARBALL_URL=... or GLINET_PRIVACY_GIT_URL=...
 
@@ -68,6 +69,7 @@ EOF
 for _arg in "$@"; do
 	case "$_arg" in
 		--with-luci) INSTALL_LUCI=1 ;;
+		--without-luci) INSTALL_LUCI=0 ;;
 		--minimal) MINIMAL=1 ;;
 		--with-imei-boot) IMEI_BOOT=1 ;;
 		--with-imei-cron) IMEI_CRON=1 ;;
@@ -315,8 +317,13 @@ setup_cron() {
 	[ "$MINIMAL" -eq 0 ] || return 0
 	[ -x /etc/init.d/cron ] || { log "cron not installed; skip crontab"; return 0; }
 	crontab_ensure_line "*/1 * * * * /usr/bin/privacy-killswitch-watchdog.sh"
-	if [ "$IMEI_CRON" -eq 1 ]; then
-		crontab_ensure_line "0 */6 * * * /usr/bin/rotate_imei.sh"
+	if [ "$IMEI_CRON" -eq 1 ] && [ -f /etc/config/rotate_imei ]; then
+		uci set rotate_imei.main.cron_enabled='1'
+		uci set rotate_imei.main.cron_interval_hours='6'
+		uci commit rotate_imei
+	fi
+	if [ -x /usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh ]; then
+		/usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh || true
 	fi
 	/etc/init.d/cron enable 2>/dev/null || true
 	/etc/init.d/cron restart 2>/dev/null || true
@@ -455,4 +462,4 @@ if [ -f /usr/share/glinet-privacy/version.mk ]; then
 	_ver="$(grep '^GLINET_PRIVACY_VERSION:=' /usr/share/glinet-privacy/version.mk | head -1 | sed 's/^GLINET_PRIVACY_VERSION:=//')"
 	[ -n "$_ver" ] && log "Installed package version: $_ver"
 fi
-log "Done. LuCI: Services → GL.iNet Privacy (use --with-luci). --minimal skips Tor/opkg/cron/telemetry automation."
+log "Done. LuCI: Services → GL.iNet Privacy (skipped if --without-luci). --minimal skips Tor/opkg/cron/telemetry automation."

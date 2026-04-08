@@ -206,6 +206,7 @@ remove_files_builtin() {
 		usr/libexec/glinet-privacy/apply-device-profile.sh \
 		usr/libexec/glinet-privacy/apply-dns-policy.sh \
 		usr/libexec/glinet-privacy/apply-telemetry.sh \
+		usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh \
 		usr/libexec/glinet-privacy/apply-vendor-vpn-killswitch.sh \
 		usr/libexec/glinet-privacy/fw-plugin.sh \
 		usr/share/glinet-privacy/version.mk

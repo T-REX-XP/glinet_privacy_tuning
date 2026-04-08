@@ -3,14 +3,14 @@ Privacy router (GL-XE300 Puli, GL-AXT1800 Slate AX / OpenWrt)
 
 All steps below are automated by install.sh unless you use --minimal.
 
-One command (replace USER/REPO; add --with-luci for LuCI files):
+One command (replace USER/REPO):
 
   curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
-    GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s -- --with-luci
+    GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s --
 
 From a git clone on the router:
 
-  sh install.sh --with-luci
+  sh install.sh
 
 To remove (from the same clone, or set GLINET_PRIVACY_SRC to the repo root):
 
@@ -30,23 +30,21 @@ What install.sh does by default (not --minimal)
 - Telemetry: uci glinet_privacy.tel.block_domains=1 and disable_vendor_cloud=1; apply-telemetry.sh
   (dnsmasq.d black-holes for goodcloud.xyz / gldns.com, glconfig.cloud.enable=0, gl_cloud stop/disable);
   optional remove_cloud_packages removes gl-cloud via opkg; dhcp dnsmasq confdir /etc/dnsmasq.d when possible
+- LuCI: copies luci-app-glinet-privacy into /usr/lib/lua/luci/... (Services → GL.iNet Privacy), unless --without-luci
 - Restarts network, firewall, dnsmasq, rpcd, uhttpd
 
 Optional flags
 --------------
   --minimal           Files + firewall + device profile only (no opkg/Tor/cron/telemetry automation)
-  --with-luci         Install LuCI app (Services → GL.iNet Privacy)
+  --without-luci      Skip LuCI app files (default is to install them)
+  --with-luci         Same as default (install LuCI app); kept for compatibility
   --with-imei-boot    Enable rotate_imei on boot (cellular; read docs/devices.md IMEI section)
-  --with-imei-cron    Add cron: IMEI rotate every 6 hours (optional ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 in crontab)
+  --with-imei-cron    Enable UCI IMEI cron (default every 6h); change interval in LuCI → IMEI rotation
 
 VPN (WireGuard / OpenVPN)
 -------------------------
 Configure the client in the GL.iNet admin. Then set the WireGuard interface name in LuCI
 (Services → GL.iNet Privacy → Kill switch) so the watchdog matches your tunnel.
-
-Prebuilt .ipk (optional)
--------------------------
-See package/BUILDING.txt and GitHub Actions artifacts / releases.
 
 Notes
 -----

@@ -131,11 +131,23 @@ msgstr "Run on boot"
 msgid "Uses /etc/init.d/rotate_imei when enabled."
 msgstr "Uses /etc/init.d/rotate_imei when enabled."
 
-msgid "Optional 8-digit TAC"
-msgstr "Optional 8-digit TAC"
+msgid "Cron: rotate on a schedule"
+msgstr "Cron: rotate on a schedule"
 
-msgid "Leave empty for fully random Luhn-valid IMEI"
-msgstr "Leave empty for fully random Luhn-valid IMEI"
+msgid "Adds one line to /etc/crontabs/root for /usr/bin/rotate_imei.sh. Requires a system cron daemon (scheduled tasks). Interval is configured below."
+msgstr "Adds one line to /etc/crontabs/root for /usr/bin/rotate_imei.sh. Requires a system cron daemon (scheduled tasks). Interval is configured below."
+
+msgid "Hours between cron rotations"
+msgstr "Hours between cron rotations"
+
+msgid "Crontab runs at minute 0 each period (1 = every hour at :00; 24 = once daily at midnight; other values use 0 */N * * *)."
+msgstr "Crontab runs at minute 0 each period (1 = every hour at :00; 24 = once daily at midnight; other values use 0 */N * * *)."
+
+msgid "Suppress legal notice in syslog (cron)"
+msgstr "Suppress legal notice in syslog (cron)"
+
+msgid "Prefixes the cron command with ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 (use only after you have verified legal compliance)."
+msgstr "Prefixes the cron command with ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 (use only after you have verified legal compliance)."
 
 msgid "Modem serial device"
 msgstr "Modem serial device"

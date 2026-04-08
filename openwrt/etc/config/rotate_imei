@@ -11,3 +11,6 @@ config rotate_imei 'main'
 	option modem_tty ''
 	# Optional wwan logical interface name (uci network section)
 	option wwan_if ''
+	option cron_enabled '0'
+	option cron_interval_hours '6'
+	option cron_suppress_legal_log '0'

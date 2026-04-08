@@ -1,12 +1,12 @@
 # GL.iNet stock web UI vs this project
 
-This repository ships **OpenWrt packages** (`glinet-privacy`, `luci-app-glinet-privacy`) and **LuCI** under **Services → GL.iNet Privacy**. That is **not** the same as a panel inside GL.iNet’s simplified **stock** admin (the non-LuCI UI).
+This repository ships **scripts, UCI, and LuCI sources** (`package/glinet-privacy/files`, `package/luci-app-glinet-privacy`) installed with **`install.sh`** — **Services → GL.iNet Privacy** in LuCI. That is **not** the same as a panel inside GL.iNet’s simplified **stock** admin (the non-LuCI UI).
 
 ## What GL.iNet offers today
 
 | Path | Purpose |
 |------|---------|
-| **[OpenWrt / GL.iNet SDK](https://github.com/gl-inet/sdk)** | Build **`.ipk`** packages for the router (CLI, **Plug-ins** / `opkg`). This is how **`glinet-privacy`** is built. |
+| **[OpenWrt / GL.iNet SDK](https://github.com/gl-inet/sdk)** | Build **`.ipk`** packages for the router (CLI, **Plug-ins** / `opkg`). This repo is **not** built that way here — use **`install.sh`** from a clone or tarball. |
 | **Plug-ins** in the stock UI | Wrapper around **`opkg`** — install/remove packages, not a framework for arbitrary new stock-UI pages. See [Plug-ins (docs)](https://docs.gl-inet.com/router/en/4/interface_guide/plugins/). |
 | **LuCI** | Standard OpenWrt web UI; **this project’s** settings live here. Access: **System → Advanced settings → Go to LuCI** (wording may vary by version). |
 

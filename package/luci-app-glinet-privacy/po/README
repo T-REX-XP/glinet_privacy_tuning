@@ -11,4 +11,4 @@ Regenerate POT and refresh PO stubs from the repository root:
 
 Then translate empty msgstr entries in po/uk/, po/de/, etc. English (po/en/) uses msgstr = msgid.
 
-The OpenWrt package Makefile compiles .po to /usr/lib/lua/luci/i18n/glinet_privacy.<lang>.lmo via po2lmo when you build the ipk.
+**Runtime catalogs:** `install.sh` (default) installs Lua sources only (English UI if no `.lmo` on the device). To ship translations, run **`po2lmo`** from OpenWrt/LuCI host tools (same as upstream LuCI packages) and copy **`glinet_privacy.<lang>.lmo`** to **`/usr/lib/lua/luci/i18n/`** on the router.

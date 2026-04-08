@@ -3,15 +3,38 @@
 Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).  
 **Source of truth:** `package/version.mk` (`GLINET_PRIVACY_VERSION`, `GLINET_PRIVACY_RELEASE`).
 
-Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VERSION` / `PKG_RELEASE` from that file.
+**`install.sh`** logs the version from that file; release notes live in this changelog.
 
 ## Release process (each change request)
 
 1. Edit **`package/version.mk`**
    - Bump **`GLINET_PRIVACY_VERSION`** for functional or documentation-visible changes (patch or minor as appropriate).
-   - Bump **`GLINET_PRIVACY_RELEASE`** only when rebuilding the **same** version (e.g. packaging fix, no version bump).
+   - Bump **`GLINET_PRIVACY_RELEASE`** only when you need another release of the **same** version string (rare).
 2. Append an entry under the new version in **`changes.md`** (this file).
-3. Rebuild ipk packages if you ship binaries.
+
+---
+
+## 1.2.4 (2026-04-08)
+
+### Added
+
+- **IMEI cron from LuCI** — UCI **`rotate_imei.main`**: **`cron_enabled`**, **`cron_interval_hours`** (1–24), **`cron_suppress_legal_log`**. **`usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh`** syncs **`/etc/crontabs/root`**; **`install.sh --with-imei-cron`** seeds **`cron_enabled=1`** and **`cron_interval_hours=6`**. **`README.md`** / **`openwrt/INSTALL.txt`** / crontab example updated.
+
+---
+
+## 1.2.3 (2026-04-08)
+
+### Changed
+
+- **`install.sh`** — Installs LuCI app files **by default** (`INSTALL_LUCI=1`). New **`--without-luci`** skips them; **`--with-luci`** remains as a no-op compatibility alias. **`README.md`**, **`openwrt/INSTALL.txt`**, **`package/luci-app-glinet-privacy/po/README`** updated.
+
+---
+
+## 1.2.2 (2026-04-08)
+
+### Removed
+
+- **OpenWrt package builds in-repo** — Deleted **`package/glinet-privacy/Makefile`**, **`package/luci-app-glinet-privacy/Makefile`**, **`package/BUILDING.txt`**, and **`.github/workflows/openwrt-packages.yml`** (entire **`.github`** tree). Distribution is **`install.sh`** / tarball only. **`README.md`**, **`openwrt/INSTALL.txt`**, **`docs/glinet-stock-ui.md`**, **`docs/backlog.md`**, **`package/luci-app-glinet-privacy/po/README`** updated accordingly.
 
 ---
 

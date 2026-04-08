@@ -165,7 +165,21 @@ end
 s:option(Flag, "enabled", translate("Run on boot"),
 	translate("Uses /etc/init.d/rotate_imei when enabled.")).rmempty = false
 
-s:option(Value, "imei_tac", translate("Optional 8-digit TAC"), translate("Leave empty for fully random Luhn-valid IMEI")).rmempty = true
+s:option(Flag, "cron_enabled", translate("Cron: rotate on a schedule"),
+	translate("Adds one line to /etc/crontabs/root for /usr/bin/rotate_imei.sh. Requires a system cron daemon (scheduled tasks). Interval is configured below.")).rmempty = false
+
+local cron_iv = s:option(ListValue, "cron_interval_hours", translate("Hours between cron rotations"),
+	translate("Crontab runs at minute 0 each period (1 = every hour at :00; 24 = once daily at midnight; other values use 0 */N * * *)."))
+for i = 1, 24 do
+	cron_iv:value(tostring(i))
+end
+cron_iv.default = "6"
+cron_iv:depends("cron_enabled", "1")
+
+local cron_sup = s:option(Flag, "cron_suppress_legal_log", translate("Suppress legal notice in syslog (cron)"),
+	translate("Prefixes the cron command with ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 (use only after you have verified legal compliance)."))
+cron_sup.rmempty = false
+cron_sup:depends("cron_enabled", "1")
 
 local modem_tty = s:option(ListValue, "modem_tty", translate("Modem serial device"),
 	translate("AT port for Quectel (often ttyUSB2). Empty = same scan order as rotate_imei.sh."))
@@ -227,6 +241,7 @@ end
 
 function m.on_commit(self)
 	sys.call("/etc/init.d/rotate_imei enable 2>/dev/null")
+	sys.call("/usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh 2>/dev/null || true")
 end
 
 return m

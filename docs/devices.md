@@ -44,7 +44,7 @@ Transparent Tor and related rules are driven by **`/usr/libexec/glinet-privacy/f
 - **Your responsibility:** You must determine whether IMEI changes are permitted **before** enabling boot rotation, cron, or manual runs of `/usr/bin/rotate_imei.sh`. The software is provided **as-is**; authors are not liable for misuse.
 - **Script behaviour:** Each run logs a short **legal notice** to syslog unless you set `ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1` (for example after you have documented compliance and want to quiet repeated cron messages). Suppressing the log does **not** reduce your legal obligations.
 
-Related: `package/glinet-privacy/files/usr/bin/rotate_imei.sh` (header comments), LuCI **Services → GL.iNet Privacy → IMEI rotation**.
+Related: `package/glinet-privacy/files/usr/bin/rotate_imei.sh` (header comments), LuCI **Services → GL.iNet Privacy → IMEI rotation** (boot, **cron schedule** via **`cron_enabled`** / **`cron_interval_hours`**, optional **`cron_suppress_legal_log`**).
 
 ## VPN kill switch: GL.iNet vendor UI vs glinet-privacy watchdog
 
