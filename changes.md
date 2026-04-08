@@ -15,6 +15,14 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.8 (2026-04-08)
+
+### Added
+
+- **LuCI i18n**: `package/luci-app-glinet-privacy/po/` — `templates/glinet_privacy.pot`, catalogs `en` / `uk` / `de` (`glinet_privacy.po`). Host scripts `tools/extract-luci-i18n-strings.py` and `tools/i18n-build-po-from-pot.py` regenerate POT/PO from LuCI sources. The app Makefile runs `po2lmo` (`PKG_BUILD_DEPENDS:=luci-base/host`) and installs `glinet_privacy.<lang>.lmo` under `/usr/lib/lua/luci/i18n/`. Runtime catalog load via `luasrc/glinet_privacy/i18n.lua` (`luci.glinet_privacy.i18n`).
+
+---
+
 ## 1.1.7 (2026-04-08)
 
 ### Added

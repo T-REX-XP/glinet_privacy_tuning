@@ -4,6 +4,8 @@ LuCI: GL.iNet Privacy — Services menu
 
 module("luci.controller.glinet_privacy", package.seeall)
 
+require "luci.glinet_privacy.i18n"
+
 function index()
 	entry({"admin", "services", "glinet_privacy"},
 		alias("admin", "services", "glinet_privacy", "overview"),

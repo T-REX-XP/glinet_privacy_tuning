@@ -26,6 +26,11 @@ Vendor VPN kill switch (GL.iNet `glvpn`): **Kill switch** page (`privacy.main.ve
 
 Versioning: edit package/version.mk and changes.md for each release; see changes.md.
 
+Translations (LuCI): after editing `.lua` / `.htm` strings, run from the repo root:
+  python tools/extract-luci-i18n-strings.py
+  python tools/i18n-build-po-from-pot.py
+Edit `package/luci-app-glinet-privacy/po/<lang>/glinet_privacy.po` (e.g. uk, de), then rebuild the ipk; `po2lmo` runs during `make package/luci-app-glinet-privacy/compile` (requires luci-base host). See `package/luci-app-glinet-privacy/po/README`.
+
 CI: push a tag `v1.2.3` to trigger `.github/workflows/openwrt-packages.yml` and publish
 `.ipk` files to a GitHub Release. PRs and pushes build artifacts only (no release).
 

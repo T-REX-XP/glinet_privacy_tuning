@@ -1,6 +1,7 @@
 --[[
 IMEI rotation — UCI: rotate_imei
 ]]
+require "luci.glinet_privacy.i18n"
 
 local sys = require "luci.sys"
 

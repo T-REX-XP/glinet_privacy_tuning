@@ -2,6 +2,8 @@
 Kill switch — UCI: privacy
 ]]
 
+require "luci.glinet_privacy.i18n"
+
 local sys = require "luci.sys"
 
 m = Map("privacy", translate("Privacy kill switch"),

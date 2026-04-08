@@ -1,6 +1,7 @@
 --[[
 Tor NAT + telemetry — single Map for glinet_privacy (avoids wiping sibling sections)
 ]]
+require "luci.glinet_privacy.i18n"
 
 local sys = require "luci.sys"
 

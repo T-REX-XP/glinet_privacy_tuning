@@ -1,0 +1,351 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app-glinet-privacy\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-08 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Device profile"
+msgstr ""
+
+msgid "Firewall plugin registered"
+msgstr ""
+
+msgid "Missing UCI firewall.glinet_privacy"
+msgstr ""
+
+msgid "Not required"
+msgstr ""
+
+msgid "Interface up"
+msgstr ""
+
+msgid "Down or missing"
+msgstr ""
+
+msgid "Tor daemon"
+msgstr ""
+
+msgid "Not required by kill switch"
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Not running"
+msgstr ""
+
+msgid "Tor transparent NAT"
+msgstr ""
+
+msgid "REDIRECT rules present"
+msgstr ""
+
+msgid "UCI enabled; no REDIRECT in NAT table"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "Kill switch"
+msgstr ""
+
+msgid "Emergency DROP active (VPN/Tor unhealthy?)"
+msgstr ""
+
+msgid "Watchdog active; no DROP (healthy)"
+msgstr ""
+
+msgid "Cron watchdog"
+msgstr ""
+
+msgid "Scheduled"
+msgstr ""
+
+msgid "No crontab line"
+msgstr ""
+
+msgid "Telemetry DNS block"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Off"
+msgstr ""
+
+msgid "tor package / binary"
+msgstr ""
+
+msgid "Present"
+msgstr ""
+
+msgid "Missing"
+msgstr ""
+
+msgid "WireGuard (%s)"
+msgstr ""
+
+msgid "GL.iNet Privacy"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "IMEI rotation"
+msgstr ""
+
+msgid "Tor, DNS & telemetry"
+msgstr ""
+
+msgid "WireGuard / Mullvad"
+msgstr ""
+
+msgid "Boot-time or cron rotation for Quectel modems via AT+EGMR. Altering IMEI may be unlawful outside operator-authorized or lab use; you are responsible for compliance. See docs/devices.md (IMEI section) in the project repository. Firmware may reject writes. Optional: set ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 on cron after you have verified compliance."
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Run on boot"
+msgstr ""
+
+msgid "Uses /etc/init.d/rotate_imei when enabled."
+msgstr ""
+
+msgid "Optional 8-digit TAC"
+msgstr ""
+
+msgid "Leave empty for fully random Luhn-valid IMEI"
+msgstr ""
+
+msgid "Modem serial device"
+msgstr ""
+
+msgid "e.g. /dev/ttyUSB2"
+msgstr ""
+
+msgid "WWAN logical interface"
+msgstr ""
+
+msgid "uci network section name, e.g. wwan"
+msgstr ""
+
+msgid "Privacy kill switch"
+msgstr ""
+
+msgid "This page configures the glinet-privacy watchdog (iptables). GL.iNet stock firmware may also offer a VPN kill switch under VPN Dashboard — see below."
+msgstr ""
+
+msgid "Privacy watchdog (glinet-privacy)"
+msgstr ""
+
+msgid "Enable watchdog"
+msgstr ""
+
+msgid "If disabled, killswitch rules are flushed."
+msgstr ""
+
+msgid "WireGuard interface"
+msgstr ""
+
+msgid "e.g. wg0"
+msgstr ""
+
+msgid "Require WG interface UP"
+msgstr ""
+
+msgid "Require Tor running"
+msgstr ""
+
+msgid "LAN bridge / device"
+msgstr ""
+
+msgid "e.g. br-lan; leave empty to use network.lan.device"
+msgstr ""
+
+msgid "Physical WAN device"
+msgstr ""
+
+msgid "e.g. wwan0 or eth0; required for correct FORWARD match"
+msgstr ""
+
+msgid "GL.iNet vendor VPN kill switch (glvpn)"
+msgstr ""
+
+msgid "Stock firmware <em>Block Non-VPN Traffic</em> is often <code>glvpn.general.block_non_vpn</code>. Default <strong>Leave</strong> does not touch vendor UCI. Use On/Off only if that file exists. Prefer one strategy: this watchdog <em>or</em> vendor rules — both may overlap. v4.8+ may use VPN Dashboard instead; see docs/devices.md."
+msgstr ""
+
+msgid "Leave (do not change glvpn)"
+msgstr ""
+
+msgid "On (block_non_vpn=1)"
+msgstr ""
+
+msgid "Off (block_non_vpn=0)"
+msgstr ""
+
+msgid "Tor transparent NAT runs via the firewall plugin. DNS policy can forward dnsmasq to Tor or Mullvad. Telemetry uses dnsmasq black-holes and optional vendor toggles. Device profile is set by /usr/libexec/glinet-privacy/apply-device-profile.sh."
+msgstr ""
+
+msgid "Detected profile"
+msgstr ""
+
+msgid "puli_xe300 = cellular; slate_ax1800 / gl_ax1800 = Ethernet travel routers (no LTE modem)."
+msgstr ""
+
+msgid "Board hint"
+msgstr ""
+
+msgid "Auto WAN device"
+msgstr ""
+
+msgid "When on, apply-device-profile sets privacy.main.wan_dev for Puli (wwan0) or clears mistaken wwan0 on Slate/Flint."
+msgstr ""
+
+msgid "Transparent Tor"
+msgstr ""
+
+msgid "Enable Tor NAT redirects"
+msgstr ""
+
+msgid "When enabled, fw-plugin runs /etc/firewall.privacy-tor.sh on firewall reload."
+msgstr ""
+
+msgid "LAN CIDR"
+msgstr ""
+
+msgid "Exclude local destinations from TCP redirect."
+msgstr ""
+
+msgid "Router LAN IP"
+msgstr ""
+
+msgid "DNS redirect exception."
+msgstr ""
+
+msgid "LAN device"
+msgstr ""
+
+msgid "Empty = network.lan.device."
+msgstr ""
+
+msgid "Tor TransPort"
+msgstr ""
+
+msgid "Default 9040"
+msgstr ""
+
+msgid "Tor DNSPort"
+msgstr ""
+
+msgid "Default 9053"
+msgstr ""
+
+msgid "Telemetry"
+msgstr ""
+
+msgid "Enable dnsmasq blocklist"
+msgstr ""
+
+msgid "Symlinks /etc/glinet-privacy/glinet-block.conf into /etc/dnsmasq.d/."
+msgstr ""
+
+msgid "Disable GL.iNet cloud (UCI + services)"
+msgstr ""
+
+msgid "Sets glconfig.cloud.enable=0 where present, stops gl_cloud / goodcloud init scripts, and installs DNS black-holes via /etc/dnsmasq.d/glinet-block.conf (same as reference: goodcloud.xyz, gldns.com)."
+msgstr ""
+
+msgid "Remove cloud packages (opkg)"
+msgstr ""
+
+msgid "When saving telemetry settings, best-effort uninstall of gl-cloud and related packages (optional; may affect stock GL.iNet features)."
+msgstr ""
+
+msgid "DNS leak reduction"
+msgstr ""
+
+msgid "Router DNS (dnsmasq)"
+msgstr ""
+
+msgid "No automatic change (manual / Mullvad apply script)"
+msgstr ""
+
+msgid "Forward to Tor (127.0.0.1 → DNSPort)"
+msgstr ""
+
+msgid "Forward to Mullvad DNS IP"
+msgstr ""
+
+msgid "Mullvad DNS address"
+msgstr ""
+
+msgid "Used when policy is Mullvad; default matches Mullvad WireGuard DNS (10.64.0.1)."
+msgstr ""
+
+msgid "Redirect LAN TCP/53 to Tor"
+msgstr ""
+
+msgid "When transparent Tor is enabled, send LAN TCP DNS to Tor DNSPort (UDP was already redirected)."
+msgstr ""
+
+msgid "Block LAN DNS-over-TLS (port 853)"
+msgstr ""
+
+msgid "Drop forwarded TCP/853 from LAN to non-router destinations. Can break DoT to public resolvers; use only if you accept that tradeoff."
+msgstr ""
+
+msgid "GL.iNet Privacy — overview"
+msgstr ""
+
+msgid "Status checklist and quick toggles. Detailed pages are linked from the menu."
+msgstr ""
+
+msgid "Setup progress"
+msgstr ""
+
+msgid "Healthy checks:"
+msgstr ""
+
+msgid "Skipped:"
+msgstr ""
+
+msgid "Quick settings"
+msgstr ""
+
+msgid "Toggle core options here; use the other tabs for advanced fields."
+msgstr ""
+
+msgid "Kill switch enabled"
+msgstr ""
+
+msgid "Require WireGuard interface up"
+msgstr ""
+
+msgid "Telemetry DNS blocklist"
+msgstr ""
+
+msgid "Disable GL.iNet cloud (GoodCloud + DNS block)"
+msgstr ""
+
+msgid "Remove GL.iNet cloud packages (opkg)"
+msgstr ""
+
+msgid "IMEI rotation enabled"
+msgstr ""
+
+msgid "Save & apply"
+msgstr ""
+
+msgid "Install WireGuard tools and add an interface under Network → Interfaces, or apply Mullvad using the helper script:"
+msgstr ""
+
+msgid "Secrets are not stored in this UI; use SSH or edit UCI <code>network</code> manually."
+msgstr ""
