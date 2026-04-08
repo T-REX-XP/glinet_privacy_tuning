@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # glinet_puli_privacy — remove glinet-privacy and LuCI app files from OpenWrt / GL.iNet.
 # Reverses a typical install.sh run: stops watchdog, flushes killswitch rules, removes
 # firewall hooks, crontab lines, Tor include, dnsmasq symlink, UCI configs, and package files.

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-only
 # Merge into /etc/crontabs/root — privacy watchdog every minute; IMEI example every 6h.
 # */1 * * * * /usr/bin/privacy-killswitch-watchdog.sh
 # 0 */6 * * * /usr/bin/rotate_imei.sh

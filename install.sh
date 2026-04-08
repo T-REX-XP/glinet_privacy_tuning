@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # glinet_puli_privacy — one-shot installer for OpenWrt / GL.iNet (POSIX sh).
 #
 # Default: copies package files, registers firewall, applies device profile, installs

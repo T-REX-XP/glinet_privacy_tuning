@@ -1,4 +1,6 @@
 --[[
+SPDX-License-Identifier: GPL-2.0-only
+Copyright (c) 2026 GL.iNet Privacy contributors
 Harden user/UCI strings before shell interpolation or UCI commit (defense-in-depth).
 IFNAMSIZ on Linux is 16 bytes including trailing NUL => 15 printable chars max.
 ]]

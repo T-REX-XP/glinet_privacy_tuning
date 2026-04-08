@@ -1,4 +1,6 @@
 --[[
+SPDX-License-Identifier: GPL-2.0-only
+Copyright (c) 2026 GL.iNet Privacy contributors
 VPN / tunnel interfaces via OpenWrt `ifstatus` / `ubus call network.interface.<name> status`.
 Callers must pass **sanitized** interface / section names (see sanitize.lua).
 ]]

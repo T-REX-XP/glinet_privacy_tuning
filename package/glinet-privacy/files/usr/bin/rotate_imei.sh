@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # rotate_imei.sh — Generate a valid 15-digit IMEI (Luhn) and write to Quectel EG25-G NV.
 # Requires: busybox awk, stty. Optional: TAC (8 digits) via env IMEI_TAC.
 #

@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # privacy-killswitch-watchdog.sh — Block LAN→WAN forward when WireGuard and/or Tor are unhealthy.
 # Uses iptables (xtables-nft on OpenWrt). Requires comment match (kmod-ipt-comment).
 

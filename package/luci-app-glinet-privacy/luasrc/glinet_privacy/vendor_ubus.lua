@@ -1,4 +1,6 @@
 --[[
+SPDX-License-Identifier: GPL-2.0-only
+Copyright (c) 2026 GL.iNet Privacy contributors
 Read-only ubus snapshots for LuCI (VPN/DNS context). Opt-in + optional version gate; see docs/vendor-ubus.md.
 Only invocations listed in docs/vendor-ubus.md are executed; object/interface names are never taken from HTTP input.
 ]]

@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # Detect GL.iNet / OpenWrt board and set sensible privacy.main.wan_dev + glinet_privacy.hw.slug.
 # GL-XE300 (Puli): cellular — default wwan0 when empty.
 # GL-AXT1800 (Slate AX), GL-AX1800 (Flint), etc.: Ethernet / travel — clear mistaken wwan0.

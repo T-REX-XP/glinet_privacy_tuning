@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-only
 # privacy — paths for killswitch / Tor helper scripts (copy to /etc/config/privacy)
 
 config privacy 'main'

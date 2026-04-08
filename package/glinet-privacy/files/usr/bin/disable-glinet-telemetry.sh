@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # disable-glinet-telemetry.sh — Best-effort UCI toggles for GL.iNet cloud/telemetry (firmware-dependent).
 # Reference behaviour: glconfig.cloud.enable=0, gl_cloud stop/disable, DNS blocks via apply-telemetry.sh + dnsmasq.d.
 

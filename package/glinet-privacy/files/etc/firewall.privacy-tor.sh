@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # NAT redirects for transparent Tor — sourced by glinet-privacy fw-plugin when enabled.
 # Values from UCI glinet_privacy.firewall.main, then network.lan, then defaults.
 

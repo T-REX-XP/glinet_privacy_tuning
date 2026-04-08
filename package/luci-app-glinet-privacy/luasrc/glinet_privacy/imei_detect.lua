@@ -1,4 +1,6 @@
 --[[
+SPDX-License-Identifier: GPL-2.0-only
+Copyright (c) 2026 GL.iNet Privacy contributors
 Shared IMEI page probes — same heuristics as rotate_imei.sh / former CBI.
 ]]
 

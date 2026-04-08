@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
+# OpenWrt packages (core + LuCI)
+# ==============================
+
+Layout (this directory)
+-----------------------
+  version.mk                    — PKG_VERSION / PKG_RELEASE for both Makefiles
+  glinet-privacy/Makefile       — shell, UCI, firewall helpers (no LuCI)
+  luci-app-glinet-privacy/Makefile — LuCI controller, views, rpcd ACL, menu.d JSON
+
+Feed integration
+----------------
+See ../feeds.conf.example (src-git …;subdir=package or src-link …/package).
+
+After feeds install, enable in menuconfig:
+  * Network → glinet-privacy
+  * LuCI → Applications → luci-app-glinet-privacy
+
+Build examples (OpenWrt buildroot):
+  make package/glinet-privacy/compile V=s
+  make package/luci-app-glinet-privacy/compile V=s
+
+Notes
+-----
+* Tor / wireguard kmod are not hard Depends on glinet-privacy (optional at runtime); install.sh pulls more than the ipk metadata.
+* Translations: .po sources live under luci-app-glinet-privacy/po/; .lmo build is not wired in the Makefile (see po/README — po2lmo on a dev host if you ship locales).
+* remove.sh --opkg assumes package names glinet-privacy and luci-app-glinet-privacy.

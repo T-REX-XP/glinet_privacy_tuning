@@ -53,6 +53,8 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 
 ## Misc (cross-cutting)
 
+- [x] **SPDX + `PKG_LICENSE`** — **`GPL-2.0-only`** in **`package/*/Makefile`**, **`LICENSE`** at repo root; SPDX file headers on sources (**v1.2.19**).
+- [x] **OpenWrt feed docs + Makefile hardening** — **`feeds.conf.example`**, **`package/OPENWRT-BUILD.txt`**, **`conffiles`** / **`postinst`** on **`glinet-privacy`** and **`luci-app-glinet-privacy`** (**v1.2.20**).
 - [ ] Automated tests in CI (none yet; no on-device smoke tests).
 - [x] LuCI i18n `.po` files if translations are required beyond English strings in templates (`po/`, `tools/extract-luci-i18n-strings.py`, `tools/i18n-build-po-from-pot.py`; optional **`po2lmo`** on a host with LuCI tools, then copy **`glinet_privacy.<lang>.lmo`** to **`/usr/lib/lua/luci/i18n/`** — see `package/luci-app-glinet-privacy/po/README`).
 - [x] **LuCI security hardening (v1.2.13)** — **`sanitize.lua`** (ifnames, tty paths, IPv4/CIDR, ports); **`rpcd` ACL** write scope narrowed; **Verify** router **`verify_ip`** path + browser/router mode + HTML **`esc()`**; **Overview** **`pcdata(details)`**. *Still open:* **nft**-native status, fully offline Verify — see **`docs/contributor-review.md`** backlog.

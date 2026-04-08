@@ -17,6 +17,10 @@ Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by defau
 - **LuCI** — `luci-app-glinet-privacy` under **Services → GL.iNet Privacy** (overview, kill switch, IMEI, Tor/DNS/telemetry).
 - **i18n** — gettext `.po` catalogs under `package/luci-app-glinet-privacy/po/`; regenerate with `tools/extract-luci-i18n-strings.py` and `tools/i18n-build-po-from-pot.py` (see [package/luci-app-glinet-privacy/po/README](package/luci-app-glinet-privacy/po/README)).
 
+## OpenWrt package build (optional)
+
+To build **`glinet-privacy`** and **`luci-app-glinet-privacy`** `.ipk` files in an OpenWrt tree, see [**`feeds.conf.example`**](feeds.conf.example) and [**`package/OPENWRT-BUILD.txt`](package/OPENWRT-BUILD.txt)** (and [**`openwrt/INSTALL.txt`](openwrt/INSTALL.txt)**).
+
 ## Quick install (on the router)
 
 Requires **OpenWrt** (e.g. GL.iNet stock firmware based on OpenWrt). Run as **root**.
@@ -74,4 +78,4 @@ Version and changelog: [package/version.mk](package/version.mk), [changes.md](ch
 
 ## License
 
-SPDX: **MIT** (see file headers in `package/glinet-privacy/files/`, `install.sh`, and `remove.sh`).
+**GPL-2.0-only** — full text in [`LICENSE`](LICENSE); package metadata uses **`PKG_LICENSE:=GPL-2.0-only`** in `package/glinet-privacy/Makefile` and `package/luci-app-glinet-privacy/Makefile`. Source files carry **`SPDX-License-Identifier: GPL-2.0-only`** where a comment syntax exists.

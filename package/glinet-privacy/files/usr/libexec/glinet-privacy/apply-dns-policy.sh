@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # apply-dns-policy.sh — Point dnsmasq at Tor DNSPort when dns_policy=tor_dnsmasq (reduces ISP DNS leaks).
 
 set -eu

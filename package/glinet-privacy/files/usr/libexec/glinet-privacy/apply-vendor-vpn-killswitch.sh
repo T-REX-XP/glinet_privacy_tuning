@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # apply-vendor-vpn-killswitch.sh — Best-effort sync of GL.iNet stock "Block Non-VPN Traffic" (VPN kill switch)
 # via UCI glvpn when present (vendor firmware). See docs/devices.md — coexistence with privacy-killswitch-watchdog.
 

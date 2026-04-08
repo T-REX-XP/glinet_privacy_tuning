@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
 """Generate en/uk/de .po files from templates/glinet_privacy.pot."""
 from __future__ import annotations
 

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-only
 # rotate_imei UCI — copy to /etc/config/rotate_imei on the router
 #
 # Legal: IMEI changes may be illegal in your jurisdiction; use only where authorized

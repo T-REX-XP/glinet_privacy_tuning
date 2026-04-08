@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # Apply dnsmasq GL.iNet blocklist from /etc/glinet-privacy/glinet-block.conf
 # When "disable vendor cloud" is on, also install the same DNS black-holes (reference: goodcloud.xyz, gldns.com).
 

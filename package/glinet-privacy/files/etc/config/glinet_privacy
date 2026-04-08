@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-only
 # GL.iNet Privacy — Tor / firewall / telemetry (LuCI + CLI)
 # Device profile: apply-device-profile.sh sets hw.slug (puli_xe300, slate_ax1800, …)
 

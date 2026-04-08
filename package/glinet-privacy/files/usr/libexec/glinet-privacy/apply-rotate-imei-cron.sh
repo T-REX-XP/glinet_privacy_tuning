@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # Sync /etc/crontabs/root IMEI rotation line from UCI rotate_imei.main (cron_enabled, cron_interval_hours, cron_suppress_legal_log).
 # Legal: see docs/devices.md (IMEI section).
 

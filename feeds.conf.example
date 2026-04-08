@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
+# Add one line to your OpenWrt buildroot feeds.conf (copy path/URL as needed).
+#
+# Recommended: clone the whole repo but index only package/ (version.mk stays next to both Makefiles).
+# src-git glinet_privacy https://github.com/T-REX-XP/glinet_privacy_tuning.git;subdir=package
+#
+# Local tree (absolute path to this repo’s package/ directory — contains version.mk + both packages):
+# src-link glinet_privacy /path/to/glinet_puli_privacy/package
+#
+# Then from the OpenWrt buildroot:
+#   ./scripts/feeds update glinet_privacy
+#   ./scripts/feeds install -a -p glinet_privacy
+#   make menuconfig   # Network → glinet-privacy; LuCI → Applications → luci-app-glinet-privacy
+#   make package/glinet-privacy/compile package/luci-app-glinet-privacy/compile V=s
+#
+# PKG_LICENSE_FILES in each Makefile expects LICENSE at the repository root (two levels up from
+# package/glinet-privacy/). With src-git;subdir=package the full checkout still includes that file.

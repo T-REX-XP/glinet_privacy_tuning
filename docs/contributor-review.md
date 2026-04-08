@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). As of **v1.2.13**, **`sanitize.lua`** and a **narrowed rpcd write ACL** address the earlier **command-injection** and **over-broad UCI write** concerns for this app’s LuCI layer. Remaining gaps for an upstream-quality package include: **iptables-centric** status checks on **nft-first** images (see **`docs/backlog.md`** Epic 3 follow-up), **optional third-party calls** on **Verify** (browser geo / router→ipify; fully offline mode still open), **legacy LuCI Lua** (`module()`, `package.seeall`), **no in-tree OpenWrt `Makefile` feed layout**, and **composition** with stock **Network → DNS** / **VPN Dashboard** (OOTB checklist — P1 backlog below). **CSRF** for custom POST forms is **implemented** (**v1.2.17+**: hidden **`token`** = session **`authtoken`**, same model as stock **`dispatcher.test_post_security`**).
+The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). As of **v1.2.13**, **`sanitize.lua`** and a **narrowed rpcd write ACL** address the earlier **command-injection** and **over-broad UCI write** concerns for this app’s LuCI layer. Remaining gaps for an upstream-quality package include: **iptables-centric** status checks on **nft-first** images (see **`docs/backlog.md`** Epic 3 follow-up), **optional third-party calls** on **Verify** (browser geo / router→ipify; fully offline mode still open), **legacy LuCI Lua** (`module()`, `package.seeall`), **feed integration** is documented (**`feeds.conf.example`**, **`v1.2.20+`**); **composition** with stock **Network → DNS** / **VPN Dashboard** (OOTB checklist — P1 backlog below). **CSRF** for custom POST forms is **implemented** (**v1.2.17+**: hidden **`token`** = session **`authtoken`**, same model as stock **`dispatcher.test_post_security`**).
 
 ---
 
@@ -81,7 +81,7 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 
 | Topic | Current state | Upstream expectation |
 |-------|---------------|----------------------|
-| **Package layout** | Install via `install.sh` copying sources | Feed package: `Makefile` with `PKG_NAME`, `PKG_LICENSE`, `PKG_MAINTAINER`, **SPDX** file headers, split `luci-app-*` vs `glinet-privacy` **core** packages |
+| **Package layout** | **`install.sh`** + feed **`Makefile`**s (**`glinet-privacy`**, **`luci-app-glinet-privacy`**): **`PKG_LICENSE`**, **`PKG_LICENSE_FILES`**, **SPDX** on sources (**v1.2.19+**) | **`DEPENDS`** / **`PKG_SOURCE`** aligned with a published feed if targeting **openwrt/packages**-style inclusion |
 | **LuCI controller style** | Lua `module("…", package.seeall)` + optional **`menu.d` JSON** | Installer auto when **`openwrt_release`** ≥ **22.03** **or** stock **`menu.d/*.json`** exists (GL.iNet **`DISTRIB_RELEASE`** may be **4.x**). Marker **`luci-use-menu-d`** → Lua **`index()`** skipped. Actions stay Lua **`call()`** until a full ucode/JS port. |
 | **Menu path** | `admin/services/glinet_privacy` | Acceptable; ensure no collision with core `services` naming |
 | **Route alias** | `plugins` used for Tor/DNS page | Confusing for contributors — consider renaming internal route to `tor_dns` with redirect from old URL |
@@ -147,8 +147,8 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 #### Packaging & license
 
-- [ ] Add **OpenWrt-style `Makefile`** packages (core + `luci-app-*`).  
-- [ ] **SPDX** headers on new/changed files; **`PKG_LICENSE`**.
+- [x] Add **OpenWrt-style `Makefile`** packages (core + `luci-app-*`).  
+- [x] **SPDX** headers on new/changed files; **`PKG_LICENSE`** (**v1.2.19+**).
 
 #### LuCI / routing hygiene
 
@@ -180,6 +180,6 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 ## Conclusion
 
-The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
+The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **nft-aware status** is the main structural follow-up (**core + LuCI `Makefile`**s, **SPDX** / **`PKG_LICENSE`**, **`conffiles`** / feed docs: **v1.2.19**–**v1.2.20**).
 
-*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.18** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.20** (`package/version.mk`). Re-check **`changes.md`** on each release.*

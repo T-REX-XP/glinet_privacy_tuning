@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # Registers glinet-privacy with OpenWrt firewall (fw3/fw4) and adds a GL.iNet-style
 # /etc/firewall.user hook. Some firmware upgrades reset UCI firewall includes; the
 # firewall.user line still runs fw-plugin.sh on each firewall reload (rules are idempotent).

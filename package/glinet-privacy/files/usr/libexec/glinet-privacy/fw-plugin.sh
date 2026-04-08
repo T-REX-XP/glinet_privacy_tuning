@@ -1,4 +1,7 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
+#
 # glinet-privacy firewall plugin — OpenWrt firewall include entry point (fw3/fw4).
 # Registered as firewall.glinet_privacy.path; also invoked from /etc/firewall.user
 # (glinet-privacy-fw-plugin) for GL.iNet images where UCI include may be reset on upgrade.

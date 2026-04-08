@@ -1,4 +1,6 @@
 --[[
+SPDX-License-Identifier: GPL-2.0-only
+Copyright (c) 2026 GL.iNet Privacy contributors
 CSRF for custom HTML forms: hidden field "token" must match the LuCI session authtoken
 (same model as stock luci.dispatcher.test_post_security in luci-lua-runtime).
 Uses luci.http only — avoids _G.L.http vs classic module mismatch on mixed images.

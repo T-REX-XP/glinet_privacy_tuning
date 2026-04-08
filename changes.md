@@ -14,6 +14,22 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.20 (2026-04-08)
+
+### Changed
+
+- **OpenWrt packaging** — Documented feed integration (**`feeds.conf.example`**, **`package/OPENWRT-BUILD.txt`**, **`openwrt/INSTALL.txt`**, README pointer). **`glinet-privacy`** Makefile: **`conffiles`** for UCI / Tor fragment / blocklist / firewall hook, **`Build/Prepare`**, **`postinst`** (enables **`privacy-killswitch`** after install). **`luci-app-glinet-privacy`**: **`conffiles`** for **`rpcd`** ACL + **`menu.d`**, **`postinst`** clears LuCI index cache, SPDX/copyright header in Makefile.
+
+---
+
+## 1.2.19 (2026-04-08)
+
+### Changed
+
+- **License metadata** — Root **`LICENSE`** is **GPL-2.0-only**; **`package/glinet-privacy/Makefile`** and **`package/luci-app-glinet-privacy/Makefile`** set **`PKG_LICENSE:=GPL-2.0-only`** and **`PKG_LICENSE_FILES`**. **SPDX-License-Identifier: GPL-2.0-only** (and copyright line where used) on shell scripts, config snippets, LuCI **`.lua` / `.htm`**, **`tools/*.py`**, and related tree files.
+
+---
+
 ## 1.2.18 (2026-04-09)
 
 ### Changed

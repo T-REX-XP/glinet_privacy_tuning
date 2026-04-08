@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: GPL-2.0-only
 # Example: rotate IMEI on a schedule (prefer LuCI → Services → GL.iNet Privacy → IMEI rotation:
 # cron_enabled + cron_interval_hours; applies /usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh).
 # 0 */6 * * * /usr/bin/rotate_imei.sh

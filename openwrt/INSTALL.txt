@@ -50,6 +50,18 @@ VPN (WireGuard / OpenVPN)
 Configure the client in the GL.iNet admin. Then set the WireGuard interface name in LuCI
 (Services → GL.iNet Privacy → Kill switch) so the watchdog matches your tunnel.
 
+Building ipk packages (OpenWrt buildroot)
+-------------------------------------------
+The repo ships **OpenWrt-style** packages under **`package/glinet-privacy/`** and
+**`package/luci-app-glinet-privacy/`** (shared **`package/version.mk`**).
+
+- Example **`feeds.conf`** lines: **`feeds.conf.example`** at the repository root
+  (**`src-git` … `;subdir=package`** or **`src-link` …/package**).
+- Details: **`package/OPENWRT-BUILD.txt`**.
+- After **`./scripts/feeds update`** / **`install`**, enable **Network → glinet-privacy**
+  and **LuCI → Applications → luci-app-glinet-privacy** in **`make menuconfig`**, then
+  **`make package/glinet-privacy/compile package/luci-app-glinet-privacy/compile`**.
+
 Notes
 -----
 - IMEI: legal use and operator/lab framing — **docs/devices.md** (IMEI rotation section); each run logs a notice unless `ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1`.

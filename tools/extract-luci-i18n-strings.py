@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-2.0-only
+# Copyright (c) 2026 GL.iNet Privacy contributors
 """Extract translate() / translatef() / tr() / <%: %> strings for luci-app-glinet-privacy."""
 from __future__ import annotations
 
