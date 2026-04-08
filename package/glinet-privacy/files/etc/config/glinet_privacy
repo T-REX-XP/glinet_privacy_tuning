@@ -20,11 +20,9 @@ config telemetry 'tel'
 	# Best-effort opkg remove (gl-cloud, …) when disable_vendor_cloud runs; can break stock GL.iNet UI
 	option remove_cloud_packages '0'
 
-# DNS leak reduction: dnsmasq on router + optional LAN TCP/53 redirect when Tor transparent is on
+# DNS: optional tor_dnsmasq (use with Tor running); else leave default
 config dns 'dns'
 	option dns_policy 'default'
-	# tor_dnsmasq: use with Tor running; mullvad_dnsmasq: use when WireGuard to Mullvad is up
-	option mullvad_dns '10.64.0.1'
 	# Redirect LAN TCP/53 to Tor DNSPort (same idea as UDP; many clients use UDP only)
 	option redirect_tcp_dns '1'
 	# Drop LAN→forwarded TCP/853 (DoT) to non-router; can break intentional DoT — off by default

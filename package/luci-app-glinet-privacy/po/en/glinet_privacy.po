@@ -170,8 +170,8 @@ msgstr "Network interfaces (uci): %s"
 msgid "Privacy kill switch"
 msgstr "Privacy kill switch"
 
-msgid "Configure the glinet-privacy watchdog (iptables). <strong>VPN first:</strong> set up Mullvad or another provider in the GL.iNet admin using the built-in <strong>WireGuard</strong> or <strong>OpenVPN</strong> client (stock firmware supports Mullvad). This LuCI app does not store VPN credentials. <strong>Then</strong> set the WireGuard interface name below to match the interface that is up when the tunnel is connected (check <em>Network → Interfaces</em> or <code>ip link</code> — often <code>wgclient</code> on GL.iNet, sometimes <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. The <strong>Overview</strong> tab shows whether that interface is up. GL.iNet may also offer a vendor kill switch under VPN Dashboard — see below."
-msgstr "Configure the glinet-privacy watchdog (iptables). <strong>VPN first:</strong> set up Mullvad or another provider in the GL.iNet admin using the built-in <strong>WireGuard</strong> or <strong>OpenVPN</strong> client (stock firmware supports Mullvad). This LuCI app does not store VPN credentials. <strong>Then</strong> set the WireGuard interface name below to match the interface that is up when the tunnel is connected (check <em>Network → Interfaces</em> or <code>ip link</code> — often <code>wgclient</code> on GL.iNet, sometimes <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. The <strong>Overview</strong> tab shows whether that interface is up. GL.iNet may also offer a vendor kill switch under VPN Dashboard — see below."
+msgid "Configure the glinet-privacy watchdog (iptables). <strong>VPN:</strong> set up WireGuard or OpenVPN in the GL.iNet admin first, then set <strong>WireGuard interface</strong> to the name of the tunnel when it is up (<em>Network → Interfaces</em> or <code>ip link</code>; often <code>wgclient</code> or <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. <strong>Overview</strong> shows interface status. Stock firmware may offer a separate VPN kill switch — see below."
+msgstr "Configure the glinet-privacy watchdog (iptables). <strong>VPN:</strong> set up WireGuard or OpenVPN in the GL.iNet admin first, then set <strong>WireGuard interface</strong> to the name of the tunnel when it is up (<em>Network → Interfaces</em> or <code>ip link</code>; often <code>wgclient</code> or <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. <strong>Overview</strong> shows interface status. Stock firmware may offer a separate VPN kill switch — see below."
 
 msgid "Privacy watchdog (glinet-privacy)"
 msgstr "Privacy watchdog (glinet-privacy)"
@@ -221,8 +221,8 @@ msgstr "On (block_non_vpn=1)"
 msgid "Off (block_non_vpn=0)"
 msgstr "Off (block_non_vpn=0)"
 
-msgid "Tor transparent NAT runs via the firewall plugin. DNS policy can forward dnsmasq to Tor or Mullvad. Telemetry uses dnsmasq black-holes and optional vendor toggles. Device profile is set by /usr/libexec/glinet-privacy/apply-device-profile.sh."
-msgstr "Tor transparent NAT runs via the firewall plugin. DNS policy can forward dnsmasq to Tor or Mullvad. Telemetry uses dnsmasq black-holes and optional vendor toggles. Device profile is set by /usr/libexec/glinet-privacy/apply-device-profile.sh."
+msgid "Tor transparent NAT uses the firewall plugin. Optional dnsmasq policy sends LAN DNS to Tor. Telemetry uses dnsmasq blocklists and optional vendor toggles. Device profile: apply-device-profile.sh."
+msgstr "Tor transparent NAT uses the firewall plugin. Optional dnsmasq policy sends LAN DNS to Tor. Telemetry uses dnsmasq blocklists and optional vendor toggles. Device profile: apply-device-profile.sh."
 
 msgid "Detected profile"
 msgstr "Detected profile"
@@ -305,20 +305,11 @@ msgstr "DNS leak reduction"
 msgid "Router DNS (dnsmasq)"
 msgstr "Router DNS (dnsmasq)"
 
-msgid "No automatic change (manual / Mullvad apply script)"
-msgstr "No automatic change (manual / Mullvad apply script)"
+msgid "No automatic change (use Network → DHCP/DNS or stock UI for VPN DNS)"
+msgstr "No automatic change (use Network → DHCP/DNS or stock UI for VPN DNS)"
 
 msgid "Forward to Tor (127.0.0.1 → DNSPort)"
 msgstr "Forward to Tor (127.0.0.1 → DNSPort)"
-
-msgid "Forward to Mullvad DNS IP"
-msgstr "Forward to Mullvad DNS IP"
-
-msgid "Mullvad DNS address"
-msgstr "Mullvad DNS address"
-
-msgid "Used when policy is Mullvad; default matches Mullvad WireGuard DNS (10.64.0.1)."
-msgstr "Used when policy is Mullvad; default matches Mullvad WireGuard DNS (10.64.0.1)."
 
 msgid "Redirect LAN TCP/53 to Tor"
 msgstr "Redirect LAN TCP/53 to Tor"

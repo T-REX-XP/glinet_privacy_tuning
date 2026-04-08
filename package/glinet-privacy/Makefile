@@ -25,8 +25,8 @@ define Package/glinet-privacy
 endef
 
 define Package/glinet-privacy/description
-  Firewall include plugin for Tor NAT redirects, DNS policy (dnsmasq), kill switch watchdog,
-  IMEI rotation helpers, Mullvad apply script, and telemetry helpers. Integrates with OpenWrt firewall4/fw3.
+  Firewall include plugin for Tor NAT redirects, dnsmasq DNS policy (Tor), kill switch watchdog,
+  IMEI rotation helpers, and telemetry helpers. Integrates with OpenWrt firewall4/fw3.
 endef
 
 define Build/Compile

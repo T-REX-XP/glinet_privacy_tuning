@@ -1,6 +1,6 @@
 # GL.iNet Privacy tuning (OpenWrt)
 
-Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iNet routers running OpenWrt: kill switch watchdog, Tor transparent NAT, DNS policy helpers, telemetry blocking, optional Quectel IMEI rotation (cellular models), and optional CLI **`apply-mullvad-wireguard.sh`** for UCI-based WireGuard (no LuCI secrets page).
+Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iNet routers running OpenWrt: kill switch watchdog, Tor transparent NAT, optional dnsmasq→Tor DNS policy, telemetry blocking, and optional Quectel IMEI rotation (cellular models). **VPN** is configured in **stock GL.iNet** (WireGuard/OpenVPN); this project only watches the tunnel interface you name in UCI.
 
 **Repository:** [https://github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning)
 
@@ -10,8 +10,8 @@ Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iN
 
 - **Kill switch** — Watchdog script and iptables rules to block forwarded traffic when VPN/Tor health checks fail; optional integration with GL.iNet stock `glvpn` “block non-VPN” where present.
 - **Tor** — Transparent proxy via **`fw-plugin.sh`** (UCI **`firewall.glinet_privacy`** include + **`/etc/firewall.user`** companion hook for GL.iNet-friendly persistence) and `torrc` fragments; optional LAN DNS forwarding and TCP/53 handling (see UCI `glinet_privacy`).
-- **DNS policy** — `dnsmasq` modes for default, Tor DNSPort, or Mullvad DNS (`apply-dns-policy.sh`).
-- **VPN / Mullvad** — Use the **stock GL.iNet admin** (WireGuard or OpenVPN client; Mullvad is supported there). Preconfigure the tunnel, then point the kill switch at the correct **WireGuard interface name** (see **Kill switch** in LuCI and the **Overview** status). Optional: `apply-mullvad-wireguard.sh` from the shell for UCI WireGuard without storing secrets in LuCI.
+- **DNS policy** — `apply-dns-policy.sh`: leave dnsmasq unchanged, or forward to **Tor** DNSPort (`glinet_privacy.dns.dns_policy`).
+- **VPN** — Configure WireGuard/OpenVPN in the **GL.iNet admin**, then set **`privacy.main.wg_if`** (and related kill switch options) in LuCI to match the running interface.
 - **Telemetry** — Disable cloud features where possible, optional package removal, dnsmasq blocklist for known GL.iNet endpoints.
 - **IMEI rotation** (LTE hardware only) — Script + init/cron examples; **high legal risk** on public networks — read [docs/devices.md](docs/devices.md) before enabling.
 - **LuCI** — `luci-app-glinet-privacy` under **Services → GL.iNet Privacy** (overview, kill switch, IMEI, Tor/DNS/telemetry).
@@ -59,7 +59,7 @@ Run as **root** from a **git clone** of this repo (so paths match), or set **`GL
 sh remove.sh
 ```
 
-Options: **`--keep-luci`** (leave LuCI files), **`--opkg`** (also `opkg remove luci-app-glinet-privacy glinet-privacy` when installed as ipk). The script stops the killswitch (flushes iptables rules), removes firewall UCI and `/etc/firewall.user` lines, cron lines, Tor include, dnsmasq blocklist symlink, project files, and `/etc/config/{privacy,glinet_privacy,rotate_imei}`. It does **not** remove unrelated opkg packages (e.g. `tor`) unless you use **`--opkg`** for our packages only.
+Option: **`--opkg`** — also run `opkg remove luci-app-glinet-privacy glinet-privacy` when those ipks are installed. The script always removes LuCI app files under `/usr/lib/lua/luci/...` when present. It stops the killswitch (flushes iptables rules), removes firewall UCI and `/etc/firewall.user` lines, cron lines, Tor include, dnsmasq blocklist symlink, project files, and `/etc/config/{privacy,glinet_privacy,rotate_imei}`. It does **not** remove unrelated opkg packages (e.g. `tor`) unless you use **`--opkg`** for our packages only.
 
 ## Building `.ipk` packages (OpenWrt SDK)
 

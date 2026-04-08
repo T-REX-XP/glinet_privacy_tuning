@@ -39,18 +39,10 @@ Optional flags
   --with-imei-boot    Enable rotate_imei on boot (cellular; read docs/devices.md IMEI section)
   --with-imei-cron    Add cron: IMEI rotate every 6 hours (optional ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 in crontab)
 
-Mullvad WireGuard (optional, requires credentials)
--------------------------------------------------
-Export then run install.sh (same session):
-
-  export MULLVAD_PRIVATE_KEY='...'
-  export MULLVAD_ADDRESS='10.x.x.x/32'
-  export MULLVAD_PUBLIC_KEY='...'
-  export MULLVAD_ENDPOINT='198.x.x.x:51820'
-  # or MULLVAD_ENDPOINT_HOST + MULLVAD_ENDPOINT_PORT
-  sh install.sh
-
-install.sh runs apply-mullvad-wireguard.sh when those variables are set.
+VPN (WireGuard / OpenVPN)
+-------------------------
+Configure the client in the GL.iNet admin. Then set the WireGuard interface name in LuCI
+(Services → GL.iNet Privacy → Kill switch) so the watchdog matches your tunnel.
 
 Prebuilt .ipk (optional)
 -------------------------
@@ -59,6 +51,6 @@ See package/BUILDING.txt and GitHub Actions artifacts / releases.
 Notes
 -----
 - IMEI: legal use and operator/lab framing — **docs/devices.md** (IMEI rotation section); each run logs a notice unless `ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1`.
-- DNS: LuCI **Tor, DNS & telemetry** (`glinet_privacy.dns`) or **`apply-dns-policy.sh`**; Tor vs Mullvad policy is one choice — do not enable conflicting modes.
-- Tor + Mullvad routing: align policy routing yourself if you use both stacks.
+- DNS: LuCI **Tor, DNS & telemetry** (`glinet_privacy.dns`) or **`apply-dns-policy.sh`** (`default` or `tor_dnsmasq`).
+- Tor + VPN: use one routing path you understand; policy routing is outside this package.
 - docs/devices.md — WAN defaults per model (Puli vs Slate AX).

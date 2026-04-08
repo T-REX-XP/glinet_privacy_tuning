@@ -15,6 +15,27 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.2.1 (2026-04-08)
+
+### Changed
+
+- **`remove.sh`** — Dropped **`--keep-luci`**; uninstall always removes LuCI app files. **`README.md`** updated.
+
+---
+
+## 1.2.0 (2026-04-08)
+
+### Removed
+
+- **`apply-mullvad-wireguard.sh`** (and **`openwrt/usr/bin/`** copy), **`install.sh`** **`maybe_mullvad`**, and all Mullvad env / install references. VPN is **only** configured via **stock GL.iNet**; the kill switch continues to use **`privacy.main.wg_if`**.
+- **DNS:** **`mullvad_dnsmasq`**, **`mullvad_dns` UCI**, and related LuCI options. **`apply-dns-policy.sh`** now only implements **`tor_dnsmasq`** vs **`default`**.
+
+### Changed
+
+- **LuCI** — Simplified **Kill switch** and **Tor, DNS & telemetry** copy; **`README.md`**, **`openwrt/INSTALL.txt`**, **`docs/*`**, **`package/glinet-privacy/Makefile`** descriptions updated. **`remove.sh`** no longer lists the removed script.
+
+---
+
 ## 1.1.18 (2026-04-08)
 
 ### Changed

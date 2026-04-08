@@ -54,7 +54,7 @@ GL.iNet stock firmware exposes **Block Non-VPN Traffic** / **VPN Kill Switch** i
 
 **Coexistence**
 
-- **Prefer one primary strategy** when possible: either rely on the **vendor** kill switch (dashboard / `glvpn`) **or** on the **glinet-privacy** watchdog. Using both can **overlap** (e.g. redundant DROP rules) or confuse debugging; interface names may also differ (e.g. stock **wgclient** vs **`wg0`** in our Mullvad helper).
+- **Prefer one primary strategy** when possible: either rely on the **vendor** kill switch (dashboard / `glvpn`) **or** on the **glinet-privacy** watchdog. Using both can **overlap** (e.g. redundant DROP rules) or confuse debugging; interface names may also differ (e.g. stock **wgclient** vs **`wg0`** from UCI WireGuard).
 - **LuCI** (**Kill switch**): **`privacy.main.vendor_gl_vpn_killswitch`** — **Leave** (default) does not change `glvpn`; **On** / **Off** runs **`/usr/libexec/glinet-privacy/apply-vendor-vpn-killswitch.sh`** when **`/etc/config/glvpn`** and **`glvpn.general`** exist, then restarts **`glvpn`** if present.
 - **Firmware v4.8+** may move behaviour into per-tunnel options and **nftables**; if **`glvpn.general`** is missing, the script logs and skips — use the **web UI** for those cases.
 

@@ -21,9 +21,6 @@
 #   --with-imei-boot   Enable rotate_imei on boot (uci + init.d)
 #   --with-imei-cron    Add crontab: IMEI rotate every 6 hours
 #
-# Mullvad (optional): export MULLVAD_PRIVATE_KEY MULLVAD_ADDRESS MULLVAD_PUBLIC_KEY MULLVAD_ENDPOINT
-#   then run install.sh — apply-mullvad-wireguard.sh runs if all are set.
-#
 # Env: GLINET_PRIVACY_SRC, GLINET_PRIVACY_GIT_URL, GLINET_PRIVACY_TARBALL_URL,
 #      GLINET_PRIVACY_BRANCH (default main)
 #      GLINET_PRIVACY_SKIP_OPKG_UPDATE=1 — skip opkg update (faster re-runs; install may fail if feeds stale)
@@ -65,8 +62,6 @@ Remote: GLINET_PRIVACY_TARBALL_URL=... or GLINET_PRIVACY_GIT_URL=...
 Re-runs: safe (skips opkg update when deps satisfied; telemetry seed once; dhcp confdir not duplicated).
 
 Env: GLINET_PRIVACY_SKIP_OPKG_UPDATE=1  GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1
-
-Mullvad: export MULLVAD_PRIVATE_KEY MULLVAD_ADDRESS MULLVAD_PUBLIC_KEY MULLVAD_ENDPOINT
 EOF
 }
 
@@ -374,18 +369,6 @@ setup_imei_boot() {
 	log "IMEI rotation enabled on boot — read docs/devices.md (IMEI legal use); compliance is your responsibility"
 }
 
-maybe_mullvad() {
-	[ "$MINIMAL" -eq 0 ] || return 0
-	_have_ep=0
-	[ -n "${MULLVAD_ENDPOINT:-}" ] && _have_ep=1
-	[ -n "${MULLVAD_ENDPOINT_HOST:-}" ] && _have_ep=1
-	[ -n "${MULLVAD_PRIVATE_KEY:-}" ] && [ -n "${MULLVAD_ADDRESS:-}" ] \
-		&& [ -n "${MULLVAD_PUBLIC_KEY:-}" ] && [ "$_have_ep" -eq 1 ] || return 0
-	log "Applying Mullvad WireGuard (env credentials set)"
-	/usr/bin/apply-mullvad-wireguard.sh || log "apply-mullvad-wireguard.sh failed"
-	/etc/init.d/network reload 2>/dev/null || true
-}
-
 install_file() {
 	_src="$1"
 	_dst="$2"
@@ -460,7 +443,6 @@ enable_killswitch_init
 setup_cron
 setup_telemetry
 setup_imei_boot
-maybe_mullvad
 setup_dns_policy
 
 if [ "$INSTALL_LUCI" -eq 1 ]; then

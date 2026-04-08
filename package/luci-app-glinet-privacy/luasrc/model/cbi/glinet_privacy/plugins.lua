@@ -7,7 +7,7 @@ local translate = i18n.translate
 local sys = require "luci.sys"
 
 m = Map("glinet_privacy", translate("Tor, DNS & telemetry"),
-	translate("Tor transparent NAT runs via the firewall plugin. DNS policy can forward dnsmasq to Tor or Mullvad. Telemetry uses dnsmasq black-holes and optional vendor toggles. Device profile is set by /usr/libexec/glinet-privacy/apply-device-profile.sh."))
+	translate("Tor transparent NAT uses the firewall plugin. Optional dnsmasq policy sends LAN DNS to Tor. Telemetry uses dnsmasq blocklists and optional vendor toggles. Device profile: apply-device-profile.sh."))
 
 h = m:section(NamedSection, "hw", "device", translate("Device profile"))
 h.addremove = false
@@ -45,14 +45,10 @@ d = m:section(NamedSection, "dns", "dns", translate("DNS leak reduction"))
 d.addremove = false
 
 dp = d:option(ListValue, "dns_policy", translate("Router DNS (dnsmasq)"))
-dp:value("default", translate("No automatic change (manual / Mullvad apply script)"))
+dp:value("default", translate("No automatic change (use Network → DHCP/DNS or stock UI for VPN DNS)"))
 dp:value("tor_dnsmasq", translate("Forward to Tor (127.0.0.1 → DNSPort)"))
-dp:value("mullvad_dnsmasq", translate("Forward to Mullvad DNS IP"))
 dp.default = "default"
 dp.rmempty = false
-
-d:option(Value, "mullvad_dns", translate("Mullvad DNS address"),
-	translate("Used when policy is Mullvad; default matches Mullvad WireGuard DNS (10.64.0.1).")).rmempty = true
 
 d:option(Flag, "redirect_tcp_dns", translate("Redirect LAN TCP/53 to Tor"),
 	translate("When transparent Tor is enabled, send LAN TCP DNS to Tor DNSPort (UDP was already redirected).")).rmempty = false

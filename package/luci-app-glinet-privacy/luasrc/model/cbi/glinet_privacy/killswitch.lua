@@ -7,7 +7,7 @@ local translate = i18n.translate
 local sys = require "luci.sys"
 
 m = Map("privacy", translate("Privacy kill switch"),
-	translate("Configure the glinet-privacy watchdog (iptables). <strong>VPN first:</strong> set up Mullvad or another provider in the GL.iNet admin using the built-in <strong>WireGuard</strong> or <strong>OpenVPN</strong> client (stock firmware supports Mullvad). This LuCI app does not store VPN credentials. <strong>Then</strong> set the WireGuard interface name below to match the interface that is up when the tunnel is connected (check <em>Network → Interfaces</em> or <code>ip link</code> — often <code>wgclient</code> on GL.iNet, sometimes <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. The <strong>Overview</strong> tab shows whether that interface is up. GL.iNet may also offer a vendor kill switch under VPN Dashboard — see below."))
+	translate("Configure the glinet-privacy watchdog (iptables). <strong>VPN:</strong> set up WireGuard or OpenVPN in the GL.iNet admin first, then set <strong>WireGuard interface</strong> to the name of the tunnel when it is up (<em>Network → Interfaces</em> or <code>ip link</code>; often <code>wgclient</code> or <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. <strong>Overview</strong> shows interface status. Stock firmware may offer a separate VPN kill switch — see below."))
 
 s = m:section(NamedSection, "main", "privacy", translate("Privacy watchdog (glinet-privacy)"))
 s.addremove = false

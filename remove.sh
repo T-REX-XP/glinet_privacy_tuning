@@ -1,10 +1,9 @@
 #!/bin/sh
-# glinet_puli_privacy — remove glinet-privacy (and optional LuCI) from OpenWrt / GL.iNet.
+# glinet_puli_privacy — remove glinet-privacy and LuCI app files from OpenWrt / GL.iNet.
 # Reverses a typical install.sh run: stops watchdog, flushes killswitch rules, removes
 # firewall hooks, crontab lines, Tor include, dnsmasq symlink, UCI configs, and package files.
 #
 #   sh remove.sh
-#   sh remove.sh --keep-luci
 #   sh remove.sh --opkg          # also: opkg remove luci-app-glinet-privacy glinet-privacy (if present)
 #
 # Same source discovery as install.sh:
@@ -15,7 +14,6 @@
 
 set -eu
 
-KEEP_LUCI=0
 DO_OPKG=0
 CLEANUP_DIR=""
 REPO_ROOT=""
@@ -27,9 +25,8 @@ print_help() {
 	cat <<'EOF'
 glinet_puli_privacy remove.sh
 
-  sh remove.sh [--keep-luci] [--opkg]
+  sh remove.sh [--opkg]
 
-  --keep-luci   Do not delete LuCI controller/CBI/views/i18n/rpcd ACL / .lmo
   --opkg        After file removal, run: opkg remove luci-app-glinet-privacy glinet-privacy
                 (only if those packages are installed; ignores errors)
 
@@ -45,7 +42,6 @@ EOF
 
 for _arg in "$@"; do
 	case "$_arg" in
-		--keep-luci) KEEP_LUCI=1 ;;
 		--opkg) DO_OPKG=1 ;;
 		-h|--help) print_help; exit 0 ;;
 		*) die "Unknown option: $_arg" ;;
@@ -203,7 +199,6 @@ remove_files_builtin() {
 		etc/tor/torrc.d/99-transparent.conf \
 		etc/uci-defaults/99-glinet-privacy-device \
 		etc/uci-defaults/99-glinet-privacy-firewall \
-		usr/bin/apply-mullvad-wireguard.sh \
 		usr/bin/apply-privacy-firewall-includes.sh \
 		usr/bin/disable-glinet-telemetry.sh \
 		usr/bin/privacy-killswitch-watchdog.sh \
@@ -256,7 +251,6 @@ rmdir_empty() {
 }
 
 remove_luci() {
-	[ "$KEEP_LUCI" -eq 0 ] || { log "Keeping LuCI files (--keep-luci)"; return 0; }
 	log "Removing LuCI app files"
 	rm -f /usr/lib/lua/luci/controller/glinet_privacy.lua
 	rm -rf /usr/lib/lua/luci/model/cbi/glinet_privacy
