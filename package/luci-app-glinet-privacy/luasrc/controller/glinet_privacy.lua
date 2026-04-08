@@ -281,6 +281,8 @@ function action_overview()
 
 	local net = require("luci.glinet_privacy.net_probe").snapshot()
 	local vendor_ubus = require("luci.glinet_privacy.vendor_ubus").snapshot()
+	local privacy_log = require("luci.glinet_privacy.privacy_log_excerpt").snapshot()
+	privacy_log.log_url = disp.build_url("admin/status/logs")
 
 	luci.template.render("glinet_privacy/overview", {
 		token = csrf.token_for_template(),
@@ -288,6 +290,7 @@ function action_overview()
 		form = form,
 		net = net,
 		vendor_ubus = vendor_ubus,
+		privacy_log = privacy_log,
 	})
 end
 

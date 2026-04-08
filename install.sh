@@ -520,6 +520,10 @@ install_luci() {
 		install_file "$_LUCI/luasrc/glinet_privacy/net_probe.lua" \
 			/usr/lib/lua/luci/glinet_privacy/net_probe.lua 0644
 	fi
+	if [ -f "$_LUCI/luasrc/glinet_privacy/privacy_log_excerpt.lua" ]; then
+		install_file "$_LUCI/luasrc/glinet_privacy/privacy_log_excerpt.lua" \
+			/usr/lib/lua/luci/glinet_privacy/privacy_log_excerpt.lua 0644
+	fi
 	if [ -f "$_LUCI/luasrc/glinet_privacy/sanitize.lua" ]; then
 		install_file "$_LUCI/luasrc/glinet_privacy/sanitize.lua" \
 			/usr/lib/lua/luci/glinet_privacy/sanitize.lua 0644

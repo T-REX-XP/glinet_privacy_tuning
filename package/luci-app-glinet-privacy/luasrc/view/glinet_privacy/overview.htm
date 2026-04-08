@@ -8,6 +8,7 @@
 <% local st = status or self.status %>
 <% local F = form or self.form %>
 <% local N = net or self.net %>
+<% local PL = privacy_log or self.privacy_log %>
 <% local pw = st.pct > 100 and 100 or st.pct %>
 <% local pclass = "progress-bar-success" %>
 <% if st.pct < 50 then pclass = "progress-bar-danger" elseif st.pct < 100 then pclass = "progress-bar-warning" end %>
@@ -67,11 +68,44 @@
 		.glp-overview .glp-comp-row { flex-wrap: wrap; }
 		.glp-overview .glp-toggle-col { width: 100%; text-align: right; padding-top: 6px; }
 	}
+	.glp-overview .glp-log-hint {
+		font-size: 0.88rem; color: #555; margin: 0 0 0.85rem 0; line-height: 1.45;
+		padding: 8px 12px; background: #f7f9fc; border: 1px solid #e2e8f0; border-radius: 6px;
+	}
+	.glp-overview .glp-log-hint code { font-size: 0.86em; background: #eef2f8; padding: 2px 5px; border-radius: 3px; cursor: help; }
+	.glp-overview .glp-log-details { margin: 6px 0 0 0; font-size: 0.85rem; }
+	.glp-overview .glp-log-details summary { cursor: pointer; color: #337ab7; user-select: none; }
+	.glp-overview .glp-log-pre {
+		margin: 8px 0 0 0; padding: 10px; background: #fff; border: 1px solid #e5e5e5;
+		border-radius: 4px; max-height: 14rem; overflow: auto; font-size: 0.82rem; white-space: pre-wrap; word-break: break-word;
+	}
 </style>
 
 <div class="cbi-map glp-overview">
 	<h2 style="margin-bottom: 6px;"><%:GL.iNet Privacy — overview%></h2>
 	<p class="glp-intro"><%:Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks.%></p>
+	<% if PL then %>
+	<p class="glp-log-hint">
+		<span class="label label-info" style="font-size:0.72rem;margin-right:6px"><%:syslog%></span>
+		<% if not PL.empty then %>
+		<strong><%:Last privacy-related line%></strong>:
+		<code<% if (PL.tooltip_title or "") ~= "" then %> title="<%=PL.tooltip_title%>"<% end %>><%= pcdata(PL.last_line or "") %></code>
+		<span class="text-muted"> — <%:hover for recent lines%></span>
+		<a href="<%=PL.log_url or '#' %>"><%:Full system log%></a>
+		<% if PL.lines and #PL.lines > 1 then %>
+		<details class="glp-log-details">
+			<summary><%:Excerpt%> (<%= #PL.lines %> <%:lines%>)</summary>
+			<pre class="glp-log-pre"><% for _, ln in ipairs(PL.lines) do %><%= pcdata(ln) %>
+<% end %></pre>
+		</details>
+		<% end %>
+		<% else %>
+		<span class="text-muted"><%:No recent lines from privacy-ks / glinet-* / rotate_imei in logread tail (scripts may not have logged yet).%></span>
+		<a href="<%=PL.log_url or '#' %>"><%:System log%></a>
+		<br /><small class="text-muted"><%:Shell (router)%>:</small> <code style="font-size:0.8em">logread | grep -E 'privacy-ks|glinet-|rotate_imei'</code>
+		<% end %>
+	</p>
+	<% end %>
 	<% if N and (N.lan_device_effective or "") ~= "" then %>
 	<p class="glp-intro" style="margin-top:-0.5rem;font-size:0.9rem">
 		<span class="label label-default" style="font-size:0.72rem;margin-right:6px"><%:Live path%></span>

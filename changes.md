@@ -14,6 +14,22 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.22 (2026-04-08)
+
+### Changed
+
+- **LuCI Overview** — **syslog** strip: last matching line from **`logread`** (logger tags `privacy-ks`, `glinet-*`, `rotate_imei`), tooltip with up to ~8 recent lines, collapsible excerpt, link to **Status → System log** (`privacy_log_excerpt.lua`). **`install.sh`** installs the new Lua module.
+
+---
+
+## 1.2.21 (2026-04-08)
+
+### Changed
+
+- **LuCI Kill switch** — Probe panel shows **Watchdog FORWARD pair** (`watchdog_lan` / `watchdog_wan`) using the same rules as **`privacy-killswitch-watchdog.sh`** (`detect_lan` / `detect_wan`: no `network.lan.ifname` fallback). **Detected on router (LuCI probe)** line kept for the richer probe (hints, sanitized path). Warning when WAN cannot be resolved; note when watchdog differs from probe.
+
+---
+
 ## 1.2.20 (2026-04-08)
 
 ### Changed

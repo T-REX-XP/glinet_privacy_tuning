@@ -311,11 +311,29 @@ msgstr "Privacy kill switch"
 msgid "The glinet-privacy watchdog schedules iptables FORWARD rules. Configure WireGuard or OpenVPN in the GL.iNet admin first, then set the tunnel interface name below (often <code>wgclient</code> or <code>wg0</code>). The <strong>Overview</strong> tab shows live interface status. Stock firmware may expose a separate VPN kill switch — see the vendor section at the bottom."
 msgstr "The glinet-privacy watchdog schedules iptables FORWARD rules. Configure WireGuard or OpenVPN in the GL.iNet admin first, then set the tunnel interface name below (often <code>wgclient</code> or <code>wg0</code>). The <strong>Overview</strong> tab shows live interface status. Stock firmware may expose a separate VPN kill switch — see the vendor section at the bottom."
 
-msgid "Detected on router:"
-msgstr "Detected on router:"
+msgid "Watchdog FORWARD pair"
+msgstr "Watchdog FORWARD pair"
+
+msgid "Same algorithm as"
+msgstr "Same algorithm as"
 
 msgid "LAN"
 msgstr "LAN"
+
+msgid "WAN"
+msgstr "WAN"
+
+msgid "These interface names are what the watchdog uses for iptables FORWARD -i / -o (privacy.main.lan_dev/wan_dev override network.lan.device and network.wan/wwan/modem.device)."
+msgstr "These interface names are what the watchdog uses for iptables FORWARD -i / -o (privacy.main.lan_dev/wan_dev override network.lan.device and network.wan/wwan/modem.device)."
+
+msgid "WAN not resolved — set WAN device in the form below or fix UCI; the watchdog script will fail until WAN is known."
+msgstr "WAN not resolved — set WAN device in the form below or fix UCI; the watchdog script will fail until WAN is known."
+
+msgid "Differs from the LuCI probe line below (e.g. probe may use legacy network.lan.ifname when network.lan.device is unset; the watchdog does not)."
+msgstr "Differs from the LuCI probe line below (e.g. probe may use legacy network.lan.ifname when network.lan.device is unset; the watchdog does not)."
+
+msgid "Detected on router (LuCI probe)"
+msgstr "Detected on router (LuCI probe)"
 
 msgid "WAN egress"
 msgstr "WAN egress"
@@ -398,11 +416,35 @@ msgstr "GL.iNet Privacy — overview"
 msgid "Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks."
 msgstr "Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks."
 
+msgid "syslog"
+msgstr "syslog"
+
+msgid "Last privacy-related line"
+msgstr "Last privacy-related line"
+
+msgid "hover for recent lines"
+msgstr "hover for recent lines"
+
+msgid "Full system log"
+msgstr "Full system log"
+
+msgid "Excerpt"
+msgstr "Excerpt"
+
+msgid "lines"
+msgstr "lines"
+
+msgid "No recent lines from privacy-ks / glinet-* / rotate_imei in logread tail (scripts may not have logged yet)."
+msgstr "No recent lines from privacy-ks / glinet-* / rotate_imei in logread tail (scripts may not have logged yet)."
+
+msgid "System log"
+msgstr "System log"
+
+msgid "Shell (router)"
+msgstr "Shell (router)"
+
 msgid "Live path"
 msgstr "Live path"
-
-msgid "WAN"
-msgstr "WAN"
 
 msgid "GW"
 msgstr "GW"

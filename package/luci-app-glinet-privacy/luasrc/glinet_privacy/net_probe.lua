@@ -111,6 +111,41 @@ local function uci_wan_hint_list(uc)
 	return rows
 end
 
+--- LAN device exactly as privacy-killswitch-watchdog.sh detect_lan() (no network.lan.ifname fallback).
+local function watchdog_detect_lan(uc)
+	local ld = trim(uc:get("privacy", "main", "lan_dev") or "")
+	if ld ~= "" then
+		return ld
+	end
+	ld = trim(uc:get("network", "lan", "device") or "")
+	if ld ~= "" then
+		return ld
+	end
+	return "br-lan"
+end
+
+--- WAN device exactly as privacy-killswitch-watchdog.sh detect_wan() (wan → wwan → modem .device, else default route dev).
+local function watchdog_detect_wan(uc)
+	local wd = trim(uc:get("privacy", "main", "wan_dev") or "")
+	if wd ~= "" then
+		return wd, "privacy.uci"
+	end
+	for _, n in ipairs({ "wan", "wwan", "modem" }) do
+		local d = trim(uc:get("network", n, "device") or "")
+		if d ~= "" then
+			return d, "network." .. n
+		end
+	end
+	local out = trim(sys.exec("ip -4 route show default 2>/dev/null") or "")
+	for line in out:gmatch("[^\r\n]+") do
+		local dev = line:match("%sdev%s+(%S+)")
+		if dev then
+			return dev, "route.default"
+		end
+	end
+	return "", ""
+end
+
 local function glvpn_snapshot(uc)
 	if not uc:get_all("glvpn") then
 		return false, nil
@@ -157,6 +192,9 @@ local function snapshot()
 	local wg = list_wireguard_ifaces()
 	local glvpn_ok, glvpn_val = glvpn_snapshot(uc)
 
+	local wd_lan = watchdog_detect_lan(uc)
+	local wd_wan, wd_wan_src = watchdog_detect_wan(uc)
+
 	return {
 		lan_device_uci = lan_uci,
 		lan_device_privacy_saved = privacy_lan,
@@ -171,6 +209,11 @@ local function snapshot()
 		wan_hints = uci_wan_hint_list(uc),
 		glvpn_present = glvpn_ok,
 		glvpn_block_non_vpn = glvpn_val,
+		watchdog_lan = wd_lan,
+		watchdog_wan = wd_wan,
+		watchdog_wan_source = wd_wan_src,
+		watchdog_wan_known = wd_wan ~= "",
+		watchdog_differs_from_probe = (wd_lan ~= lan_eff) or (wd_wan ~= wan_dev),
 	}
 end
 
@@ -178,5 +221,7 @@ return {
 	snapshot = snapshot,
 	uci_lan_device = uci_lan_device,
 	detect_wan_dev = detect_wan_dev,
+	watchdog_detect_lan = watchdog_detect_lan,
+	watchdog_detect_wan = watchdog_detect_wan,
 	list_wireguard_ifaces = list_wireguard_ifaces,
 }

@@ -87,7 +87,21 @@
 
 	<% if N then %>
 	<p class="glp-probe">
-		<strong><%:Detected on router:%></strong>
+		<strong><%:Watchdog FORWARD pair%></strong>
+		<%:Same algorithm as%> <code>privacy-killswitch-watchdog.sh</code>:
+		<%:LAN%>: <code><%= pcdata(N.watchdog_lan or "?") %></code>
+		→ <%:WAN%>: <code><%= pcdata(N.watchdog_wan_known and N.watchdog_wan or "—") %></code>
+		<% if N.watchdog_wan_known and (N.watchdog_wan_source or "") ~= "" then %>
+			<span class="text-muted">(<%= pcdata(N.watchdog_wan_source) %>)</span>
+		<% end %>
+		<br /><small class="text-muted"><%:These interface names are what the watchdog uses for iptables FORWARD -i / -o (privacy.main.lan_dev/wan_dev override network.lan.device and network.wan/wwan/modem.device).%></small>
+		<% if not N.watchdog_wan_known then %>
+		<br /><small style="color:#a94442;"><%:WAN not resolved — set WAN device in the form below or fix UCI; the watchdog script will fail until WAN is known.%></small>
+		<% elseif N.watchdog_differs_from_probe then %>
+		<br /><small class="text-muted"><%:Differs from the LuCI probe line below (e.g. probe may use legacy network.lan.ifname when network.lan.device is unset; the watchdog does not).%></small>
+		<% end %>
+		<br /><br />
+		<strong><%:Detected on router (LuCI probe)%></strong>:
 		<%:LAN%>: <code><%= pcdata(N.lan_device_effective or "?") %></code>
 		→ <%:WAN egress%>: <code><%= pcdata(N.wan_device_effective ~= "" and N.wan_device_effective or "—") %></code>
 		<% if (N.wan_source or "") ~= "" then %>

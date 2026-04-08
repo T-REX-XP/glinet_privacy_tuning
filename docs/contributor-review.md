@@ -127,7 +127,7 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 - [x] **Verify — router-side quick IP** — authenticated **`verify_ip`** `call()` (router → **api.ipify.org** via `uclient-fetch` / `wget` / `curl`); LuCI **Router WAN** vs **Browser** mode; browser path still optional **ipwho.is** geo; strip text explains trade-offs. *Remaining:* true **“no external requests”** mode (fully offline / LAN-only).  
 - [ ] **Overview:** link or tooltip to **last script exit** / `logread -e privacy` (or equivalent) excerpt.  
-- [ ] **Kill switch:** show **effective** `_lan` / `_wan` the watchdog will use (same algorithm as `privacy-killswitch-watchdog.sh`) beside the live **`net_probe`** strip (today: detected path; watchdog-specific `_lan`/`_wan` resolution not duplicated in UI).
+- [x] **Kill switch:** show **effective** `_lan` / `_wan` the watchdog will use (same algorithm as `privacy-killswitch-watchdog.sh`) beside the live **`net_probe`** strip (**v1.2.21+**: **`net_probe.watchdog_*`** + Kill switch template).
 
 #### GL.iNet OOTB — privacy checkpoints & handoff
 
@@ -182,4 +182,4 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **nft-aware status** is the main structural follow-up (**core + LuCI `Makefile`**s, **SPDX** / **`PKG_LICENSE`**, **`conffiles`** / feed docs: **v1.2.19**–**v1.2.20**).
 
-*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.20** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.22** (`package/version.mk`). Re-check **`changes.md`** on each release.*
