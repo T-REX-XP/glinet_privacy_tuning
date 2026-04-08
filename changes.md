@@ -24,6 +24,8 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 ### Changed
 
 - **CI** (`.github/workflows/openwrt-packages.yml`): `concurrency.cancel-in-progress` only for **`pull_request`** (branch/tag pushes no longer abort in-flight SDK jobs); `actions/checkout@v6`, `actions/upload-artifact@v6` (Node.js 24–compatible actions per GitHub guidance).
+- **CI — OpenWrt SDK**: pin **`ARCH`** to **`mipsel_24kc-openwrt-24.10`** and **`aarch64_cortex-a53-openwrt-24.10`**; **remove `EXTRA_FEEDS` for luci** — the SDK `feeds.conf.default` already declares feed **`luci`**; appending another `src-git luci …` line causes `./scripts/feeds update -a` to abort with **Duplicate feed name 'luci'** (see [OpenWrt `scripts/feeds`](https://github.com/openwrt/openwrt/blob/master/scripts/feeds) `parse_file`). **`package/BUILDING.txt`** notes the same.
+- **Docs — remote install**: **`README.md`** and **`install.sh`** header clarify that **`curl` or `wget` must precede the raw URL** (otherwise ash reports `not found`); added **`wget -qO- … |`** example.
 
 ---
 

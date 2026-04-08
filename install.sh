@@ -8,8 +8,12 @@
 #   sh install.sh --with-luci
 #   sh install.sh --minimal
 #
-# curl | sh:
-#   curl -fsSL ... | GLINET_PRIVACY_TARBALL_URL=... sh -s -- --with-luci
+# Remote: you must fetch the script with curl or wget first — do not paste only the https URL
+#   (ash will report "not found" because the URL is not an executable).
+#   curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
+#     GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s -- --with-luci
+#   wget -qO- https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
+#     GLINET_PRIVACY_TARBALL_URL=... sh -s -- --with-luci
 #
 # Optional flags:
 #   --minimal          Only copy files + firewall + device profile (no opkg/Tor/cron/telemetry)

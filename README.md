@@ -2,7 +2,7 @@
 
 Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iNet routers running OpenWrt: kill switch watchdog, Tor transparent NAT, DNS policy helpers, telemetry blocking, Mullvad WireGuard apply script, and optional Quectel IMEI rotation (cellular models).
 
-**Repository:** [github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning)
+**Repository:** [https://github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning)
 
 ## Features
 
@@ -19,10 +19,20 @@ Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iN
 
 Requires **OpenWrt** (e.g. GL.iNet stock firmware based on OpenWrt). Run as **root**.
 
-From a tarball URL (replace `USER/REPO` with this repo):
+**Remote install** — the script must be **downloaded** first. Start the line with `curl` or `wget`; pasting only the `https://…` URL makes the shell try to run the URL as a command (`not found`).
+
+With **curl** (install `curl` with `opkg update && opkg install curl` if needed):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | \
+  GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz \
+  sh -s -- --with-luci
+```
+
+With **wget** (common on busybox systems):
+
+```sh
+wget -qO- https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | \
   GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz \
   sh -s -- --with-luci
 ```

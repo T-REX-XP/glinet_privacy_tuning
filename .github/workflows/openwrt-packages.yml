@@ -28,11 +28,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Match docs/devices.md: Puli (ramips/mt7621), Slate AX + Flint (qualcommax/ipq60xx).
-        # Not x86_64 — that is the generic SDK host, not router feed arch.
+        # Pinned SDK tags (see gh-action-sdk: ARCH = <feed_arch>-<branch>).
+        # Do NOT set EXTRA_FEEDS for luci — feeds.conf.default already defines feed "luci"; duplicating it
+        # makes ./scripts/feeds die with "Duplicate feed name 'luci'".
+        # Match docs/devices.md: Puli (mipsel_24kc), Slate AX / Flint (aarch64_cortex-a53).
         arch:
-          - mipsel_24kc
-          - aarch64_cortex-a53
+          - mipsel_24kc-openwrt-24.10
+          - aarch64_cortex-a53-openwrt-24.10
 
     steps:
       - name: Checkout
@@ -43,8 +45,6 @@ jobs:
         env:
           ARCH: ${{ matrix.arch }}
           PACKAGES: glinet-privacy luci-app-glinet-privacy
-          # LuCI feed (pipes become spaces in feeds.conf); mirrors use github.com per SDK defaults
-          EXTRA_FEEDS: src-git|luci|https://github.com/openwrt/luci.git
           INDEX: 1
           V: sc
 
