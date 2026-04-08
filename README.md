@@ -4,6 +4,8 @@ Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iN
 
 **Repository:** [https://github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning)
 
+**Stock GL.iNet web UI:** this project’s UI is **LuCI** (and CLI). GL.iNet does not currently ship a public SDK for custom stock-admin pages; vendor adoption or a future official SDK would be separate — see [docs/glinet-stock-ui.md](docs/glinet-stock-ui.md).
+
 ## Features
 
 - **Kill switch** — Watchdog script and iptables rules to block forwarded traffic when VPN/Tor health checks fail; optional integration with GL.iNet stock `glvpn` “block non-VPN” where present.
@@ -58,6 +60,7 @@ Version and changelog: [package/version.mk](package/version.mk), [changes.md](ch
 | [docs/devices.md](docs/devices.md) | Supported models, WAN defaults, vendor kill switch notes, **IMEI legal notice** |
 | [docs/requirements.md](docs/requirements.md) | Original design goals (reference) |
 | [docs/backlog.md](docs/backlog.md) | Implementation checklist |
+| [docs/glinet-stock-ui.md](docs/glinet-stock-ui.md) | Stock GL.iNet UI vs LuCI; vendor outreach template |
 
 ## License
 

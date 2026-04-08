@@ -15,6 +15,14 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.15 (2026-04-08)
+
+### Added
+
+- **`docs/glinet-stock-ui.md`** — Clarifies that **GL.iNet has no public stock-web UI plugin SDK** for custom admin pages (with forum link); documents **OpenWrt SDK** vs **Plug-ins** vs **LuCI**; includes a **vendor feature-request template** for GL.iNet adoption or future UI integration. **`README.md`** links to it from the top and documentation table.
+
+---
+
 ## 1.1.14 (2026-04-08)
 
 ### Added
