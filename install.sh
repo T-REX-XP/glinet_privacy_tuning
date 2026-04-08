@@ -408,6 +408,18 @@ setup_dns_policy() {
 	/usr/libexec/glinet-privacy/apply-dns-policy.sh || true
 }
 
+# Merge vendor_ubus UCI for upgrades (LuCI reads it; default off — docs/vendor-ubus.md)
+ensure_glinet_privacy_vendor_ubus() {
+	[ -f /etc/config/glinet_privacy ] || return 0
+	if ! uci -q show glinet_privacy.vendor_ubus >/dev/null 2>&1; then
+		uci set glinet_privacy.vendor_ubus=vendor_ubus
+		uci set glinet_privacy.vendor_ubus.enabled='0'
+		uci set glinet_privacy.vendor_ubus.min_release_substr=''
+		uci commit glinet_privacy 2>/dev/null || true
+		log "glinet_privacy.vendor_ubus added (default off); see docs/vendor-ubus.md"
+	fi
+}
+
 setup_imei_boot() {
 	[ "$IMEI_BOOT" -eq 1 ] || return 0
 	[ -f /etc/config/rotate_imei ] || return 0
@@ -451,12 +463,20 @@ install_luci() {
 		install_file "$_LUCI/luasrc/glinet_privacy/sanitize.lua" \
 			/usr/lib/lua/luci/glinet_privacy/sanitize.lua 0644
 	fi
+	if [ -f "$_LUCI/luasrc/glinet_privacy/csrf.lua" ]; then
+		install_file "$_LUCI/luasrc/glinet_privacy/csrf.lua" \
+			/usr/lib/lua/luci/glinet_privacy/csrf.lua 0644
+	fi
 	if [ -f "$_LUCI/luasrc/glinet_privacy/vpn_probe.lua" ]; then
 		install_file "$_LUCI/luasrc/glinet_privacy/vpn_probe.lua" \
 			/usr/lib/lua/luci/glinet_privacy/vpn_probe.lua 0644
 	fi
+	if [ -f "$_LUCI/luasrc/glinet_privacy/vendor_ubus.lua" ]; then
+		install_file "$_LUCI/luasrc/glinet_privacy/vendor_ubus.lua" \
+			/usr/lib/lua/luci/glinet_privacy/vendor_ubus.lua 0644
+	fi
 	mkdir -p /usr/lib/lua/luci/view/glinet_privacy
-	for _v in overview.htm verify.htm killswitch.htm imei.htm tor_dns.htm; do
+	for _v in overview.htm verify.htm killswitch.htm imei.htm tor_dns.htm vendor_ubus_card.htm csrf_field.htm; do
 		[ -f "$_LUCI/luasrc/view/glinet_privacy/$_v" ] || continue
 		install_file "$_LUCI/luasrc/view/glinet_privacy/$_v" \
 			"/usr/lib/lua/luci/view/glinet_privacy/$_v" 0644
@@ -502,6 +522,7 @@ enable_tor
 enable_killswitch_init
 setup_cron
 setup_telemetry
+ensure_glinet_privacy_vendor_ubus
 setup_imei_boot
 setup_dns_policy
 

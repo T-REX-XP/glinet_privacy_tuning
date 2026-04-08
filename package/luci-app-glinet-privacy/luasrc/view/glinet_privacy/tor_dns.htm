@@ -88,8 +88,11 @@
 		<p class="glp-strip-hint"><strong><%:Tor NAT:%></strong> <%= th %></p>
 	</div>
 
+	<%+glinet_privacy/vendor_ubus_card%>
+
 	<form method="post" action="">
 		<input type="hidden" name="submit" value="1" />
+		<%+glinet_privacy/csrf_field%>
 
 		<div class="glp-card">
 			<h3 class="glp-card-h"><%:Device profile%></h3>

@@ -14,6 +14,7 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 **Open / follow-up**
 
 - [x] **Legal documentation** — `docs/devices.md` (IMEI section), script header + `legal_notice()` in `rotate_imei.sh`, LuCI / UCI / init comments, `ROTATE_IMEI_SUPPRESS_LEGAL_LOG` for cron.
+- [x] **IMEI LuCI diagnostics** — Read-only **mmcli** / **uqmi** hints on **IMEI rotation** when tools are installed (`imei_detect.lua` **`get_mmcli_uqmi_hints`**, `imei.htm`).
 
 ---
 
@@ -54,5 +55,7 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 
 - [ ] Automated tests in CI (none yet; no on-device smoke tests).
 - [x] LuCI i18n `.po` files if translations are required beyond English strings in templates (`po/`, `tools/extract-luci-i18n-strings.py`, `tools/i18n-build-po-from-pot.py`; optional **`po2lmo`** on a host with LuCI tools, then copy **`glinet_privacy.<lang>.lmo`** to **`/usr/lib/lua/luci/i18n/`** — see `package/luci-app-glinet-privacy/po/README`).
-- [x] **LuCI security hardening (v1.2.13)** — **`sanitize.lua`** (ifnames, tty paths, IPv4/CIDR, ports); **`rpcd` ACL** write scope narrowed; **Verify** router **`verify_ip`** path + browser/router mode + HTML **`esc()`**; **Overview** **`pcdata(details)`**. *Still open:* **nft**-native status, fully offline Verify, CSRF tokens — see **`docs/contributor-review.md`** backlog.
+- [x] **LuCI security hardening (v1.2.13)** — **`sanitize.lua`** (ifnames, tty paths, IPv4/CIDR, ports); **`rpcd` ACL** write scope narrowed; **Verify** router **`verify_ip`** path + browser/router mode + HTML **`esc()`**; **Overview** **`pcdata(details)`**. *Still open:* **nft**-native status, fully offline Verify — see **`docs/contributor-review.md`** backlog.
+- [x] **LuCI CSRF (v1.2.17)** — Custom POST forms include session **`token`**; **`csrf.verify_post()`** in controller (see **`docs/contributor-review.md`** §4).
 - [x] **LuCI Overview VPN ifstatus (v1.2.14)** — **`vpn_probe.lua`**: **`ifstatus`** / **`ubus`** for **`wg_if`** and **`network`** OpenVPN/WireGuard sections; enriches **WireGuard** Overview row (see **`changes.md`**).
+- [x] **LuCI optional vendor ubus (v1.2.16)** — **`vendor_ubus.lua`** + **`docs/vendor-ubus.md`**: read-only **`ubus`** whitelist, UCI opt-in / **`min_release_substr`**; UI on Overview / Kill switch / Tor-DNS.

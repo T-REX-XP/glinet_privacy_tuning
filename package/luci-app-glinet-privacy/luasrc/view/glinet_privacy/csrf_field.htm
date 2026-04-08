@@ -1,0 +1,7 @@
+<%#
+ Hidden CSRF token — pass `token` from controller (luci.glinet_privacy.csrf.token_for_template).
+-%>
+<% local t = token or (self and self.token) %>
+<% if t and t ~= "" then %>
+<input type="hidden" name="token" value="<%=pcdata(t)%>" />
+<% end %>

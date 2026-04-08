@@ -48,6 +48,8 @@ Related: `package/glinet-privacy/files/usr/bin/rotate_imei.sh` (header comments)
 
 ## VPN kill switch: GL.iNet vendor UI vs glinet-privacy watchdog
 
+**Optional LuCI ubus readouts** (WAN / DHCP context, read-only): **`docs/vendor-ubus.md`** — opt-in **`glinet_privacy.vendor_ubus.enabled`**, optional **`min_release_substr`** gate, whitelist aligned with OpenWrt **`system` / `network` / `dhcp`** (vendor/GSDK-only calls require docs + code updates together).
+
 GL.iNet stock firmware exposes **Block Non-VPN Traffic** / **VPN Kill Switch** in the admin **VPN Dashboard** (exact names vary by version). On many builds the global toggle lives in UCI as **`glvpn.general.block_non_vpn`** (see GL.iNet docs for *Internet Kill Switch* / *block non-VPN traffic*).
 
 **This repository** ships **`privacy-killswitch-watchdog.sh`**, which inserts an iptables **`FORWARD`** DROP between LAN and the chosen WAN device when WireGuard/Tor checks fail (`privacy.main.*`). That is **independent** of the vendor VPN stack.

@@ -12,6 +12,8 @@ local translatef = i18n.translatef or function(fmt, ...)
 	return i18n.translate(string.format(fmt, ...))
 end
 
+local csrf = require "luci.glinet_privacy.csrf"
+
 function index()
 	entry({"admin", "services", "glinet_privacy"},
 		alias("admin", "services", "glinet_privacy", "overview"),
@@ -204,7 +206,10 @@ function action_overview()
 	local disp = require "luci.dispatcher"
 	local sys = require "luci.sys"
 
-	if http.formvalue("submit_settings") == "1" then
+	if http.getenv("REQUEST_METHOD") == "POST" and http.formvalue("submit_settings") == "1" then
+		if not csrf.verify_post() then
+			return
+		end
 		local function yn(name)
 			local v = http.formvalue(name)
 			if type(v) == "table" then
@@ -266,11 +271,14 @@ function action_overview()
 	end
 
 	local net = require("luci.glinet_privacy.net_probe").snapshot()
+	local vendor_ubus = require("luci.glinet_privacy.vendor_ubus").snapshot()
 
 	luci.template.render("glinet_privacy/overview", {
+		token = csrf.token_for_template(),
 		status = st,
 		form = form,
 		net = net,
+		vendor_ubus = vendor_ubus,
 	})
 end
 
@@ -299,7 +307,10 @@ function action_killswitch()
 		return v:gsub("^%s+", ""):gsub("%s+$", "")
 	end
 
-	if http.formvalue("submit") == "1" then
+	if http.getenv("REQUEST_METHOD") == "POST" and http.formvalue("submit") == "1" then
+		if not csrf.verify_post() then
+			return
+		end
 		uci:set("privacy", "main", "enabled", yn("enabled"))
 		local wg = str1("wg_if")
 		if wg == "" then
@@ -355,12 +366,15 @@ function action_killswitch()
 	end
 
 	local net = require("luci.glinet_privacy.net_probe").snapshot()
+	local vendor_ubus = require("luci.glinet_privacy.vendor_ubus").snapshot()
 
 	luci.template.render("glinet_privacy/killswitch", {
+		token = csrf.token_for_template(),
 		badge_label = badge_label,
 		badge_class = badge_class,
 		badge_hint = badge_hint,
 		net = net,
+		vendor_ubus = vendor_ubus,
 		form = {
 			enabled = en,
 			wg_if = uci:get("privacy", "main", "wg_if") or "wg0",
@@ -399,7 +413,10 @@ function action_imei()
 		return v:gsub("^%s+", ""):gsub("%s+$", "")
 	end
 
-	if http.formvalue("submit") == "1" then
+	if http.getenv("REQUEST_METHOD") == "POST" and http.formvalue("submit") == "1" then
+		if not csrf.verify_post() then
+			return
+		end
 		uci:set("rotate_imei", "main", "enabled", yn("enabled"))
 		uci:set("rotate_imei", "main", "cron_enabled", yn("cron_enabled"))
 		local hrs = tonumber(http.formvalue("cron_interval_hours") or 6) or 6
@@ -465,6 +482,7 @@ function action_imei()
 	end
 
 	luci.template.render("glinet_privacy/imei", {
+		token = csrf.token_for_template(),
 		preview = preview,
 		profile_blurb = profile_blurb,
 		modem_opts = modem_opts,
@@ -508,7 +526,10 @@ function action_tor_dns()
 		return v:gsub("^%s+", ""):gsub("%s+$", "")
 	end
 
-	if http.formvalue("submit") == "1" then
+	if http.getenv("REQUEST_METHOD") == "POST" and http.formvalue("submit") == "1" then
+		if not csrf.verify_post() then
+			return
+		end
 		uci:set("glinet_privacy", "hw", "auto_wan", yn("auto_wan"))
 		uci:set("glinet_privacy", "tor", "tor_transparent", yn("tor_transparent"))
 		local cidr = str1("lan_cidr")
@@ -593,6 +614,7 @@ function action_tor_dns()
 	end
 
 	local net = require("luci.glinet_privacy.net_probe").snapshot()
+	local vendor_ubus = require("luci.glinet_privacy.vendor_ubus").snapshot()
 	local function tor_field(section, opt, fallback, runtime)
 		local v = uci:get("glinet_privacy", section, opt)
 		if v and v ~= "" then
@@ -605,6 +627,7 @@ function action_tor_dns()
 	end
 
 	luci.template.render("glinet_privacy/tor_dns", {
+		token = csrf.token_for_template(),
 		verify_url = disp.build_url("admin/services/glinet_privacy/verify"),
 		tor_badge_class = tor_badge_class,
 		tor_badge_label = tor_badge_label,
@@ -616,6 +639,7 @@ function action_tor_dns()
 		profile_slug = uci:get("glinet_privacy", "hw", "slug") or "",
 		profile_board = uci:get("glinet_privacy", "hw", "board_hint") or "",
 		net = net,
+		vendor_ubus = vendor_ubus,
 		form = {
 			auto_wan = uci:get("glinet_privacy", "hw", "auto_wan") or "1",
 			tor_transparent = uci:get("glinet_privacy", "tor", "tor_transparent") or "0",

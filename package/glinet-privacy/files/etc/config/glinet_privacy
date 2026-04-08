@@ -20,6 +20,11 @@ config telemetry 'tel'
 	# Best-effort opkg remove (gl-cloud, …) when disable_vendor_cloud runs; can break stock GL.iNet UI
 	option remove_cloud_packages '0'
 
+# Optional read-only ubus snapshots on LuCI (Overview / Tor-DNS); see docs/vendor-ubus.md
+config vendor_ubus 'vendor_ubus'
+	option enabled '0'
+	option min_release_substr ''
+
 # DNS: optional tor_dnsmasq (use with Tor running); else leave default
 config dns 'dns'
 	option dns_policy 'default'

@@ -1,0 +1,63 @@
+<%#
+ Optional read-only ubus card — context: vendor_ubus (from vendor_ubus.snapshot)
+-%>
+<% local VU = vendor_ubus or self.vendor_ubus %>
+<% if VU and VU.active then %>
+<style type="text/css">
+	.glp-vubus { margin-bottom: 16px; }
+	.glp-vubus .glp-vubus-card {
+		border: 1px solid #e5e5e5; border-radius: 8px; background: #fff; overflow: hidden;
+	}
+	.glp-vubus .glp-vubus-h {
+		margin: 0; padding: 12px 16px; font-size: 1.05rem; font-weight: 600;
+		border-bottom: 1px solid #eee; background: #fafafa;
+	}
+	.glp-vubus .glp-vubus-body { padding: 12px 16px; }
+	.glp-vubus .glp-vubus-intro { margin: 0 0 10px 0; font-size: 0.88rem; color: #666; line-height: 1.45; }
+	.glp-vubus .glp-vubus-meta { margin: 0 0 12px 0; font-size: 0.82rem; color: #555; line-height: 1.4; }
+	.glp-vubus .glp-vubus-warn {
+		margin: 0 0 12px 0; padding: 8px 10px; background: #fff8e6; border: 1px solid #f0e0c0;
+		border-radius: 6px; font-size: 0.86rem; color: #6a5a40;
+	}
+	.glp-vubus .glp-vubus-probe-title { font-weight: 600; margin: 14px 0 6px 0; font-size: 0.92rem; color: #333; }
+	.glp-vubus .glp-vubus-probe-title:first-of-type { margin-top: 4px; }
+	.glp-vubus .glp-vubus-pre {
+		margin: 0 0 8px 0; padding: 10px 12px; background: #f8f9fa; border: 1px solid #e9ecef;
+		border-radius: 6px; font-size: 0.78rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
+		max-height: 16rem; overflow: auto; font-family: ui-monospace, monospace;
+	}
+	.glp-vubus .glp-vubus-cmd { font-size: 0.75rem; color: #777; margin: 0 0 12px 0; }
+	.glp-vubus .glp-vubus-cmd code { background: #eef1f4; padding: 2px 5px; border-radius: 3px; }
+	.glp-vubus .glp-vubus-err { color: #a94442; font-size: 0.86rem; margin: 0 0 8px 0; }
+	.glp-vubus .glp-vubus-skip { font-size: 0.86rem; color: #777; margin: 0 0 8px 0; font-style: italic; }
+</style>
+<div class="glp-vubus">
+	<div class="glp-vubus-card">
+		<h3 class="glp-vubus-h"><%:Optional ubus readout (read-only)%></h3>
+		<div class="glp-vubus-body">
+			<p class="glp-vubus-intro"><%:Fixed, documented ubus calls only (OpenWrt system / network / dhcp). Enable with%> <code>glinet_privacy.vendor_ubus.enabled=1</code> <%:and optional version gate%> <code>min_release_substr</code> <%:— see%> <code>docs/vendor-ubus.md</code>.</p>
+			<% if (VU.board_release or "") ~= "" then %>
+			<p class="glp-vubus-meta"><strong><%:Release (from board):%></strong> <%= pcdata(VU.board_release) %></p>
+			<% end %>
+			<% if VU.gated then %>
+			<p class="glp-vubus-warn"><%:Version gate active: system board output does not contain the configured substring.%> <code><%= pcdata(VU.gate_substr or "") %></code>. <%:Only the board probe is shown; WAN interface and DHCP lease probes were skipped.%></p>
+			<% end %>
+			<% for _, pr in ipairs(VU.probes or {}) do %>
+			<p class="glp-vubus-probe-title"><%= pcdata(pr.title or pr.id or "?") %></p>
+			<% if pr.skipped then %>
+			<p class="glp-vubus-skip"><%= pcdata(pr.skipped) %></p>
+			<% elseif not pr.ok then %>
+			<p class="glp-vubus-err"><%:Probe error:%> <%= pcdata(pr.error or "?") %></p>
+			<% elseif (pr.output or "") ~= "" then %>
+			<pre class="glp-vubus-pre"><%= pcdata(pr.output) %></pre>
+			<% else %>
+			<p class="glp-vubus-skip"><%:(empty output — object may be missing on this image)%></p>
+			<% end %>
+			<% if pr.cmd and pr.cmd ~= "" then %>
+			<p class="glp-vubus-cmd"><code><%= pcdata(pr.cmd) %></code></p>
+			<% end %>
+			<% end %>
+		</div>
+	</div>
+</div>
+<% end %>

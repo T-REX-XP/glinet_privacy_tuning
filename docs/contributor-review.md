@@ -1,6 +1,6 @@
 # GL.iNet Privacy — Contributor review
 
-**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, `net_probe.lua`, **`vpn_probe.lua`** (ifstatus / ubus VPN), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
+**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, **`csrf.lua`**, `net_probe.lua`, **`vpn_probe.lua`** (ifstatus / ubus VPN), **`vendor_ubus.lua`** (opt-in documented ubus readout), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`, `vendor_ubus_card`, `csrf_field`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
 **Perspectives:** security hardening, OpenWrt packaging / upstream norms, maintainability / best practices, **composition with GL.iNet stock (OOTB) features**.  
 **Companion backlog:** epic-level tasks live in **`docs/backlog.md`**; this file adds reviewer lens, security notes, and the **P0–P3** feature backlog.
 
@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). As of **v1.2.13**, **`sanitize.lua`** and a **narrowed rpcd write ACL** address the earlier **command-injection** and **over-broad UCI write** concerns for this app’s LuCI layer. Remaining gaps for an upstream-quality package include: **iptables-centric** status checks on **nft-first** images (see **`docs/backlog.md`** Epic 3 follow-up), **optional third-party calls** on **Verify** (browser geo / router→ipify; fully offline mode still open), **legacy LuCI Lua** (`module()`, `package.seeall`), **no in-tree OpenWrt `Makefile` feed layout**, and **composition** with stock **Network → DNS** / **VPN Dashboard** (OOTB checklist — P1 backlog below). **CSRF** tokens for custom forms remain **deferred** (stock LuCI session model).
+The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). As of **v1.2.13**, **`sanitize.lua`** and a **narrowed rpcd write ACL** address the earlier **command-injection** and **over-broad UCI write** concerns for this app’s LuCI layer. Remaining gaps for an upstream-quality package include: **iptables-centric** status checks on **nft-first** images (see **`docs/backlog.md`** Epic 3 follow-up), **optional third-party calls** on **Verify** (browser geo / router→ipify; fully offline mode still open), **legacy LuCI Lua** (`module()`, `package.seeall`), **no in-tree OpenWrt `Makefile` feed layout**, and **composition** with stock **Network → DNS** / **VPN Dashboard** (OOTB checklist — P1 backlog below). **CSRF** for custom POST forms is **implemented** (**v1.2.17+**: hidden **`token`** = session **`authtoken`**, same model as stock **`dispatcher.test_post_security`**).
 
 ---
 
@@ -64,9 +64,9 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
    - **Status:** Partially implemented — **Router WAN** mode: authenticated **`verify_ip`** `call()` fetches **ipify** from the router (no browser→ipify; still router→ipify). **Browser** mode unchanged (ipify + optional ipwho.is); strip text explains trade-offs; JS escapes `& < > "` for injected HTML.
 
 4. **CSRF / session**  
-   - Standard LuCI POST forms rely on session cookie and admin trust model.  
-   - **Recommendation:** Align with target LuCI major version (ucode/JS) and any **anti-CSRF** helpers if upstream requires them for new apps.  
-   - **Status:** Deferred — same model as stock LuCI `call()` + POST; **SameSite** session cookies are the main browser mitigation. **`verify_ip`** uses **same-origin** `fetch` with session cookie (admin-only path).
+   - Standard LuCI POST forms rely on session cookie and admin trust model; stock **`test_post_security`** compares **`formvalue("token")`** to **`context.authtoken`**.  
+   - **Recommendation:** Use the same hidden-field **`token`** on custom forms; keep state-changing handlers on **POST** only.  
+   - **Status (v1.2.17+):** **`luci.glinet_privacy.csrf`** + **`csrf_field.htm`** on **Overview**, **Kill switch**, **IMEI**, **Tor/DNS** forms; handlers require **`REQUEST_METHOD == POST`** before **`csrf.verify_post()`**. **`verify_ip`** remains GET JSON (session cookie only; not a form POST).
 
 ### Lower priority
 
@@ -164,22 +164,22 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 #### Runtime diagnostics (read-only)
 
 - [x] **WireGuard / OpenVPN** — **`vpn_probe.lua`** + Overview **WireGuard** row detail: **`ifstatus`** / **`ubus`** for **`wg_if`** and **`network`** **`proto`** `wireguard` / `openvpn`; **up** prefers ubus when present, else **`ip link`**.  
-- [ ] **IMEI** page: `mmcli` / `uqmi` hints when packages exist.
+- [x] **IMEI** page: `mmcli` / `uqmi` hints when packages exist.
 
 #### Quality & vendor APIs
 
 - [ ] **CI:** `shellcheck`, lua static checks, mock UCI fixtures.  
-- [ ] **GL.iNet:** optional **`ubus` / `rpcd`** wrappers for VPN/DNS UI state (read-only, version-gated) only when documented (e.g. GSDK / vendor docs).
+- [x] **GL.iNet:** optional **`ubus` / `rpcd`** wrappers for VPN/DNS UI state (read-only, version-gated) only when documented (e.g. GSDK / vendor docs) — **`vendor_ubus.lua`**, **`docs/vendor-ubus.md`**, LuCI card (**Overview** / **Kill switch** / **Tor, DNS**); opt-in UCI **`glinet_privacy.vendor_ubus`**; no new rpcd plugins (server-side **`ubus`**, whitelist only).
 
 #### Security / hygiene (ongoing)
 
 - [x] **Overview dynamic detail** — **`pcdata(it.detail)`**; **Verify** dynamic HTML via **`esc()`**.  
-- [ ] **CSRF tokens** on custom POST forms — deferred; same trust model as stock LuCI `call()` / session cookie (see Security findings §4).
+- [x] **CSRF tokens** on custom POST forms — **`csrf.lua`** / **`csrf_field.htm`**; session **`authtoken`** as **`token`** (see Security findings §4).
 
 ---
 
 ## Conclusion
 
-The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
+The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
 
-*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.14** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.17** (`package/version.mk`). Re-check **`changes.md`** on each release.*

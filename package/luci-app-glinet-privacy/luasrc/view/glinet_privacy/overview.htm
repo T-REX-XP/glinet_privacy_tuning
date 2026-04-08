@@ -94,8 +94,11 @@
 		</div>
 	</div>
 
+	<%+glinet_privacy/vendor_ubus_card%>
+
 	<form method="post" action="">
 		<input type="hidden" name="submit_settings" value="1" />
+		<%+glinet_privacy/csrf_field%>
 		<div class="cbi-section" style="padding-top: 0;">
 			<div class="glp-comp-head">
 				<h3 style="margin: 0; font-size: 1.1rem; border: none;"><%:Components & settings%></h3>

@@ -188,6 +188,27 @@ msgstr ""
 msgid "WireGuard (%s)"
 msgstr ""
 
+msgid "(no mmcli output — ModemManager may be inactive)"
+msgstr ""
+
+msgid "(no data — wrong QMI device or busy)"
+msgstr ""
+
+msgid "(no /dev/cdc-wdm* character device — check WWAN UCI device path)"
+msgstr ""
+
+msgid "System board (ubus)"
+msgstr ""
+
+msgid "Primary WAN-class interface (ubus)"
+msgstr ""
+
+msgid "No WAN / WWAN / modem network section in UCI."
+msgstr ""
+
+msgid "DHCP IPv4 leases (ubus)"
+msgstr ""
+
 msgid "Boot-time or scheduled rotation for Quectel-class modems (AT+EGMR). Altering IMEI may be unlawful outside operator-authorized or lab use — see docs/devices.md (IMEI). Optional:"
 msgstr ""
 
@@ -213,6 +234,12 @@ msgid "Network (UCI):"
 msgstr ""
 
 msgid "none"
+msgstr ""
+
+msgid "ModemManager / QMI (read-only)"
+msgstr ""
+
+msgid "Output from mmcli / uqmi when those tools are installed. For diagnostics only; IMEI rotation still uses the AT port configured below."
 msgstr ""
 
 msgid "Schedule & boot"
@@ -522,6 +549,33 @@ msgid "Block LAN DNS-over-TLS (port 853)"
 msgstr ""
 
 msgid "Drops forwarded TCP/853 from LAN (can break DoT to public resolvers)."
+msgstr ""
+
+msgid "Optional ubus readout (read-only)"
+msgstr ""
+
+msgid "Fixed, documented ubus calls only (OpenWrt system / network / dhcp). Enable with"
+msgstr ""
+
+msgid "and optional version gate"
+msgstr ""
+
+msgid "— see"
+msgstr ""
+
+msgid "Release (from board):"
+msgstr ""
+
+msgid "Version gate active: system board output does not contain the configured substring."
+msgstr ""
+
+msgid "Only the board probe is shown; WAN interface and DHCP lease probes were skipped."
+msgstr ""
+
+msgid "Probe error:"
+msgstr ""
+
+msgid "(empty output — object may be missing on this image)"
 msgstr ""
 
 msgid "Ready"

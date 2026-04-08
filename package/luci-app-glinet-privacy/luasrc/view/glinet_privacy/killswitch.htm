@@ -82,6 +82,8 @@
 		<p class="glp-status-hint"><%= bh %></p>
 	</div>
 
+	<%+glinet_privacy/vendor_ubus_card%>
+
 	<% if N then %>
 	<p class="glp-probe">
 		<strong><%:Detected on router:%></strong>
@@ -103,6 +105,7 @@
 
 	<form method="post" action="">
 		<input type="hidden" name="submit" value="1" />
+		<%+glinet_privacy/csrf_field%>
 
 		<div class="glp-card">
 			<h3 class="glp-card-h"><%:Privacy watchdog (glinet-privacy)%></h3>

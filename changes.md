@@ -14,6 +14,30 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.17 (2026-04-09)
+
+### Security / Changed
+
+- **LuCI CSRF on custom POST forms** — **`luci.glinet_privacy.csrf`**: **`token_for_template()`** / **`verify_post()`** (hidden field **`token`** must match session **`authtoken`**, same rule as stock **`luci.dispatcher.test_post_security`**). **Overview**, **Kill switch**, **IMEI**, **Tor, DNS** templates include **`csrf_field.htm`**. State-changing actions run only for **`REQUEST_METHOD == POST`** plus valid token. **`install.sh`** installs **`csrf.lua`** and **`csrf_field.htm`**.
+
+---
+
+## 1.2.16 (2026-04-09)
+
+### Changed
+
+- **LuCI — optional GL.iNet / OpenWrt ubus readout** — New **`vendor_ubus.lua`** (read-only **`ubus`**, fixed whitelist per **`docs/vendor-ubus.md`**): **`system board`**, **`network.interface.<wan|wwan|modem>` status**, **`dhcp ipv4leases`**. **Opt-in** **`glinet_privacy.vendor_ubus`** (**`enabled`**, **`min_release_substr`** version gate). Card on **Overview**, **Kill switch**, **Tor, DNS & telemetry** (`vendor_ubus_card.htm`). **`install.sh`** installs Lua + view; **`ensure_glinet_privacy_vendor_ubus`** merges UCI on upgrade. **`/etc/config/glinet_privacy`** ships default section (**off**). No new **rpcd** methods — server-side only.
+
+---
+
+## 1.2.15 (2026-04-09)
+
+### Changed
+
+- **LuCI IMEI rotation** — When **`mmcli`** and/or **`uqmi`** are on **`$PATH`**, the IMEI page shows a read-only **ModemManager / QMI** card with **`mmcli -L`** / **`mmcli -m 0`** and per-**`/dev/cdc-wdm*`** **`uqmi`** snippets (from UCI **`network.*.device`** and common nodes). Strings are translatable via **`imei_detect.lua`** + template **`<%: %>`**. **`install.sh`** unchanged (same **`imei_detect.lua`** path).
+
+---
+
 ## 1.2.14 (2026-04-09)
 
 ### Changed

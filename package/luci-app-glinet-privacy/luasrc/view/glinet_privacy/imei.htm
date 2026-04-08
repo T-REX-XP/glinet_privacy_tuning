@@ -9,6 +9,7 @@
 <% local mopts = modem_opts or self.modem_opts or {} %>
 <% local wopts = wwan_opts or self.wwan_opts or {} %>
 <% local modem_ok = P and P.tty_scan and #P.tty_scan > 0 %>
+<% local MH = P and P.mm_hints %>
 
 <style type="text/css">
 	.glp-imei .glp-intro { color: #666; line-height: 1.45; margin-bottom: 1rem; font-size: 0.92rem; }
@@ -56,6 +57,11 @@
 		background: #fff;
 	}
 	.glp-imei .glp-det-line { margin: 0 0 6px 0; font-size: 0.88rem; color: #555; }
+	.glp-imei .glp-mm-pre {
+		margin: 0 0 12px 0; padding: 10px 12px; background: #f8f9fa; border: 1px solid #e9ecef;
+		border-radius: 6px; font-size: 0.82rem; line-height: 1.45; white-space: pre-wrap; word-break: break-word;
+		max-height: 22rem; overflow: auto; font-family: ui-monospace, monospace;
+	}
 	@media (max-width: 600px) {
 		.glp-imei .glp-field { flex-direction: column; }
 		.glp-imei .glp-field-ctrl { align-self: flex-start; }
@@ -93,8 +99,26 @@
 		</div>
 	</div>
 
+	<% if MH and (MH.mmcli_present or MH.uqmi_present) then %>
+	<div class="glp-card">
+		<h3 class="glp-card-h"><%:ModemManager / QMI (read-only)%></h3>
+		<div style="padding: 12px 16px;">
+			<p class="glp-field-help" style="margin-top: 0"><%:Output from mmcli / uqmi when those tools are installed. For diagnostics only; IMEI rotation still uses the AT port configured below.%></p>
+			<% if MH.mmcli_present then %>
+			<p class="glp-field-title" style="margin-top: 10px">mmcli</p>
+			<pre class="glp-mm-pre"><%= pcdata(MH.mmcli_summary or "") %></pre>
+			<% end %>
+			<% if MH.uqmi_present then %>
+			<p class="glp-field-title" style="margin-top: 4px">uqmi</p>
+			<pre class="glp-mm-pre"><%= pcdata(MH.uqmi_summary or "") %></pre>
+			<% end %>
+		</div>
+	</div>
+	<% end %>
+
 	<form method="post" action="">
 		<input type="hidden" name="submit" value="1" />
+		<%+glinet_privacy/csrf_field%>
 
 		<div class="glp-card">
 			<h3 class="glp-card-h"><%:Schedule & boot%></h3>

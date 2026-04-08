@@ -188,6 +188,27 @@ msgstr "Telemetry blocklist on"
 msgid "WireGuard (%s)"
 msgstr "WireGuard (%s)"
 
+msgid "(no mmcli output — ModemManager may be inactive)"
+msgstr "(no mmcli output — ModemManager may be inactive)"
+
+msgid "(no data — wrong QMI device or busy)"
+msgstr "(no data — wrong QMI device or busy)"
+
+msgid "(no /dev/cdc-wdm* character device — check WWAN UCI device path)"
+msgstr "(no /dev/cdc-wdm* character device — check WWAN UCI device path)"
+
+msgid "System board (ubus)"
+msgstr "System board (ubus)"
+
+msgid "Primary WAN-class interface (ubus)"
+msgstr "Primary WAN-class interface (ubus)"
+
+msgid "No WAN / WWAN / modem network section in UCI."
+msgstr "No WAN / WWAN / modem network section in UCI."
+
+msgid "DHCP IPv4 leases (ubus)"
+msgstr "DHCP IPv4 leases (ubus)"
+
 msgid "Boot-time or scheduled rotation for Quectel-class modems (AT+EGMR). Altering IMEI may be unlawful outside operator-authorized or lab use — see docs/devices.md (IMEI). Optional:"
 msgstr "Boot-time or scheduled rotation for Quectel-class modems (AT+EGMR). Altering IMEI may be unlawful outside operator-authorized or lab use — see docs/devices.md (IMEI). Optional:"
 
@@ -214,6 +235,12 @@ msgstr "Network (UCI):"
 
 msgid "none"
 msgstr "none"
+
+msgid "ModemManager / QMI (read-only)"
+msgstr "ModemManager / QMI (read-only)"
+
+msgid "Output from mmcli / uqmi when those tools are installed. For diagnostics only; IMEI rotation still uses the AT port configured below."
+msgstr "Output from mmcli / uqmi when those tools are installed. For diagnostics only; IMEI rotation still uses the AT port configured below."
 
 msgid "Schedule & boot"
 msgstr "Schedule & boot"
@@ -523,6 +550,33 @@ msgstr "Block LAN DNS-over-TLS (port 853)"
 
 msgid "Drops forwarded TCP/853 from LAN (can break DoT to public resolvers)."
 msgstr "Drops forwarded TCP/853 from LAN (can break DoT to public resolvers)."
+
+msgid "Optional ubus readout (read-only)"
+msgstr "Optional ubus readout (read-only)"
+
+msgid "Fixed, documented ubus calls only (OpenWrt system / network / dhcp). Enable with"
+msgstr "Fixed, documented ubus calls only (OpenWrt system / network / dhcp). Enable with"
+
+msgid "and optional version gate"
+msgstr "and optional version gate"
+
+msgid "— see"
+msgstr "— see"
+
+msgid "Release (from board):"
+msgstr "Release (from board):"
+
+msgid "Version gate active: system board output does not contain the configured substring."
+msgstr "Version gate active: system board output does not contain the configured substring."
+
+msgid "Only the board probe is shown; WAN interface and DHCP lease probes were skipped."
+msgstr "Only the board probe is shown; WAN interface and DHCP lease probes were skipped."
+
+msgid "Probe error:"
+msgstr "Probe error:"
+
+msgid "(empty output — object may be missing on this image)"
+msgstr "(empty output — object may be missing on this image)"
 
 msgid "Ready"
 msgstr "Ready"

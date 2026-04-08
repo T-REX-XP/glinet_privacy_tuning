@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract translate() / translatef() / <%: %> strings for luci-app-glinet-privacy."""
+"""Extract translate() / translatef() / tr() / <%: %> strings for luci-app-glinet-privacy."""
 from __future__ import annotations
 
 import os
@@ -14,6 +14,8 @@ PAT_TRANSLATEF = re.compile(r'translatef\s*\(\s*"([^"]*)"')
 PAT_TRANSLATEF2 = re.compile(r"translatef\s*\(\s*'([^']*)'")
 PAT_UNDERSCORE = re.compile(r'_\(\s*"([^"]*)"')
 PAT_UNDERSCORE2 = re.compile(r"_\(\s*'([^']*)'")
+PAT_TR = re.compile(r'\btr\s*\(\s*"([^"]*)"')
+PAT_TR2 = re.compile(r"\btr\s*\(\s*'([^']*)'")
 PAT_HTM = re.compile(r"<%:([^%]+)%>")
 
 
@@ -33,6 +35,8 @@ def collect() -> list[str]:
                 PAT_TRANSLATEF2,
                 PAT_UNDERSCORE,
                 PAT_UNDERSCORE2,
+                PAT_TR,
+                PAT_TR2,
             ):
                 msgs.extend(m.group(1) for m in pat.finditer(s))
             for m in PAT_HTM.finditer(s):
