@@ -71,10 +71,10 @@ msgstr ""
 msgid "Tor transparent NAT"
 msgstr ""
 
-msgid "REDIRECT rules present"
+msgid "REDIRECT / nft redirect rules present"
 msgstr ""
 
-msgid "UCI enabled; no REDIRECT in NAT table"
+msgid "UCI enabled; no REDIRECT/redirect seen in iptables or nft"
 msgstr ""
 
 msgid "Disabled"
@@ -164,13 +164,13 @@ msgstr ""
 msgid "NAT redirects present"
 msgstr ""
 
-msgid "PREROUTING REDIRECT rules present (Tor TransPort path)."
+msgid "PREROUTING REDIRECT or nft redirect to Tor ports (TransPort / DNSPort)."
 msgstr ""
 
 msgid "Tor NAT — check firewall"
 msgstr ""
 
-msgid "UCI is on but no REDIRECT seen yet — save & apply or reload firewall."
+msgid "UCI is on but no iptables/nft transparent redirect seen — save & apply or reload firewall."
 msgstr ""
 
 msgid "Router DNS: default"

@@ -1,6 +1,6 @@
 # GL.iNet Privacy — Contributor review
 
-**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, **`csrf.lua`**, `net_probe.lua`, **`vpn_probe.lua`** (ifstatus / ubus VPN), **`vendor_ubus.lua`** (opt-in documented ubus readout), **`root/usr/share/luci/menu.d/luci-app-glinet-privacy.json`** (OpenWrt 22.03+ pagetree), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`, `vendor_ubus_card`, `csrf_field`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
+**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, **`csrf.lua`**, `net_probe.lua`, **`firewall_status.lua`** (iptables / **nft** status fallbacks), **`vpn_probe.lua`** (ifstatus / ubus VPN), **`vendor_ubus.lua`** (opt-in documented ubus readout), **`privacy_log_excerpt.lua`**, **`root/usr/share/luci/menu.d/luci-app-glinet-privacy.json`** (OpenWrt 22.03+ pagetree), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`, `vendor_ubus_card`, `csrf_field`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
 **Perspectives:** security hardening, OpenWrt packaging / upstream norms, maintainability / best practices, **composition with GL.iNet stock (OOTB) features**.  
 **Companion backlog:** epic-level tasks live in **`docs/backlog.md`**; this file adds reviewer lens, security notes, and the **P0–P3** feature backlog.
 
@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). As of **v1.2.13**, **`sanitize.lua`** and a **narrowed rpcd write ACL** address the earlier **command-injection** and **over-broad UCI write** concerns for this app’s LuCI layer. Remaining gaps for an upstream-quality package include: **iptables-centric** status checks on **nft-first** images (see **`docs/backlog.md`** Epic 3 follow-up), **optional third-party calls** on **Verify** (browser geo / router→ipify; fully offline mode still open), **legacy LuCI Lua** (`module()`, `package.seeall`), **feed integration** is documented (**`feeds.conf.example`**, **`v1.2.20+`**); **composition** with stock **Network → DNS** / **VPN Dashboard** (OOTB checklist — P1 backlog below). **CSRF** for custom POST forms is **implemented** (**v1.2.17+**: hidden **`token`** = session **`authtoken`**, same model as stock **`dispatcher.test_post_security`**).
+The LuCI surface is **coherent and user-oriented**: UCI-backed forms, shared styling, runtime probing for LAN/WAN/Tor hints, and scripts invoked via **fixed paths** (good). As of **v1.2.13**, **`sanitize.lua`** and a **narrowed rpcd write ACL** address the earlier **command-injection** and **over-broad UCI write** concerns for this app’s LuCI layer. Remaining gaps for an upstream-quality package include: **nft-native shell** watchdog/Tor hooks (LuCI status falls back via **`firewall_status.lua`** — **v1.2.23+**; see **`docs/backlog.md`** Epic 3), **optional third-party calls** on **Verify** (browser geo / router→ipify; fully offline mode still open), **legacy LuCI Lua** (`module()`, `package.seeall`), **feed integration** is documented (**`feeds.conf.example`**, **`v1.2.20+`**); **composition** with stock **Network → DNS** / **VPN Dashboard** (OOTB checklist — P1 backlog below). **CSRF** for custom POST forms is **implemented** (**v1.2.17+**: hidden **`token`** = session **`authtoken`**, same model as stock **`dispatcher.test_post_security`**).
 
 ---
 
@@ -93,7 +93,7 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 
 ## Best practices / maintainability
 
-1. **Single source for “is watchdog dropping?”** — Today: `iptables` greps in Lua mirror shell. Extract a tiny **shared probe** (lua require or one `sh -c` script) and use **nft** fallback when `iptables` is absent.  
+1. **Single source for “is watchdog dropping?”** — *LuCI:* **`firewall_status.killswitch_drop_active()`** (`iptables`, **`iptables-save`**, **`nft list ruleset`**) — **v1.2.23+**. *Shell watchdog* still uses **`iptables`** only; optional future **nft** apply script.  
 2. **Centralize validators** — *Done for input hardening:* **`luci/glinet_privacy/sanitize.lua`** (ifnames, modem tty, IPv4, CIDR, ports) shared by **`glinet_privacy.lua`** and **`net_probe.lua`**.  
 3. **Privilege documentation** — README section: what runs as root, what UCI keys are written, what external URLs are contacted.  
 4. **Error handling** — `sys.call` failures are often ignored (`>/dev/null`); consider surfaced **logread** hints on Overview for last apply failure (backlog).
@@ -115,7 +115,7 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 #### Firewall stack fidelity
 
-- [ ] **nft coexistence:** extend status checks (Overview + Tor badge) when `iptables-nft` or raw **`nft`** is the only path.
+- [x] **nft coexistence (status):** **`firewall_status.lua`** — Overview, Kill switch badge, Tor/DNS Tor badge (**v1.2.23+**). *Shell apply still iptables.*
 
 ---
 
@@ -126,7 +126,7 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 #### In-app UX & transparency
 
 - [x] **Verify — router-side quick IP** — authenticated **`verify_ip`** `call()` (router → **api.ipify.org** via `uclient-fetch` / `wget` / `curl`); LuCI **Router WAN** vs **Browser** mode; browser path still optional **ipwho.is** geo; strip text explains trade-offs. *Remaining:* true **“no external requests”** mode (fully offline / LAN-only).  
-- [ ] **Overview:** link or tooltip to **last script exit** / `logread -e privacy` (or equivalent) excerpt.  
+- [x] **Overview:** link or **`logread`** excerpt for privacy-tagged lines — **`privacy_log_excerpt.lua`** (**v1.2.22+**).  
 - [x] **Kill switch:** show **effective** `_lan` / `_wan` the watchdog will use (same algorithm as `privacy-killswitch-watchdog.sh`) beside the live **`net_probe`** strip (**v1.2.21+**: **`net_probe.watchdog_*`** + Kill switch template).
 
 #### GL.iNet OOTB — privacy checkpoints & handoff
@@ -180,6 +180,6 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 ## Conclusion
 
-The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **nft-aware status** is the main structural follow-up (**core + LuCI `Makefile`**s, **SPDX** / **`PKG_LICENSE`**, **`conffiles`** / feed docs: **v1.2.19**–**v1.2.20**).
+The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **LuCI nft-aware status** in **v1.2.23**; **GL.iNet OOTB** checklist and **nft-native shell** rules remain follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile** / **SPDX** / feed docs landed **v1.2.19**–**v1.2.20**; **nft** next step is **watchdog/Tor shell** on **nft-only** images.
 
-*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.22** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.23** (`package/version.mk`). Re-check **`changes.md`** on each release.*

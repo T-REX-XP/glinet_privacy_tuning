@@ -35,7 +35,8 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 
 **Open / follow-up**
 
-- [ ] **nftables-native** path on images without iptables-nft compat (today assumes `iptables`/`iptables-save` as on typical GL.iNet OpenWrt).
+- [x] **nft / iptables-nft LuCI status** — **`firewall_status.lua`** extends Overview + Tor badge checks (**v1.2.23**).
+- [ ] **nftables-native watchdog** — **`privacy-killswitch-watchdog.sh`** / **`firewall.privacy-tor.sh`** still assume **`iptables`** (xtables-nft on stock); raw **nft-only** drop/redirect not implemented in shell.
 
 ---
 

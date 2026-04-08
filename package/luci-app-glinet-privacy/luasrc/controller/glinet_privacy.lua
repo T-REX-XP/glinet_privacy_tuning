@@ -15,6 +15,7 @@ local translatef = i18n.translatef or function(fmt, ...)
 end
 
 local csrf = require "luci.glinet_privacy.csrf"
+local fwst = require "luci.glinet_privacy.firewall_status"
 
 function index()
 	-- When install.sh drops /usr/share/glinet-privacy/luci-use-menu-d (OpenWrt 22.03+), the
@@ -130,11 +131,25 @@ function build_status()
 	end
 
 	local tt = uci:get("glinet_privacy", "tor", "tor_transparent") or "0"
+	local tor_tp = uci:get("glinet_privacy", "tor", "tor_trans_port") or "9040"
+	local tor_dp = uci:get("glinet_privacy", "tor", "tor_dns_port") or "9053"
 	if tt == "1" then
-		if sh_ok("iptables -t nat -L PREROUTING -n 2>/dev/null | grep -q REDIRECT") then
-			add("tor_nat", translate("Tor transparent NAT"), translate("REDIRECT rules present"), "ok", "f_tor_transparent")
+		if fwst.tor_transparent_redirect_present(tor_tp, tor_dp) then
+			add(
+				"tor_nat",
+				translate("Tor transparent NAT"),
+				translate("REDIRECT / nft redirect rules present"),
+				"ok",
+				"f_tor_transparent"
+			)
 		else
-			add("tor_nat", translate("Tor transparent NAT"), translate("UCI enabled; no REDIRECT in NAT table"), "warn", "f_tor_transparent")
+			add(
+				"tor_nat",
+				translate("Tor transparent NAT"),
+				translate("UCI enabled; no REDIRECT/redirect seen in iptables or nft"),
+				"warn",
+				"f_tor_transparent"
+			)
 		end
 	else
 		add("tor_nat", translate("Tor transparent NAT"), translate("Disabled"), "skip", "f_tor_transparent")
@@ -142,7 +157,7 @@ function build_status()
 
 	local ks_en = uci:get("privacy", "main", "enabled") or "1"
 	if ks_en == "1" then
-		if sh_ok("iptables -L FORWARD -n 2>/dev/null | grep -q privacy-killswitch-drop") then
+		if fwst.killswitch_drop_active() then
 			add("ks", translate("Kill switch"), translate("Emergency DROP active (VPN/Tor unhealthy?)"), "warn", "f_privacy_enabled")
 		else
 			add("ks", translate("Kill switch"), translate("Watchdog active; no DROP (healthy)"), "ok", "f_privacy_enabled")
@@ -365,7 +380,7 @@ function action_killswitch()
 	local badge_class = "default"
 	local badge_hint = translate("Killswitch rules are flushed when watchdog is off.")
 	if en == "1" then
-		if sh_ok("iptables -L FORWARD -n 2>/dev/null | grep -q privacy-killswitch-drop") then
+		if fwst.killswitch_drop_active() then
 			badge_label = translate("Blocking traffic")
 			badge_class = "warning"
 			badge_hint =
@@ -592,20 +607,23 @@ function action_tor_dns()
 	end
 
 	local tt = uci:get("glinet_privacy", "tor", "tor_transparent") or "0"
+	local tor_tp = uci:get("glinet_privacy", "tor", "tor_trans_port") or "9040"
+	local tor_dp = uci:get("glinet_privacy", "tor", "tor_dns_port") or "9053"
 	local tor_badge_class, tor_badge_label, tor_hint
 	if tt ~= "1" then
 		tor_badge_class = "default"
 		tor_badge_label = translate("Tor NAT off")
 		tor_hint = translate("Transparent redirects are disabled in UCI.")
 	else
-		if sh_ok("iptables -t nat -L PREROUTING -n 2>/dev/null | grep -q REDIRECT") then
+		if fwst.tor_transparent_redirect_present(tor_tp, tor_dp) then
 			tor_badge_class = "success"
 			tor_badge_label = translate("NAT redirects present")
-			tor_hint = translate("PREROUTING REDIRECT rules present (Tor TransPort path).")
+			tor_hint = translate("PREROUTING REDIRECT or nft redirect to Tor ports (TransPort / DNSPort).")
 		else
 			tor_badge_class = "warning"
 			tor_badge_label = translate("Tor NAT — check firewall")
-			tor_hint = translate("UCI is on but no REDIRECT seen yet — save & apply or reload firewall.")
+			tor_hint =
+				translate("UCI is on but no iptables/nft transparent redirect seen — save & apply or reload firewall.")
 		end
 	end
 

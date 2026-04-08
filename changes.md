@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.23 (2026-04-08)
+
+### Changed
+
+- **LuCI nft coexistence (status)** — New **`firewall_status.lua`**: kill switch DROP detection falls back to **`iptables-save`** and **`nft list ruleset`** (comment **`privacy-killswitch-drop`**). Tor transparent NAT probe uses iptables PREROUTING / **`iptables-save -t nat`** / nft **`redirect`/`dnat`** with UCI **TransPort** / **DNSPort**. Wired into **Overview** (`build_status`), **Kill switch** badge, **Tor, DNS & telemetry** Tor badge. **`install.sh`** installs the module. Watchdog scripts remain **`iptables`**; this release targets UI accuracy on **iptables-nft**-only or **nft**-heavy images.
+
+---
+
 ## 1.2.22 (2026-04-08)
 
 ### Changed
