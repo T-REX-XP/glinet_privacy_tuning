@@ -555,7 +555,28 @@ install_luci() {
 		install_file "$_LUCI/root/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json" \
 			/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json 0644
 	fi
+	install_luci_i18n_lmo "$_LUCI"
 	install_luci_menu_json
+}
+
+# Standard LuCI .lmo catalogs (same domain as luci.i18n.loadc("glinet_privacy")).
+install_luci_i18n_lmo() {
+	_LUCI="$1"
+	if ! command -v po2lmo >/dev/null 2>&1; then
+		log "po2lmo not found — skipping .lmo (English from Lua sources; use opkg ipk or SDK for translations)"
+		return 0
+	fi
+	for _po in "$_LUCI/po"/*/glinet_privacy.po; do
+		[ -f "$_po" ] || continue
+		_lang="$(basename "$(dirname "$_po")")"
+		mkdir -p /usr/lib/lua/luci/i18n
+		if po2lmo "$_po" "/usr/lib/lua/luci/i18n/glinet_privacy.${_lang}.lmo" 2>/dev/null; then
+			chmod 644 "/usr/lib/lua/luci/i18n/glinet_privacy.${_lang}.lmo" 2>/dev/null || true
+			log "Installed i18n: glinet_privacy.${_lang}.lmo"
+		else
+			log "po2lmo failed for $_lang (non-fatal)"
+		fi
+	done
 }
 
 restart_services() {

@@ -25,5 +25,5 @@ Build examples (OpenWrt buildroot):
 Notes
 -----
 * Tor / wireguard kmod are not hard Depends on glinet-privacy (optional at runtime); install.sh pulls more than the ipk metadata.
-* Translations: .po sources live under luci-app-glinet-privacy/po/; .lmo build is not wired in the Makefile (see po/README — po2lmo on a dev host if you ship locales).
+* Translations: po/ + Makefile Build/Compile runs po2lmo (PKG_BUILD_DEPENDS:=luci-base/host); .lmo install to usr/lib/lua/luci/i18n/. See luci-app-glinet-privacy/po/README (Weblate-oriented).
 * remove.sh --opkg assumes package names glinet-privacy and luci-app-glinet-privacy.

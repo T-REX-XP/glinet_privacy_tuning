@@ -22,7 +22,7 @@ Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by defau
 - **Telemetry** — Disable cloud features where possible, optional package removal, dnsmasq blocklist for known GL.iNet endpoints.
 - **IMEI rotation** (LTE hardware only) — Script + init/cron examples; **high legal risk** on public networks — read [docs/devices.md](docs/devices.md) before enabling.
 - **LuCI** — `luci-app-glinet-privacy` under **Services → GL.iNet Privacy** (overview, kill switch, IMEI, Tor/DNS/telemetry).
-- **i18n** — gettext `.po` catalogs under `package/luci-app-glinet-privacy/po/`; regenerate with `tools/extract-luci-i18n-strings.py` and `tools/i18n-build-po-from-pot.py` (see [package/luci-app-glinet-privacy/po/README](package/luci-app-glinet-privacy/po/README)).
+- **i18n** — Standard LuCI domain **`glinet_privacy`**: gettext **`po/`** + **`po2lmo`** in the OpenWrt **`luci-app-glinet-privacy`** Makefile (installs **`glinet_privacy.<lang>.lmo`**); **`install.sh`** compiles **`.lmo`** when **`po2lmo`** exists on the router. Regenerate strings with **`tools/extract-luci-i18n-strings.py`** / **`tools/i18n-build-po-from-pot.py`**; Weblate-oriented notes in [package/luci-app-glinet-privacy/po/README](package/luci-app-glinet-privacy/po/README).
 
 ## OpenWrt package build (optional)
 

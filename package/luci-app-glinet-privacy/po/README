@@ -1,14 +1,47 @@
-LuCI gettext catalogs for luci-app-glinet-privacy
-==================================================
+LuCI gettext for luci-app-glinet-privacy (standard .lmo workflow, same idea as upstream luci-app-* packages)
+============================================================================================================
 
-- templates/glinet_privacy.pot — template (regenerated; do not edit by hand except to fix tooling)
-- <lang>/glinet_privacy.po — per-language catalog (edit msgstr lines)
+Layout
+------
+  templates/glinet_privacy.pot     — template catalog (regenerate from sources; tooling fixes only)
+  <lang>/glinet_privacy.po       — per-language PO (edit msgstr)
+  (build) glinet_privacy.<lang>.lmo — installed to /usr/lib/lua/luci/i18n/ via OpenWrt Makefile po2lmo
 
-Regenerate POT and refresh PO stubs from the repository root:
+Runtime: luci.glinet_privacy.i18n calls luci.i18n.loadc("glinet_privacy") so <%: … %> and translate() use the domain.
 
+Regenerate POT / refresh PO stubs (repository root)
+---------------------------------------------------
   python tools/extract-luci-i18n-strings.py
   python tools/i18n-build-po-from-pot.py
 
-Then translate empty msgstr entries in po/uk/, po/de/, etc. English (po/en/) uses msgstr = msgid.
+English po/en/ usually keeps msgstr = msgid; translate po/de/, po/uk/, etc.
 
-**Runtime catalogs:** `install.sh` (default) installs Lua sources only (English UI if no `.lmo` on the device). To ship translations, run **`po2lmo`** from OpenWrt/LuCI host tools (same as upstream LuCI packages) and copy **`glinet_privacy.<lang>.lmo`** to **`/usr/lib/lua/luci/i18n/`** on the router.
+OpenWrt package build (.lmo)
+----------------------------
+package/luci-app-glinet-privacy/Makefile sets PKG_BUILD_DEPENDS:=luci-base/host, runs po2lmo in Build/Compile
+for every po/*/glinet_privacy.po, and installs glinet_privacy.*.lmo into the ipk.
+
+  make package/luci-app-glinet-privacy/compile V=s
+
+Router install without opkg (install.sh)
+----------------------------------------
+If po2lmo exists on the device, install.sh compiles PO → LMO when installing LuCI; otherwise English from sources.
+
+Weblate (upstream translations)
+-----------------------------
+Gettext PO is compatible with Weblate “gettext PO” components.
+
+Suggested (adjust paths if the component root is only luci-app-glinet-privacy):
+
+  File mask for translations:  package/luci-app-glinet-privacy/po/*/glinet_privacy.po
+  Monolingual gettext:         off
+  New language template:       package/luci-app-glinet-privacy/po/templates/glinet_privacy.pot
+
+Use LuCI-style language directory names (en, de, uk, …) so output stays glinet_privacy.<lang>.lmo.
+
+After PO updates from Weblate: merge new msgids with msgmerge when templates change; re-run extract script when Lua/.htm change.
+
+New language
+------------
+1. Add po/<lang>/glinet_privacy.po (copy po/en/ header; set Language / Language-Team).
+2. No Makefile edit — Build/Compile discovers any po/*/glinet_privacy.po.

@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.25 (2026-04-08)
+
+### Changed
+
+- **LuCI i18n / upstream workflow** — **`luci-app-glinet-privacy/Makefile`**: **`PKG_BUILD_DEPENDS:=luci-base/host`**, **`Build/Compile`** runs **`po2lmo`** on every **`po/*/glinet_privacy.po`**, installs **`glinet_privacy.<lang>.lmo`** to **`usr/lib/lua/luci/i18n/`**. **`install.sh`**: optional **`install_luci_i18n_lmo`** when **`po2lmo`** is on the device. **`i18n.lua`** documented as standard **`luci.i18n`** domain loader. **`po/README`**: OpenWrt build, **Weblate** file masks, new-language flow. **`README`**, **`OPENWRT-BUILD.txt`**, **`docs/backlog.md`**, **`docs/contributor-review.md`** table updated.
+
+---
+
 ## 1.2.24 (2026-04-08)
 
 ### Changed

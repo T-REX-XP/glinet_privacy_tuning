@@ -85,7 +85,7 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 | **LuCI controller style** | Lua `module("…", package.seeall)` + optional **`menu.d` JSON** | Installer auto when **`openwrt_release`** ≥ **22.03** **or** stock **`menu.d/*.json`** exists (GL.iNet **`DISTRIB_RELEASE`** may be **4.x**). Marker **`luci-use-menu-d`** → Lua **`index()`** skipped. Actions stay Lua **`call()`** until a full ucode/JS port. |
 | **Menu path** | `admin/services/glinet_privacy` | Acceptable; ensure no collision with core `services` naming |
 | **Route alias** | `plugins` used for Tor/DNS page | Confusing for contributors — consider renaming internal route to `tor_dns` with redirect from old URL |
-| **i18n** | Custom `luci.glinet_privacy.i18n` + POT | Prefer integration with **standard LuCI lmo** workflow and **Weblate** if targeting upstream |
+| **i18n** | Domain **`glinet_privacy`**: **`luci.glinet_privacy.i18n`** = **`luci.i18n.loadc`** + **`po2lmo`** in Makefile (**`luci-base/host`**) + **`po/README`** (Weblate) | Align **msgmerge** / Weblate export with **`templates/glinet_privacy.pot`** when strings change |
 | **Dependencies** | Declared implicitly in `install.sh` / opkg calls | `DEPENDS` in Makefile: `luci-base`, firewall, optional `tor`, etc. |
 | **Tests** | None visible in repo | Shell: `shellcheck`; Lua: minimal unit tests for validators; optional CI |
 
@@ -182,4 +182,4 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **LuCI nft-aware status** in **v1.2.23**; **GL.iNet OOTB** checklist and **nft-native shell** rules remain follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile** / **SPDX** / feed docs landed **v1.2.19**–**v1.2.20**; **nft** next step is **watchdog/Tor shell** on **nft-only** images.
 
-*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.24** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.25** (`package/version.mk`). Re-check **`changes.md`** on each release.*
