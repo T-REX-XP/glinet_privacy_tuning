@@ -338,35 +338,89 @@ msgstr "Drop forwarded TCP/853 from LAN to non-router destinations. Can break Do
 msgid "GL.iNet Privacy — overview"
 msgstr "GL.iNet Privacy — overview"
 
-msgid "Status checklist and quick toggles. Detailed pages are linked from the menu."
-msgstr "Status checklist and quick toggles. Detailed pages are linked from the menu."
+msgid "Health of each component, quick toggles, and links to verify your IP / DNS / Tor from this browser."
+msgstr "Health of each component, quick toggles, and links to verify your IP / DNS / Tor from this browser."
 
 msgid "Setup progress"
 msgstr "Setup progress"
 
-msgid "Healthy checks:"
-msgstr "Healthy checks:"
+msgid "Checks passed:"
+msgstr "Checks passed:"
 
 msgid "Skipped:"
 msgstr "Skipped:"
 
-msgid "Component"
-msgstr "Component"
+msgid "Green = checks that are OK. Amber/red = something to fix or review. “Skipped” means not applicable with your settings."
+msgstr "Green = checks that are OK. Amber/red = something to fix or review. “Skipped” means not applicable with your settings."
 
-msgid "Status"
-msgstr "Status"
+msgid "Summary:"
+msgstr "Summary:"
 
-msgid "OK"
-msgstr "OK"
+msgid "OK:"
+msgstr "OK:"
 
-msgid "Problem"
-msgstr "Problem"
+msgid "Issues:"
+msgstr "Issues:"
 
-msgid "Warning"
-msgstr "Warning"
+msgid "Verify from this browser"
+msgstr "Verify from this browser"
 
-msgid "N/A"
-msgstr "N/A"
+msgid "Open in a new tab. Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path."
+msgstr "Open in a new tab. Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path."
+
+msgid "IP leak / WebRTC checks"
+msgstr "IP leak / WebRTC checks"
+
+msgid "Shows public IP and basic leak tests (IPv4/IPv6/DNS hints)."
+msgstr "Shows public IP and basic leak tests (IPv4/IPv6/DNS hints)."
+
+msgid "DNS leak test"
+msgstr "DNS leak test"
+
+msgid "Extended DNS leak check (run extended test when possible)."
+msgstr "Extended DNS leak check (run extended test when possible)."
+
+msgid "Cloudflare trace"
+msgstr "Cloudflare trace"
+
+msgid "Shows IP, location, and connection path as seen by Cloudflare (sanity check)."
+msgstr "Shows IP, location, and connection path as seen by Cloudflare (sanity check)."
+
+msgid "Tor check"
+msgstr "Tor check"
+
+msgid "Confirms whether this browser’s traffic appears to use the Tor network."
+msgstr "Confirms whether this browser’s traffic appears to use the Tor network."
+
+msgid "Component status"
+msgstr "Component status"
+
+msgid "This check passed"
+msgstr "This check passed"
+
+msgid "Good"
+msgstr "Good"
+
+msgid "Fix this in settings or on the device"
+msgstr "Fix this in settings or on the device"
+
+msgid "Needs attention"
+msgstr "Needs attention"
+
+msgid "Review — may be expected in some setups"
+msgstr "Review — may be expected in some setups"
+
+msgid "Review"
+msgstr "Review"
+
+msgid "Not required with your current configuration"
+msgstr "Not required with your current configuration"
+
+msgid "Not applicable"
+msgstr "Not applicable"
+
+msgid "Unknown"
+msgstr "Unknown"
 
 msgid "Quick settings"
 msgstr "Quick settings"

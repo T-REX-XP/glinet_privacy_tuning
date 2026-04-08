@@ -1,5 +1,5 @@
 <%#
- Copyright 2026, GL.iNet Privacy LuCI — onboarding overview (LuCI / Bootstrap markup)
+ Copyright 2026, GL.iNet Privacy LuCI — overview (Bootstrap + mobile-friendly)
 -%>
 
 <%+header%>
@@ -10,50 +10,113 @@
 <% local pclass = "progress-bar-success" %>
 <% if st.pct < 50 then pclass = "progress-bar-danger" elseif st.pct < 100 then pclass = "progress-bar-warning" end %>
 
-<div class="cbi-map">
+<style type="text/css">
+	.glp-overview .glp-progress-wrap { margin-bottom: 1em; }
+	.glp-overview .progress { height: 2rem; margin-bottom: 0.75rem; border-radius: 6px; box-shadow: inset 0 1px 2px rgba(0,0,0,.08); }
+	.glp-overview .progress-bar { line-height: 2rem; font-size: 0.95rem; font-weight: 600; }
+	.glp-overview .glp-stats .label { display: inline-block; margin: 0.25rem 0.35rem 0.25rem 0; font-size: 0.85rem; padding: 0.35em 0.65em; }
+	.glp-overview .glp-link-row { margin: 0 -4px; }
+	.glp-overview .glp-link-tile {
+		padding: 10px 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px;
+		background: #fafafa; min-height: 5.5em;
+	}
+	.glp-overview .glp-link-tile a { font-weight: 600; word-break: break-word; }
+	.glp-overview .glp-link-tile small { display: block; margin-top: 6px; color: #666; line-height: 1.35; }
+	.glp-overview .glp-status-card {
+		border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 10px; padding: 12px 14px;
+		background: #fff;
+	}
+	.glp-overview .glp-status-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px; }
+	.glp-overview .glp-status-head .glp-label-wrap { flex-shrink: 0; }
+	.glp-overview .glp-status-detail { margin-top: 8px; color: #555; font-size: 0.9rem; line-height: 1.4; }
+	@media (max-width: 767px) {
+		.glp-overview .glp-status-head { flex-direction: column; }
+		.glp-overview .glp-status-head .glp-label-wrap { align-self: flex-start; }
+	}
+</style>
+
+<div class="cbi-map glp-overview">
 	<h2><%:GL.iNet Privacy — overview%></h2>
-	<div class="cbi-map-descr"><%:Status checklist and quick toggles. Detailed pages are linked from the menu.%></div>
+	<div class="cbi-map-descr"><%:Health of each component, quick toggles, and links to verify your IP / DNS / Tor from this browser.%></div>
 
 	<div class="cbi-section">
 		<h3><%:Setup progress%></h3>
-		<div class="cbi-section-descr">
-			<%:Healthy checks:%> <%= st.ok_c %> / <%= st.denom %>
-			<% if st.skip_c and st.skip_c > 0 then %>
-			— <%:Skipped:%> <%= st.skip_c %>
+		<div class="row glp-progress-wrap">
+			<div class="col-sm-7">
+				<div class="cbi-section-descr" style="margin-bottom: 8px;">
+					<strong><%:Checks passed:%></strong> <%= st.ok_c %> / <%= st.denom %>
+					<% if st.skip_c and st.skip_c > 0 then %>
+					<span class="text-muted"> · <%:Skipped:%> <%= st.skip_c %></span>
+					<% end %>
+				</div>
+				<div class="progress">
+					<div class="progress-bar <%= pclass %> progress-bar-striped" role="progressbar" style="min-width: 2.5em; width: <%= pw %>%"><%= pw %>%</div>
+				</div>
+				<p class="text-muted" style="font-size: 0.9rem; margin: 0;"><%:Green = checks that are OK. Amber/red = something to fix or review. “Skipped” means not applicable with your settings.%></p>
+			</div>
+			<div class="col-sm-5 glp-stats">
+				<strong><%:Summary:%></strong><br />
+				<span class="label label-success"><%:OK:%> <%= st.ok_c %></span>
+				<span class="label label-warning"><%:Issues:%> <%= st.problem_c %></span>
+				<% if st.skip_c and st.skip_c > 0 then %>
+				<span class="label label-default"><%:Skipped:%> <%= st.skip_c %></span>
+				<% end %>
+			</div>
+		</div>
+
+		<h4 style="margin-top: 1.25em;"><%:Verify from this browser%></h4>
+		<p class="text-muted" style="font-size: 0.9rem;"><%:Open in a new tab. Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path.%></p>
+		<div class="row glp-link-row">
+			<div class="col-sm-6 col-md-3">
+				<div class="glp-link-tile">
+					<a href="https://ipleak.net/" target="_blank" rel="noopener noreferrer"><%:IP leak / WebRTC checks%></a>
+					<small><%:Shows public IP and basic leak tests (IPv4/IPv6/DNS hints).%></small>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="glp-link-tile">
+					<a href="https://dnsleaktest.com/" target="_blank" rel="noopener noreferrer"><%:DNS leak test%></a>
+					<small><%:Extended DNS leak check (run extended test when possible).%></small>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="glp-link-tile">
+					<a href="https://www.cloudflare.com/cdn-cgi/trace/" target="_blank" rel="noopener noreferrer"><%:Cloudflare trace%></a>
+					<small><%:Shows IP, location, and connection path as seen by Cloudflare (sanity check).%></small>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div class="glp-link-tile">
+					<a href="https://check.torproject.org/" target="_blank" rel="noopener noreferrer"><%:Tor check%></a>
+					<small><%:Confirms whether this browser’s traffic appears to use the Tor network.%></small>
+				</div>
+			</div>
+		</div>
+
+		<h4 style="margin-top: 1em;"><%:Component status%></h4>
+		<% for _, it in ipairs(st.items) do %>
+		<div class="glp-status-card">
+			<div class="glp-status-head">
+				<div><strong><%= it.label %></strong></div>
+				<div class="glp-label-wrap">
+					<% if it.state == "ok" then %>
+					<span class="label label-success" title="<%:This check passed%>"><%:Good%></span>
+					<% elseif it.state == "bad" then %>
+					<span class="label label-danger" title="<%:Fix this in settings or on the device%>"><%:Needs attention%></span>
+					<% elseif it.state == "warn" then %>
+					<span class="label label-warning" title="<%:Review — may be expected in some setups%>"><%:Review%></span>
+					<% elseif it.state == "skip" then %>
+					<span class="label label-info" title="<%:Not required with your current configuration%>"><%:Not applicable%></span>
+					<% else %>
+					<span class="label label-default"><%:Unknown%></span>
+					<% end %>
+				</div>
+			</div>
+			<% if it.detail and it.detail ~= "" then %>
+			<div class="glp-status-detail"><%= it.detail %></div>
 			<% end %>
 		</div>
-		<div class="progress">
-			<div class="progress-bar <%= pclass %>" style="width: <%= pw %>%"><%= pw %>%</div>
-		</div>
-		<table class="table table-striped">
-			<thead>
-				<tr class="cbi-section-table-titles">
-					<th class="th"><%:Component%></th>
-					<th class="th"><%:Status%></th>
-				</tr>
-			</thead>
-			<tbody>
-			<% for _, it in ipairs(st.items) do %>
-				<tr class="cbi-section-table-row">
-					<td><%= it.label %></td>
-					<td>
-						<% if it.state == "ok" then %>
-						<span class="label label-success"><%:OK%></span>
-						<% elseif it.state == "bad" then %>
-						<span class="label label-danger"><%:Problem%></span>
-						<% elseif it.state == "warn" then %>
-						<span class="label label-warning"><%:Warning%></span>
-						<% else %>
-						<span class="label label-default"><%:N/A%></span>
-						<% end %>
-						<% if it.detail and it.detail ~= "" then %>
-						<br /><small><%= it.detail %></small>
-						<% end %>
-					</td>
-				</tr>
-			<% end %>
-			</tbody>
-		</table>
+		<% end %>
 	</div>
 
 	<form method="post" action="">

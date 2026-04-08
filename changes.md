@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.6 (2026-04-08)
+
+### Changed
+
+- **LuCI Overview** — Reworked layout: taller striped progress bar, summary **OK / Issues / Skipped** badges, **card-style** component list with **Good / Needs attention / Review / Not applicable** labels and tooltips, short help text. **External links** (new tab): IP leak/WebRTC (**ipleak.net**), **dnsleaktest.com**, **Cloudflare trace**, **check.torproject.org** with descriptions. Responsive **Bootstrap** grid for link tiles and status cards on small screens. **i18n** POT/PO regenerated.
+
+---
+
 ## 1.2.5 (2026-04-08)
 
 ### Fixed
