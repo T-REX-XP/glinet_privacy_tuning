@@ -57,13 +57,7 @@ endef
 define Package/glinet-privacy/postinst
 #!/bin/sh
 [ -n "$${IPKG_INSTROOT}" ] && exit 0
-if ! uci -q get firewall.glinet_privacy >/dev/null 2>&1; then
-	uci set firewall.glinet_privacy=include
-	uci set firewall.glinet_privacy.path='/usr/libexec/glinet-privacy/fw-plugin.sh'
-	uci set firewall.glinet_privacy.reload='1'
-	uci set firewall.glinet_privacy.enabled='1'
-	uci commit firewall
-fi
+[ -x /usr/bin/apply-privacy-firewall-includes.sh ] && /usr/bin/apply-privacy-firewall-includes.sh
 /etc/init.d/firewall reload 2>/dev/null || true
 exit 0
 endef

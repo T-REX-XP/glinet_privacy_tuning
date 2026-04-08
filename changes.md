@@ -15,6 +15,14 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.14 (2026-04-08)
+
+### Added
+
+- **GL.iNet firewall plugin companion**: **`/usr/bin/apply-privacy-firewall-includes.sh`** now registers UCI **`firewall.glinet_privacy`** and appends a **`glinet-privacy-fw-plugin`** line to **`/etc/firewall.user`** so **`fw-plugin.sh`** still runs after firewall reloads if a firmware upgrade drops the UCI include. **`postinst`**, **`uci-defaults/99-glinet-privacy-firewall`**, and **`install.sh`** **`register_firewall`** use this script. **`fw-plugin.sh`** comment updated; **`docs/devices.md`** and **`README.md`** describe the dual hook.
+
+---
+
 ## 1.1.13 (2026-04-08)
 
 ### Fixed

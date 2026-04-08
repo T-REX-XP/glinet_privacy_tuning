@@ -70,5 +70,6 @@ If the menu entry is missing, run: /etc/init.d/rpcd restart; /etc/init.d/uhttpd 
 ACL: ensure your LuCI login role can access the new app (rpcd acl
 /usr/share/rpcd/acl.d/luci-app-glinet-privacy.json).
 
-Firewall plugin: package postinst registers firewall.glinet_privacy pointing at
-/usr/libexec/glinet-privacy/fw-plugin.sh (OpenWrt firewall include).
+Firewall plugin: /usr/bin/apply-privacy-firewall-includes.sh registers UCI firewall.glinet_privacy
+→ /usr/libexec/glinet-privacy/fw-plugin.sh and appends a glinet-privacy-fw-plugin line to
+/etc/firewall.user (postinst, uci-defaults, install.sh register_firewall).

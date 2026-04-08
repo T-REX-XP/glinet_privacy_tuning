@@ -7,7 +7,7 @@ Privacy-oriented scripts, UCI, firewall hooks, and an optional LuCI UI for GL.iN
 ## Features
 
 - **Kill switch** — Watchdog script and iptables rules to block forwarded traffic when VPN/Tor health checks fail; optional integration with GL.iNet stock `glvpn` “block non-VPN” where present.
-- **Tor** — Transparent proxy via firewall include + `torrc` fragments; optional LAN DNS forwarding and TCP/53 handling (see UCI `glinet_privacy`).
+- **Tor** — Transparent proxy via **`fw-plugin.sh`** (UCI **`firewall.glinet_privacy`** include + **`/etc/firewall.user`** companion hook for GL.iNet-friendly persistence) and `torrc` fragments; optional LAN DNS forwarding and TCP/53 handling (see UCI `glinet_privacy`).
 - **DNS policy** — `dnsmasq` modes for default, Tor DNSPort, or Mullvad DNS (`apply-dns-policy.sh`).
 - **Mullvad WireGuard** — Helper script to apply WireGuard client settings from environment variables (no secrets stored in LuCI).
 - **Telemetry** — Disable cloud features where possible, optional package removal, dnsmasq blocklist for known GL.iNet endpoints.

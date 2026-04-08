@@ -1,6 +1,7 @@
 #!/bin/sh
-# glinet-privacy firewall plugin — single OpenWrt firewall include entry point.
-# Registered as firewall.glinet_privacy.path (see postinst / uci-defaults).
+# glinet-privacy firewall plugin — OpenWrt firewall include entry point (fw3/fw4).
+# Registered as firewall.glinet_privacy.path; also invoked from /etc/firewall.user
+# (glinet-privacy-fw-plugin) for GL.iNet images where UCI include may be reset on upgrade.
 
 set -eu
 

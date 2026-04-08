@@ -27,6 +27,13 @@ uci commit glinet_privacy
 
 **IMEI rotation** is only relevant on cellular models (e.g. Puli). On Slate AX / Flint, leave `rotate_imei.main.enabled` off.
 
+## Firewall plugin (Tor NAT / hooks)
+
+Transparent Tor and related rules are driven by **`/usr/libexec/glinet-privacy/fw-plugin.sh`**, registered in two ways:
+
+1. **UCI** — `firewall.glinet_privacy` **include** (standard OpenWrt firewall4/fw3).
+2. **GL.iNet companion** — a line tagged **`glinet-privacy-fw-plugin`** in **`/etc/firewall.user`** (installed by **`/usr/bin/apply-privacy-firewall-includes.sh`**). Some firmware upgrades reset custom UCI includes; the **`firewall.user`** hook still runs **`fw-plugin.sh`** on each firewall reload. Tor NAT iptables rules use **`-C` / `-I`** checks and remain safe if both paths execute.
+
 ## IMEI rotation — legal use and responsibility
 
 **This is not legal advice.** Laws differ by country and change over time.

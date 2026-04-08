@@ -190,14 +190,18 @@ chmod_installed() {
 }
 
 register_firewall() {
-	if ! uci -q get firewall.glinet_privacy >/dev/null 2>&1; then
-		uci set firewall.glinet_privacy=include
-		uci set firewall.glinet_privacy.path='/usr/libexec/glinet-privacy/fw-plugin.sh'
-		uci set firewall.glinet_privacy.reload='1'
-		uci set firewall.glinet_privacy.enabled='1'
+	if [ -x /usr/bin/apply-privacy-firewall-includes.sh ]; then
+		/usr/bin/apply-privacy-firewall-includes.sh || log "apply-privacy-firewall-includes.sh failed (non-fatal)"
+	else
+		if ! uci -q get firewall.glinet_privacy >/dev/null 2>&1; then
+			uci set firewall.glinet_privacy=include
+			uci set firewall.glinet_privacy.path='/usr/libexec/glinet-privacy/fw-plugin.sh'
+			uci set firewall.glinet_privacy.reload='1'
+			uci set firewall.glinet_privacy.enabled='1'
+		fi
+		uci -q delete firewall.privacy_tor 2>/dev/null || true
+		uci commit firewall
 	fi
-	uci -q delete firewall.privacy_tor 2>/dev/null || true
-	uci commit firewall
 }
 
 merge_torrc() {
