@@ -15,6 +15,8 @@
 #
 # Env: GLINET_PRIVACY_SRC, GLINET_PRIVACY_GIT_URL, GLINET_PRIVACY_TARBALL_URL,
 #      GLINET_PRIVACY_BRANCH (default main)
+#
+# Package version: package/version.mk (GLINET_PRIVACY_VERSION)
 
 set -eu
 
@@ -216,6 +218,15 @@ restart_services() {
 
 resolve_source
 log "Using repo root: $REPO_ROOT"
+if [ -f "$REPO_ROOT/package/version.mk" ]; then
+	_ver="$(grep '^GLINET_PRIVACY_VERSION:=' "$REPO_ROOT/package/version.mk" | head -1 | sed 's/^GLINET_PRIVACY_VERSION:=//')"
+	_rel="$(grep '^GLINET_PRIVACY_RELEASE:=' "$REPO_ROOT/package/version.mk" | head -1 | sed 's/^GLINET_PRIVACY_RELEASE:=//')"
+	if [ -n "$_ver" ] && [ -n "$_rel" ]; then
+		log "Package version (source): ${_ver}-r${_rel}"
+	elif [ -n "$_ver" ]; then
+		log "Package version (source): ${_ver}"
+	fi
+fi
 
 install_opkg_deps
 install_core
@@ -232,4 +243,8 @@ fi
 
 restart_services
 
+if [ -f /usr/share/glinet-privacy/version.mk ]; then
+	_ver="$(grep '^GLINET_PRIVACY_VERSION:=' /usr/share/glinet-privacy/version.mk | head -1 | sed 's/^GLINET_PRIVACY_VERSION:=//')"
+	[ -n "$_ver" ] && log "Installed package version: $_ver"
+fi
 log "Done. LuCI: Services → GL.iNet Privacy (with --with-luci). Firewall: firewall.glinet_privacy"

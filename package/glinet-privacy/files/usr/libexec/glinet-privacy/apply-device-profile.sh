@@ -75,6 +75,13 @@ main() {
 	[ -f /etc/config/glinet_privacy ] || return 0
 	[ -f /etc/config/privacy ] || return 0
 
+	if ! uci -q show glinet_privacy.hw >/dev/null 2>&1; then
+		uci set glinet_privacy.hw=device
+		uci set glinet_privacy.hw.slug='auto'
+		uci set glinet_privacy.hw.auto_wan='1'
+		uci set glinet_privacy.hw.board_hint=''
+	fi
+
 	_slug="$(detect_slug)"
 	_board_raw="$(read_board_haystack | tr -s ' ' | head -c 200)"
 

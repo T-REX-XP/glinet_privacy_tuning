@@ -16,6 +16,10 @@ From a git clone on the device:
 
 See install.sh header for GLINET_PRIVACY_SRC / GLINET_PRIVACY_GIT_URL.
 
+Supported models (WAN defaults): see docs/devices.md (GL-XE300 Puli, GL-AXT1800 Slate AX, GL-AX1800 Flint).
+
+Versioning: edit package/version.mk and changes.md for each release; see changes.md.
+
 ---
 
 These are standard OpenWrt packages. Copy this repository into your OpenWrt SDK or

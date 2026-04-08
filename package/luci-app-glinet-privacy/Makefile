@@ -2,11 +2,13 @@
 # SPDX-License-Identifier: MIT
 #
 
+THISDIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 include $(TOPDIR)/rules.mk
 
+include $(THISDIR)../version.mk
 PKG_NAME:=luci-app-glinet-privacy
-PKG_VERSION:=1.0.0
-PKG_RELEASE:=1
+PKG_VERSION:=$(GLINET_PRIVACY_VERSION)
+PKG_RELEASE:=$(GLINET_PRIVACY_RELEASE)
 
 PKG_LICENSE:=MIT
 

@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: MIT
 #
 
+THISDIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 include $(TOPDIR)/rules.mk
 
+include $(THISDIR)../version.mk
 PKG_NAME:=glinet-privacy
-PKG_VERSION:=1.0.0
-PKG_RELEASE:=1
+PKG_VERSION:=$(GLINET_PRIVACY_VERSION)
+PKG_RELEASE:=$(GLINET_PRIVACY_RELEASE)
 
 PKG_MAINTAINER:=
 PKG_LICENSE:=MIT
@@ -46,6 +48,8 @@ define Package/glinet-privacy/install
 	$(INSTALL_DATA) ./files/etc/crontabs/* $(1)/etc/crontabs/
 	$(INSTALL_DIR) $(1)/etc/glinet-privacy
 	$(INSTALL_DATA) ./files/etc/glinet-privacy/* $(1)/etc/glinet-privacy/
+	$(INSTALL_DIR) $(1)/usr/share/glinet-privacy
+	$(INSTALL_DATA) ./../version.mk $(1)/usr/share/glinet-privacy/version.mk
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults/
 endef
