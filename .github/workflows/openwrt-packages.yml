@@ -1,0 +1,61 @@
+# Build glinet-privacy + luci-app-glinet-privacy with the official OpenWrt SDK (Docker).
+# Pushes tags v* attach .ipk files to a GitHub Release; other events upload workflow artifacts.
+
+name: OpenWrt packages
+
+on:
+  push:
+    branches: [main, master]
+    tags:
+      - 'v*'
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: SDK ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build with OpenWrt SDK
+        uses: openwrt/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}
+          PACKAGES: glinet-privacy luci-app-glinet-privacy
+          # LuCI feed (pipes become spaces in feeds.conf); mirrors use github.com per SDK defaults
+          EXTRA_FEEDS: src-git|luci|https://github.com/openwrt/luci.git
+          INDEX: 1
+          V: sc
+
+      - name: List built packages
+        run: find bin -name '*.ipk' -print || true
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-ipk-${{ matrix.arch }}-${{ github.sha }}
+          path: bin/packages/**/*.ipk
+          if-no-files-found: warn
+
+      - name: Upload to GitHub Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: bin/packages/**/*.ipk
+          generate_release_notes: true

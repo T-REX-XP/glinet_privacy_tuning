@@ -1,99 +1,55 @@
-Privacy router artifacts (GL-XE300 Puli, GL-AXT1800 Slate AX / OpenWrt)
-=============================================
+Privacy router (GL-XE300 Puli, GL-AXT1800 Slate AX / OpenWrt)
+==============================================================
 
-Fastest on a running router (replace USER/REPO with your fork):
+All steps below are automated by install.sh unless you use --minimal.
+
+One command (replace USER/REPO; add --with-luci for LuCI files):
 
   curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
     GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s -- --with-luci
 
-Or: clone repo on the router and run: sh install.sh --with-luci
+From a git clone on the router:
 
----
+  sh install.sh --with-luci
 
-Recommended: build or install the OpenWrt packages (firewall plugin + LuCI UI):
+What install.sh does by default (not --minimal)
+-----------------------------------------------
+- Copies package/glinet-privacy/files to /, chmod scripts, installs /usr/share/glinet-privacy/version.mk
+- Registers firewall.glinet_privacy → fw-plugin.sh; runs apply-device-profile.sh (WAN per device)
+- opkg update + install: iptables, iptables-mod-*, wireguard-tools, kmod-wireguard, tor, tor-fw-helper,
+  dnsmasq-full, ca-bundle (best-effort if offline)
+- Tor: ensures %include /etc/tor/torrc.d/99-transparent.conf in /etc/tor/torrc; enables and starts tor
+- Kill switch: enables /etc/init.d/privacy-killswitch; adds cron */1 for privacy-killswitch-watchdog.sh
+- Telemetry: uci glinet_privacy.tel.block_domains=1, apply-telemetry.sh, disable-glinet-telemetry.sh,
+  dhcp dnsmasq confdir /etc/dnsmasq.d when possible
+- Restarts network, firewall, dnsmasq, rpcd, uhttpd
 
-  package/glinet-privacy/          — core scripts, UCI, /usr/libexec/glinet-privacy/fw-plugin.sh
-  package/luci-app-glinet-privacy/ — LuCI: Services → GL.iNet Privacy
-  package/BUILDING.txt             — SDK build / opkg install notes
+Optional flags
+--------------
+  --minimal           Files + firewall + device profile only (no opkg/Tor/cron/telemetry automation)
+  --with-luci         Install LuCI app (Services → GL.iNet Privacy)
+  --with-imei-boot    Enable rotate_imei on boot (cellular; legal risk — your responsibility)
+  --with-imei-cron    Add cron: IMEI rotate every 6 hours
 
-The postinst registers firewall.glinet_privacy → fw-plugin.sh (Tor NAT when enabled in
-uci glinet_privacy.tor.tor_transparent).
+Mullvad WireGuard (optional, requires credentials)
+-------------------------------------------------
+Export then run install.sh (same session):
 
-Manual install (without ipk): copy files to the router root (scp/rsync), chmod +x scripts.
-
-Packages (opkg)
----------------
-  opkg update
-  opkg install wireguard-tools kmod-wireguard tor tor-fw-helper iptables-mod-extra iptables-mod-comment dnsmasq-full ca-bundle
-
-Paths in this repo mirror the router: openwrt/usr/bin -> /usr/bin, etc.
-
-1) IMEI rotation
-----------------
-  chmod +x /usr/bin/rotate_imei.sh /etc/init.d/rotate_imei
-  cp etc/config/rotate_imei /etc/config/
-  uci set rotate_imei.main.enabled=1
-  uci commit rotate_imei
-  /etc/init.d/rotate_imei enable
-  /etc/init.d/rotate_imei start
-
-Cron (every 6 hours example):
-  echo '0 */6 * * * /usr/bin/rotate_imei.sh' >> /etc/crontabs/root
-  /etc/init.d/cron restart
-
-Optional env: IMEI_TAC (8 digits), MODEM_TTY, WWAN_IF.
-
-2) Mullvad WireGuard
---------------------
   export MULLVAD_PRIVATE_KEY='...'
   export MULLVAD_ADDRESS='10.x.x.x/32'
   export MULLVAD_PUBLIC_KEY='...'
   export MULLVAD_ENDPOINT='198.x.x.x:51820'
-  chmod +x /usr/bin/apply-mullvad-wireguard.sh
-  /usr/bin/apply-mullvad-wireguard.sh
-  /etc/init.d/network reload
-  /etc/init.d/firewall reload
-  /etc/init.d/dnsmasq restart
+  # or MULLVAD_ENDPOINT_HOST + MULLVAD_ENDPOINT_PORT
+  sh install.sh
 
-3) Tor transparent proxy
-------------------------
-  opkg install tor
-  mkdir -p /etc/tor/torrc.d
-  cat /etc/tor/torrc.d/99-transparent.conf >> /etc/tor/torrc
-  # or: echo '%include /etc/tor/torrc.d/99-transparent.conf' >> /etc/tor/torrc
-  /etc/init.d/tor enable
-  /etc/init.d/tor start
+install.sh runs apply-mullvad-wireguard.sh when those variables are set.
 
-  chmod +x /etc/firewall.privacy-tor.sh
-  /usr/bin/apply-privacy-firewall-includes.sh
-  /etc/init.d/firewall reload
-
-Tune LAN_CIDR / ROUTER_LAN_IP for your LAN (defaults suit GL.iNet 192.168.8.x).
-
-4) Kill switch watchdog
------------------------
-  chmod +x /usr/bin/privacy-killswitch-watchdog.sh /etc/init.d/privacy-killswitch
-  cp etc/config/privacy /etc/config/
-  uci set privacy.main.wan_dev='wwan0'   # Puli cellular; Slate AX: leave empty or eth0 — see docs/devices.md
-  uci commit privacy
-  /etc/init.d/privacy-killswitch enable
-  /etc/init.d/privacy-killswitch start
-
-Cron:
-  echo '*/1 * * * * /usr/bin/privacy-killswitch-watchdog.sh' >> /etc/crontabs/root
-  /etc/init.d/cron restart
-
-5) GL.iNet telemetry
----------------------
-  chmod +x /usr/bin/disable-glinet-telemetry.sh
-  /usr/bin/disable-glinet-telemetry.sh
-  cp /etc/dnsmasq.d/glinet-block.conf /etc/dnsmasq.d/
-  uci add_list dhcp.@dnsmasq[0].confdir='/etc/dnsmasq.d'
-  uci commit dhcp
-  /etc/init.d/dnsmasq restart
+Prebuilt .ipk (optional)
+-------------------------
+See package/BUILDING.txt and GitHub Actions artifacts / releases.
 
 Notes
 -----
-- IMEI changes may be unlawful where you live; use only if permitted.
-- Verify firewall order and interfaces (br-lan, wwan0, wg0) on your build.
-- Tor + Mullvad together: ensure default route sends Tor traffic via wg0 (policy routing) and resolve DNS conflicts (Tor DNS vs Mullvad).
+- IMEI changes may be unlawful where you live.
+- Tor + Mullvad: align routing/DNS yourself (policy routing, dnsmasq vs Tor DNS).
+- docs/devices.md — WAN defaults per model (Puli vs Slate AX).

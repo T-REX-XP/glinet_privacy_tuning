@@ -6,9 +6,12 @@ One-command install on the router (replace USER/REPO):
   curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
     GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh
 
-Add LuCI UI and optional opkg deps:
+Add LuCI UI:
 
-  curl -fsSL ... | GLINET_PRIVACY_TARBALL_URL=... sh -s -- --with-luci --with-opkg-deps
+  curl -fsSL ... | GLINET_PRIVACY_TARBALL_URL=... sh -s -- --with-luci
+
+Default install.sh already runs opkg (WireGuard, Tor, dnsmasq-full, …), Tor torrc, cron,
+telemetry — use --minimal to skip that.
 
 From a git clone on the device:
 
@@ -19,6 +22,9 @@ See install.sh header for GLINET_PRIVACY_SRC / GLINET_PRIVACY_GIT_URL.
 Supported models (WAN defaults): see docs/devices.md (GL-XE300 Puli, GL-AXT1800 Slate AX, GL-AX1800 Flint).
 
 Versioning: edit package/version.mk and changes.md for each release; see changes.md.
+
+CI: push a tag `v1.2.3` to trigger `.github/workflows/openwrt-packages.yml` and publish
+`.ipk` files to a GitHub Release. PRs and pushes build artifacts only (no release).
 
 ---
 
