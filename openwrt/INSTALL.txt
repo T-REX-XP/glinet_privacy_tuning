@@ -3,10 +3,11 @@ Privacy router (GL-XE300 Puli, GL-AXT1800 Slate AX / OpenWrt)
 
 All steps below are automated by install.sh unless you use --minimal.
 
-One command (replace USER/REPO):
+One command (replace USER/REPO; one line avoids broken copy-paste with \):
 
-  curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | \
-    GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s --
+  curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s --
+
+Do not paste installer log lines back into the shell. GLINET_PRIVACY_TARBALL_URL must end in .tar.gz (source tree archive).
 
 From a git clone on the router:
 

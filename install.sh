@@ -28,6 +28,7 @@
 #      GLINET_PRIVACY_BRANCH (default main)
 #      GLINET_PRIVACY_SKIP_OPKG_UPDATE=1 — skip opkg update (faster re-runs; install may fail if feeds stale)
 # opkg: uses "iptables-nft" as satisfying the iptables stack when present; tor-fw-helper is optional (not in all feeds).
+#      Install uses plain "opkg install" (no -V0); some vendor opkg builds reject "-V 0" and print usage.
 #      GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1 — re-apply installer telemetry UCI defaults (normally once only)
 #      GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0 — menu.d for ucode LuCI (default auto: OpenWrt 22.03+ per /etc/openwrt_release)
 #
@@ -201,9 +202,9 @@ wireguard_kernel_ok() {
 	return 1
 }
 
-# Global options (e.g. -V) must precede the subcommand; "opkg install -V 0 pkg" makes opkg treat "0" as a package name.
+# Do not use "opkg -V 0 install": some vendor images (e.g. GL.iNet) treat "-V 0" as invalid and print usage instead of installing.
 opkg_install_quiet() {
-	opkg -V 0 install "$@" 2>/dev/null || return 1
+	opkg install "$@" >/dev/null 2>&1 || return 1
 	return 0
 }
 

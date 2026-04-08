@@ -34,20 +34,26 @@ Requires **OpenWrt** (e.g. GL.iNet stock firmware based on OpenWrt). Run as **ro
 
 **Remote install** — the script must be **downloaded** first. Start the line with `curl` or `wget`; pasting only the `https://…` URL makes the shell try to run the URL as a command (`not found`).
 
-With **curl** (install `curl` with `opkg update && opkg install curl` if needed):
+**Do not paste installer log lines** (`Using repo root:`, `opkg: …`, `Done. …`) back into the shell — they are messages, not commands.
+
+**`GLINET_PRIVACY_TARBALL_URL`** must be the **`.tar.gz`** archive URL (the tree must contain `package/glinet-privacy/files`), not the bare GitHub repo page.
+
+With **curl** (install `curl` with `opkg update && opkg install curl` if needed). One line (no `\` line breaks — safest for copy-paste):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | \
-  GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz \
-  sh -s --
+curl -fsSL https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz sh -s --
+```
+
+With flags (example `--with-luci` is default; shown for clarity):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz sh -s -- --with-luci
 ```
 
 With **wget** (common on busybox systems):
 
 ```sh
-wget -qO- https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | \
-  GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz \
-  sh -s --
+wget -qO- https://raw.githubusercontent.com/T-REX-XP/glinet_privacy_tuning/main/install.sh | GLINET_PRIVACY_TARBALL_URL=https://github.com/T-REX-XP/glinet_privacy_tuning/archive/refs/heads/main.tar.gz sh -s --
 ```
 
 From a git clone on the device:

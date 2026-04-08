@@ -14,6 +14,18 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.26 (2026-04-08)
+
+### Fixed
+
+- **`install.sh`** — **`opkg install`** no longer uses **`opkg -V 0 install`** (breaks on some GL.iNet **`opkg`** builds: prints usage and skips the package). Uses plain **`opkg install … >/dev/null 2>&1`**. **`tor-fw-helper`** and other optional installs behave correctly when the package exists in the feed.
+
+### Changed
+
+- **README** — Remote install: single-line **`curl`** / **`wget`** examples; note not to paste log lines; clarify **`.tar.gz`** URL for **`GLINET_PRIVACY_TARBALL_URL`**.
+
+---
+
 ## 1.2.25 (2026-04-08)
 
 ### Changed
