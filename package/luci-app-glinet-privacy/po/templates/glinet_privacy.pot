@@ -41,10 +41,10 @@ msgstr ""
 msgid "Missing UCI firewall.glinet_privacy"
 msgstr ""
 
-msgid "WireGuard"
+msgid "Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped)."
 msgstr ""
 
-msgid "Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped)."
+msgid "WireGuard"
 msgstr ""
 
 msgid "Not required"

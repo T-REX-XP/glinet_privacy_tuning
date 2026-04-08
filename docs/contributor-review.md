@@ -1,6 +1,6 @@
 # GL.iNet Privacy — Contributor review
 
-**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, `net_probe.lua`, controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
+**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, `net_probe.lua`, **`vpn_probe.lua`** (ifstatus / ubus VPN), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
 **Perspectives:** security hardening, OpenWrt packaging / upstream norms, maintainability / best practices, **composition with GL.iNet stock (OOTB) features**.  
 **Companion backlog:** epic-level tasks live in **`docs/backlog.md`**; this file adds reviewer lens, security notes, and the **P0–P3** feature backlog.
 
@@ -163,7 +163,7 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 #### Runtime diagnostics (read-only)
 
-- [ ] **WireGuard / OpenVPN** status row via `ifstatus` / `ubus` where available.  
+- [x] **WireGuard / OpenVPN** — **`vpn_probe.lua`** + Overview **WireGuard** row detail: **`ifstatus`** / **`ubus`** for **`wg_if`** and **`network`** **`proto`** `wireguard` / `openvpn`; **up** prefers ubus when present, else **`ip link`**.  
 - [ ] **IMEI** page: `mmcli` / `uqmi` hints when packages exist.
 
 #### Quality & vendor APIs
@@ -182,4 +182,4 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
 
-*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.13** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-09 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.14** (`package/version.mk`). Re-check **`changes.md`** on each release.*

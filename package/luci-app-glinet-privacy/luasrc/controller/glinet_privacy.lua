@@ -37,6 +37,7 @@ end
 
 function build_status()
 	local uci = require "luci.model.uci".cursor()
+	local vpnp = require "luci.glinet_privacy.vpn_probe"
 	local items = {}
 	local ok_c, problem_c, skip_c = 0, 0, 0
 
@@ -74,20 +75,38 @@ function build_status()
 	local wg_safe = san.sanitize_ifname(wg_raw)
 	local wg_shell = wg_safe or "wg0"
 	local req_wg = uci:get("privacy", "main", "require_wg") or "1"
+
+	local function vpn_detail_extra(wg_san_for_probe)
+		local lines = vpnp.overview_vpn_detail_lines(uci, wg_san_for_probe)
+		if #lines == 0 then
+			return ""
+		end
+		return " — " .. table.concat(lines, " | ")
+	end
+
 	if wg_safe == nil and wg_raw ~= "" then
-		add(
-			"wg",
-			translate("WireGuard"),
-			translate("Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped).") .. " (" .. wg_raw .. ")",
-			"bad",
-			"f_require_wg"
-		)
+		local det = translate("Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped).")
+			.. " ("
+			.. wg_raw
+			.. ")"
+		det = det .. vpn_detail_extra(nil)
+		add("wg", translate("WireGuard"), det, "bad", "f_require_wg")
 	elseif req_wg == "0" then
-		add("wg", translatef("WireGuard (%s)", wg_raw), translate("Not required"), "skip", "f_require_wg")
-	elseif sh_ok("ip link show " .. wg_shell .. " 2>/dev/null | grep -q 'state UP'") then
-		add("wg", translatef("WireGuard (%s)", wg_raw), translate("Interface up"), "ok", "f_require_wg")
+		local det = translate("Not required") .. vpn_detail_extra(wg_safe or wg_shell)
+		add("wg", translatef("WireGuard (%s)", wg_raw), det, "skip", "f_require_wg")
 	else
-		add("wg", translatef("WireGuard (%s)", wg_raw), translate("Down or missing"), "bad", "f_require_wg")
+		local link_up = sh_ok("ip link show " .. wg_shell .. " 2>/dev/null | grep -q 'state UP'")
+		local ubus_wg = vpnp.wg_logical_up(wg_shell)
+		local up = link_up
+		if ubus_wg ~= nil then
+			up = ubus_wg
+		end
+		local suf = vpn_detail_extra(wg_safe or wg_shell)
+		if up then
+			add("wg", translatef("WireGuard (%s)", wg_raw), translate("Interface up") .. suf, "ok", "f_require_wg")
+		else
+			add("wg", translatef("WireGuard (%s)", wg_raw), translate("Down or missing") .. suf, "bad", "f_require_wg")
+		end
 	end
 
 	local req_tor = uci:get("privacy", "main", "require_tor") or "1"

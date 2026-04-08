@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.14 (2026-04-09)
+
+### Changed
+
+- **LuCI Overview VPN status** — New **`vpn_probe.lua`**: **`ifstatus`** / **`ubus call network.interface.<name> status`** for **`privacy.main.wg_if`** and for **`network`** sections with **`proto wireguard`** or **`proto openvpn`** (names passed through **`sanitize`**). Overview **WireGuard** row detail includes logical **up/down**, first **IPv4** when present, and extra interfaces; kill-switch **up** uses **ubus/ifstatus** when available, else **`ip link`**. **`install.sh`** installs **`vpn_probe.lua`**.
+
+---
+
 ## 1.2.13 (2026-04-08)
 
 ### Security / Changed
