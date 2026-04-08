@@ -1,12 +1,10 @@
 #!/bin/sh
-# apply-dns-policy.sh — Configure dnsmasq (dhcp) for Tor or Mullvad DNS to reduce ISP DNS leaks.
-# Does not replace apply-mullvad-wireguard.sh (that script also sets dnsmasq); align dns_policy with your setup.
+# apply-dns-policy.sh — Point dnsmasq at Tor DNSPort when dns_policy=tor_dnsmasq (reduces ISP DNS leaks).
 
 set -eu
 
 POLICY="$(uci -q get glinet_privacy.dns.dns_policy 2>/dev/null || echo default)"
 TOR_DNS="$(uci -q get glinet_privacy.tor.tor_dns_port 2>/dev/null || echo 9053)"
-MULLVAD_DNS="$(uci -q get glinet_privacy.dns.mullvad_dns 2>/dev/null || echo 10.64.0.1)"
 DMQ="dhcp.@dnsmasq[0]"
 
 if ! uci -q get "$DMQ" >/dev/null 2>&1; then
@@ -21,13 +19,6 @@ case "$POLICY" in
 		uci set "${DMQ}.noresolv=1"
 		uci commit dhcp
 		logger -t glinet-dns-policy "dnsmasq -> 127.0.0.1#${TOR_DNS} (Tor DNSPort); noresolv=1" 2>/dev/null || true
-		;;
-	mullvad_dnsmasq)
-		uci -q delete "${DMQ}.server" 2>/dev/null || true
-		uci add_list "${DMQ}.server=${MULLVAD_DNS}"
-		uci set "${DMQ}.noresolv=1"
-		uci commit dhcp
-		logger -t glinet-dns-policy "dnsmasq -> ${MULLVAD_DNS} (Mullvad); noresolv=1" 2>/dev/null || true
 		;;
 	default|*)
 		exit 0

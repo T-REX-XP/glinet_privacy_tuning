@@ -26,9 +26,6 @@ msgstr "IMEI rotation"
 msgid "Tor, DNS & telemetry"
 msgstr "Tor, DNS & telemetry"
 
-msgid "WireGuard / Mullvad"
-msgstr "WireGuard / Mullvad"
-
 msgid "Device profile"
 msgstr "Device profile"
 
@@ -113,6 +110,21 @@ msgstr "Boot-time or cron rotation for Quectel modems via AT+EGMR. Altering IMEI
 msgid "Settings"
 msgstr "Settings"
 
+msgid "Auto-detection"
+msgstr "Auto-detection"
+
+msgid "Cellular (Puli) — IMEI rotation applies when modem is present."
+msgstr "Cellular (Puli) — IMEI rotation applies when modem is present."
+
+msgid "Travel router profile — no built-in modem; leave rotation off unless you use USB cellular."
+msgstr "Travel router profile — no built-in modem; leave rotation off unless you use USB cellular."
+
+msgid "No readable /dev/ttyUSB* or /dev/ttyACM* — modem not connected or permissions."
+msgstr "No readable /dev/ttyUSB* or /dev/ttyACM* — modem not connected or permissions."
+
+msgid "No network interfaces in UCI."
+msgstr "No network interfaces in UCI."
+
 msgid "Run on boot"
 msgstr "Run on boot"
 
@@ -128,20 +140,38 @@ msgstr "Leave empty for fully random Luhn-valid IMEI"
 msgid "Modem serial device"
 msgstr "Modem serial device"
 
-msgid "e.g. /dev/ttyUSB2"
-msgstr "e.g. /dev/ttyUSB2"
+msgid "AT port for Quectel (often ttyUSB2). Empty = same scan order as rotate_imei.sh."
+msgstr "AT port for Quectel (often ttyUSB2). Empty = same scan order as rotate_imei.sh."
+
+msgid "Auto (scan /dev/ttyUSB* then /dev/ttyACM*)"
+msgstr "Auto (scan /dev/ttyUSB* then /dev/ttyACM*)"
+
+msgid "saved"
+msgstr "saved"
 
 msgid "WWAN logical interface"
 msgstr "WWAN logical interface"
 
-msgid "uci network section name, e.g. wwan"
-msgstr "uci network section name, e.g. wwan"
+msgid "Which Network → Interfaces section to restart after IMEI write. Empty = same auto-detect as rotate_imei.sh (wwan / 4g / modem / cellular, or first wwan/3g/qmi/mbim/ncm)."
+msgstr "Which Network → Interfaces section to restart after IMEI write. Empty = same auto-detect as rotate_imei.sh (wwan / 4g / modem / cellular, or first wwan/3g/qmi/mbim/ncm)."
+
+msgid "Auto (from network config)"
+msgstr "Auto (from network config)"
+
+msgid "Device profile: %s"
+msgstr "Device profile: %s"
+
+msgid "Serial ports found: %s"
+msgstr "Serial ports found: %s"
+
+msgid "Network interfaces (uci): %s"
+msgstr "Network interfaces (uci): %s"
 
 msgid "Privacy kill switch"
 msgstr "Privacy kill switch"
 
-msgid "This page configures the glinet-privacy watchdog (iptables). GL.iNet stock firmware may also offer a VPN kill switch under VPN Dashboard — see below."
-msgstr "This page configures the glinet-privacy watchdog (iptables). GL.iNet stock firmware may also offer a VPN kill switch under VPN Dashboard — see below."
+msgid "Configure the glinet-privacy watchdog (iptables). <strong>VPN first:</strong> set up Mullvad or another provider in the GL.iNet admin using the built-in <strong>WireGuard</strong> or <strong>OpenVPN</strong> client (stock firmware supports Mullvad). This LuCI app does not store VPN credentials. <strong>Then</strong> set the WireGuard interface name below to match the interface that is up when the tunnel is connected (check <em>Network → Interfaces</em> or <code>ip link</code> — often <code>wgclient</code> on GL.iNet, sometimes <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. The <strong>Overview</strong> tab shows whether that interface is up. GL.iNet may also offer a vendor kill switch under VPN Dashboard — see below."
+msgstr "Configure the glinet-privacy watchdog (iptables). <strong>VPN first:</strong> set up Mullvad or another provider in the GL.iNet admin using the built-in <strong>WireGuard</strong> or <strong>OpenVPN</strong> client (stock firmware supports Mullvad). This LuCI app does not store VPN credentials. <strong>Then</strong> set the WireGuard interface name below to match the interface that is up when the tunnel is connected (check <em>Network → Interfaces</em> or <code>ip link</code> — often <code>wgclient</code> on GL.iNet, sometimes <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. The <strong>Overview</strong> tab shows whether that interface is up. GL.iNet may also offer a vendor kill switch under VPN Dashboard — see below."
 
 msgid "Privacy watchdog (glinet-privacy)"
 msgstr "Privacy watchdog (glinet-privacy)"
@@ -155,8 +185,8 @@ msgstr "If disabled, killswitch rules are flushed."
 msgid "WireGuard interface"
 msgstr "WireGuard interface"
 
-msgid "e.g. wg0"
-msgstr "e.g. wg0"
+msgid "Must match the interface name when your stock VPN client has brought WireGuard up (e.g. wgclient, wg0). Preconfigure the VPN in the GL.iNet UI first."
+msgstr "Must match the interface name when your stock VPN client has brought WireGuard up (e.g. wgclient, wg0). Preconfigure the VPN in the GL.iNet UI first."
 
 msgid "Require WG interface UP"
 msgstr "Require WG interface UP"
@@ -317,6 +347,24 @@ msgstr "Healthy checks:"
 msgid "Skipped:"
 msgstr "Skipped:"
 
+msgid "Component"
+msgstr "Component"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Problem"
+msgstr "Problem"
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "N/A"
+msgstr "N/A"
+
 msgid "Quick settings"
 msgstr "Quick settings"
 
@@ -343,10 +391,4 @@ msgstr "IMEI rotation enabled"
 
 msgid "Save & apply"
 msgstr "Save & apply"
-
-msgid "Install WireGuard tools and add an interface under Network → Interfaces, or apply Mullvad using the helper script:"
-msgstr "Install WireGuard tools and add an interface under Network → Interfaces, or apply Mullvad using the helper script:"
-
-msgid "Secrets are not stored in this UI; use SSH or edit UCI <code>network</code> manually."
-msgstr "Secrets are not stored in this UI; use SSH or edit UCI <code>network</code> manually."
 

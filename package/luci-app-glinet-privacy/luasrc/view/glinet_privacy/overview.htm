@@ -1,328 +1,131 @@
 <%#
- Copyright 2026, GL.iNet Privacy LuCI — onboarding overview
+ Copyright 2026, GL.iNet Privacy LuCI — onboarding overview (LuCI / Bootstrap markup)
 -%>
 
 <%+header%>
 <% require "luci.glinet_privacy.i18n" %>
 <% local st = status or self.status %>
 <% local form = form or self.form %>
+<% local pw = st.pct > 100 and 100 or st.pct %>
+<% local pclass = "progress-bar-success" %>
+<% if st.pct < 50 then pclass = "progress-bar-danger" elseif st.pct < 100 then pclass = "progress-bar-warning" end %>
 
-<style type="text/css">
-/* Overview — layout tuned for LuCI light/dark themes */
-.gp-page {
-	max-width: 72rem;
-	margin: 0 auto;
-}
-.gp-hero {
-	margin: 0 0 1.25rem;
-	padding: 1.1rem 1.35rem;
-	border-radius: 10px;
-	border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
-	background: linear-gradient(
-		145deg,
-		rgba(46, 160, 67, 0.14) 0%,
-		var(--bg-secondary, rgba(128, 128, 128, 0.07)) 55%
-	);
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-.gp-hero h2 {
-	margin: 0 0 0.35rem;
-	font-size: 1.35rem;
-	font-weight: 650;
-	letter-spacing: -0.02em;
-	line-height: 1.25;
-}
-.gp-hero .gp-hero-descr {
-	margin: 0;
-	opacity: 0.88;
-	font-size: 0.95rem;
-	line-height: 1.45;
-}
-.gp-layout {
-	display: grid;
-	gap: 1.25rem;
-	align-items: start;
-}
-@media (min-width: 56rem) {
-	.gp-layout {
-		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-	}
-}
-.gp-panel {
-	border-radius: 10px;
-	border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
-	background: var(--bg-secondary, rgba(128, 128, 128, 0.06));
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-	padding: 1rem 1.15rem 1.15rem;
-}
-.gp-panel > h3 {
-	margin: 0 0 0.75rem;
-	font-size: 1.05rem;
-	font-weight: 650;
-}
-.gp-meta {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.5rem 0.85rem;
-	margin-bottom: 0.75rem;
-	font-size: 0.9rem;
-	opacity: 0.92;
-}
-.gp-pill {
-	display: inline-block;
-	padding: 0.15rem 0.55rem;
-	border-radius: 999px;
-	font-size: 0.82rem;
-	font-weight: 600;
-	background: rgba(46, 160, 67, 0.18);
-	color: inherit;
-}
-.gp-pill.gp-pill-muted {
-	background: rgba(128, 128, 128, 0.2);
-	font-weight: 500;
-}
-.gp-progress {
-	background: var(--bg-medium, rgba(0, 0, 0, 0.08));
-	border-radius: 6px;
-	height: 0.55rem;
-	overflow: hidden;
-	margin: 0 0 1rem;
-}
-.gp-progress > div {
-	height: 100%;
-	background: linear-gradient(90deg, #2ea043, #56d364);
-	transition: width 0.35s ease;
-	min-width: 0;
-	border-radius: 6px;
-}
-.gp-progress.gp-partial > div {
-	background: linear-gradient(90deg, #d4a017, #f0b429);
-}
-.gp-progress.gp-bad > div {
-	background: linear-gradient(90deg, #cf222e, #ff7b72);
-}
-.gp-status-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(14.5rem, 1fr));
-	gap: 0.5rem;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-.gp-item {
-	display: flex;
-	align-items: flex-start;
-	gap: 0.65rem;
-	padding: 0.55rem 0.65rem;
-	border-radius: 8px;
-	border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
-	background: rgba(128, 128, 128, 0.08);
-	min-height: 3.25rem;
-	box-sizing: border-box;
-}
-.gp-item.gp-ok { border-left: 3px solid #2ea043; }
-.gp-item.gp-bad { border-left: 3px solid #cf222e; background: rgba(207, 34, 46, 0.06); }
-.gp-item.gp-warn { border-left: 3px solid #d4a017; background: rgba(212, 160, 23, 0.08); }
-.gp-item.gp-skip { border-left: 3px solid #8c959f; opacity: 0.95; }
-.gp-icon {
-	flex: 0 0 1.35rem;
-	font-weight: 700;
-	font-size: 1rem;
-	line-height: 1.35;
-	width: 1.35rem;
-	text-align: center;
-	font-family: system-ui, sans-serif;
-}
-.gp-ok .gp-icon { color: #2ea043; }
-.gp-bad .gp-icon { color: #cf222e; }
-.gp-warn .gp-icon { color: #d4a017; }
-.gp-skip .gp-icon { color: #8c959f; }
-.gp-body { flex: 1; min-width: 0; }
-.gp-label { font-weight: 600; font-size: 0.9rem; line-height: 1.3; }
-.gp-detail { font-size: 0.8rem; opacity: 0.82; margin-top: 0.2rem; line-height: 1.35; }
-.gp-form-panel .gp-form-descr {
-	margin: 0 0 0.85rem;
-	font-size: 0.9rem;
-	opacity: 0.88;
-	line-height: 1.45;
-}
-.gp-toggle-list {
-	display: flex;
-	flex-direction: column;
-	gap: 0;
-}
-.gp-toggle {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
-	padding: 0.65rem 0.5rem;
-	margin: 0 -0.5rem;
-	border-radius: 8px;
-	min-height: 2.75rem;
-	cursor: pointer;
-	border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.07));
-	box-sizing: border-box;
-	transition: background 0.12s ease;
-}
-.gp-toggle:last-child {
-	border-bottom: none;
-}
-.gp-toggle:hover {
-	background: rgba(128, 128, 128, 0.08);
-}
-.gp-toggle-text {
-	flex: 1;
-	min-width: 0;
-	font-size: 0.92rem;
-	line-height: 1.35;
-	font-weight: 500;
-}
-.gp-toggle-field {
-	flex: 0 0 auto;
-	display: flex;
-	align-items: center;
-}
-.gp-toggle-field input[type="checkbox"] {
-	width: 1.15rem;
-	height: 1.15rem;
-	margin: 0;
-	cursor: pointer;
-	accent-color: #2ea043;
-}
-.gp-divider {
-	height: 0;
-	margin: 0.35rem 0 0.5rem;
-	border: none;
-	border-top: 1px dashed var(--border-color, rgba(0, 0, 0, 0.12));
-}
-.gp-form-panel .cbi-page-actions {
-	margin-top: 1rem;
-	padding-top: 0.75rem;
-	border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
-	text-align: right;
-}
-.gp-form-panel .cbi-button-save {
-	min-width: 9rem;
-	padding: 0.45rem 1rem;
-}
-</style>
+<div class="cbi-map">
+	<h2><%:GL.iNet Privacy — overview%></h2>
+	<div class="cbi-map-descr"><%:Status checklist and quick toggles. Detailed pages are linked from the menu.%></div>
 
-<div class="cbi-map gp-page">
-	<header class="gp-hero">
-		<h2><%:GL.iNet Privacy — overview%></h2>
-		<p class="gp-hero-descr"><%:Status checklist and quick toggles. Detailed pages are linked from the menu.%></p>
-	</header>
-
-	<div class="gp-layout">
-		<section class="gp-panel" aria-labelledby="gp-setup-heading">
-			<h3 id="gp-setup-heading"><%:Setup progress%></h3>
-			<div class="gp-meta">
-				<span class="gp-pill"><%:Healthy checks:%> <%= st.ok_c %> / <%= st.denom %></span>
-				<% if st.skip_c and st.skip_c > 0 then %>
-				<span class="gp-pill gp-pill-muted"><%:Skipped:%> <%= st.skip_c %></span>
-				<% end %>
-			</div>
-			<% local pw = st.pct > 100 and 100 or st.pct %>
-			<div class="gp-progress<% if st.pct < 50 then %> gp-bad<% elseif st.pct < 100 then %> gp-partial<% end %>" role="progressbar" aria-valuenow="<%= pw %>" aria-valuemin="0" aria-valuemax="100">
-				<div style="width: <%= pw %>%;"></div>
-			</div>
-
-			<ul class="gp-status-grid">
-			<% for _, it in ipairs(st.items) do %>
-				<li class="gp-item gp-<%= it.state %>">
-					<span class="gp-icon" aria-hidden="true"><%
-						if it.state == "ok" then %>✓<%
-						elseif it.state == "bad" then %>✗<%
-						elseif it.state == "warn" then %>!<%
-						else %>–<% end %></span>
-					<div class="gp-body">
-						<div class="gp-label"><%= it.label %></div>
-						<% if it.detail and it.detail ~= "" then %>
-						<div class="gp-detail"><%= it.detail %></div>
-						<% end %>
-					</div>
-				</li>
+	<div class="cbi-section">
+		<h3><%:Setup progress%></h3>
+		<div class="cbi-section-descr">
+			<%:Healthy checks:%> <%= st.ok_c %> / <%= st.denom %>
+			<% if st.skip_c and st.skip_c > 0 then %>
+			— <%:Skipped:%> <%= st.skip_c %>
 			<% end %>
-			</ul>
-		</section>
+		</div>
+		<div class="progress">
+			<div class="progress-bar <%= pclass %>" style="width: <%= pw %>%"><%= pw %>%</div>
+		</div>
+		<table class="table table-striped">
+			<thead>
+				<tr class="cbi-section-table-titles">
+					<th class="th"><%:Component%></th>
+					<th class="th"><%:Status%></th>
+				</tr>
+			</thead>
+			<tbody>
+			<% for _, it in ipairs(st.items) do %>
+				<tr class="cbi-section-table-row">
+					<td><%= it.label %></td>
+					<td>
+						<% if it.state == "ok" then %>
+						<span class="label label-success"><%:OK%></span>
+						<% elseif it.state == "bad" then %>
+						<span class="label label-danger"><%:Problem%></span>
+						<% elseif it.state == "warn" then %>
+						<span class="label label-warning"><%:Warning%></span>
+						<% else %>
+						<span class="label label-default"><%:N/A%></span>
+						<% end %>
+						<% if it.detail and it.detail ~= "" then %>
+						<br /><small><%= it.detail %></small>
+						<% end %>
+					</td>
+				</tr>
+			<% end %>
+			</tbody>
+		</table>
+	</div>
 
-		<form class="gp-form-panel gp-panel" method="post" action="" aria-labelledby="gp-quick-heading">
-			<input type="hidden" name="submit_settings" value="1" />
-			<h3 id="gp-quick-heading"><%:Quick settings%></h3>
-			<p class="gp-form-descr"><%:Toggle core options here; use the other tabs for advanced fields.%></p>
+	<form method="post" action="">
+		<input type="hidden" name="submit_settings" value="1" />
+		<div class="cbi-section">
+			<h3><%:Quick settings%></h3>
+			<div class="cbi-section-descr"><%:Toggle core options here; use the other tabs for advanced fields.%></div>
 
-			<div class="gp-toggle-list">
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:Kill switch enabled%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_privacy_enabled" value="0" />
-						<input type="checkbox" name="f_privacy_enabled" value="1" <% if form.f_privacy_enabled == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:Require WireGuard interface up%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_require_wg" value="0" />
-						<input type="checkbox" name="f_require_wg" value="1" <% if form.f_require_wg == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:Require Tor running%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_require_tor" value="0" />
-						<input type="checkbox" name="f_require_tor" value="1" <% if form.f_require_tor == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-
-				<hr class="gp-divider" />
-
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:Tor transparent NAT%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_tor_transparent" value="0" />
-						<input type="checkbox" name="f_tor_transparent" value="1" <% if form.f_tor_transparent == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:Telemetry DNS blocklist%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_block_domains" value="0" />
-						<input type="checkbox" name="f_block_domains" value="1" <% if form.f_block_domains == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:Disable GL.iNet cloud (GoodCloud + DNS block)%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_disable_vendor" value="0" />
-						<input type="checkbox" name="f_disable_vendor" value="1" <% if form.f_disable_vendor == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:Remove GL.iNet cloud packages (opkg)%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_remove_cloud_pkgs" value="0" />
-						<input type="checkbox" name="f_remove_cloud_pkgs" value="1" <% if form.f_remove_cloud_pkgs == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-				<% if form.has_rotate_imei then %>
-				<hr class="gp-divider" />
-				<label class="gp-toggle">
-					<span class="gp-toggle-text"><%:IMEI rotation enabled%></span>
-					<span class="gp-toggle-field">
-						<input type="hidden" name="f_rotate_imei" value="0" />
-						<input type="checkbox" name="f_rotate_imei" value="1" <% if form.f_rotate_imei == "1" then %>checked="checked" <% end %>/>
-					</span>
-				</label>
-				<% end %>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Kill switch enabled%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_privacy_enabled" value="0" />
+					<input type="checkbox" name="f_privacy_enabled" value="1" <% if form.f_privacy_enabled == "1" then %>checked="checked" <% end %>/>
+				</div>
 			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Require WireGuard interface up%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_require_wg" value="0" />
+					<input type="checkbox" name="f_require_wg" value="1" <% if form.f_require_wg == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Require Tor running%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_require_tor" value="0" />
+					<input type="checkbox" name="f_require_tor" value="1" <% if form.f_require_tor == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Tor transparent NAT%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_tor_transparent" value="0" />
+					<input type="checkbox" name="f_tor_transparent" value="1" <% if form.f_tor_transparent == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Telemetry DNS blocklist%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_block_domains" value="0" />
+					<input type="checkbox" name="f_block_domains" value="1" <% if form.f_block_domains == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Disable GL.iNet cloud (GoodCloud + DNS block)%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_disable_vendor" value="0" />
+					<input type="checkbox" name="f_disable_vendor" value="1" <% if form.f_disable_vendor == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:Remove GL.iNet cloud packages (opkg)%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_remove_cloud_pkgs" value="0" />
+					<input type="checkbox" name="f_remove_cloud_pkgs" value="1" <% if form.f_remove_cloud_pkgs == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<% if form.has_rotate_imei then %>
+			<div class="cbi-value">
+				<label class="cbi-title"><%:IMEI rotation enabled%></label>
+				<div class="cbi-value-field">
+					<input type="hidden" name="f_rotate_imei" value="0" />
+					<input type="checkbox" name="f_rotate_imei" value="1" <% if form.f_rotate_imei == "1" then %>checked="checked" <% end %>/>
+				</div>
+			</div>
+			<% end %>
 
 			<div class="cbi-page-actions">
 				<input class="cbi-button cbi-button-save" type="submit" value="<%:Save & apply%>" />
 			</div>
-		</form>
-	</div>
+		</div>
+	</form>
 </div>
 
 <%+footer%>

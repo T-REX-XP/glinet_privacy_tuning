@@ -19,7 +19,7 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 
 ## Epic 2: Secure tunneling (VPN & Tor)
 
-- [x] **Task 2.1** — Mullvad WireGuard via UCI helper: `package/glinet-privacy/files/usr/bin/apply-mullvad-wireguard.sh`, LuCI wireguard page / `install.sh` optional env.
+- [x] **Task 2.1** — Mullvad WireGuard via UCI helper: `package/glinet-privacy/files/usr/bin/apply-mullvad-wireguard.sh`, `install.sh` optional env; VPN/Mullvad UX documented on LuCI **Kill switch** (no separate Mullvad tab).
 - [x] **Task 2.2** — Tor package + config: `install.sh` opkg, `package/glinet-privacy/files/etc/tor/torrc.d/99-transparent.conf`.
 - [x] **Task 2.3** — Tor transparent proxy (LAN → Tor): `fw-plugin.sh`, `firewall.privacy-tor.sh`, `glinet_privacy` UCI `tor_transparent`.
 - [x] **Task 2.4** — **DNS policy hardening**: UCI **`glinet_privacy.dns`** (`dns_policy` default / `tor_dnsmasq` / `mullvad_dnsmasq`), **`/usr/libexec/glinet-privacy/apply-dns-policy.sh`**, LuCI **Tor, DNS & telemetry**; **`firewall.privacy-tor.sh`** adds LAN **TCP/53** → Tor DNSPort and optional **LAN DoT (853) drop**; **`apply-mullvad-wireguard.sh`** syncs **`mullvad_dnsmasq`** when glinet-privacy is installed. Tor+Mullvad simultaneously still requires a manual choice (policy is single-valued).

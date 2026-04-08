@@ -24,8 +24,6 @@ function index()
 		cbi("glinet_privacy/imei"), translate("IMEI rotation"), 3)
 	entry({"admin", "services", "glinet_privacy", "plugins"},
 		cbi("glinet_privacy/plugins"), translate("Tor, DNS & telemetry"), 4)
-	entry({"admin", "services", "glinet_privacy", "wireguard"},
-		template("glinet_privacy/wireguard"), translate("WireGuard / Mullvad"), 5)
 end
 
 local function sh_ok(cmd)

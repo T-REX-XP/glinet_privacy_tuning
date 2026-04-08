@@ -7,7 +7,7 @@ local translate = i18n.translate
 local sys = require "luci.sys"
 
 m = Map("privacy", translate("Privacy kill switch"),
-	translate("This page configures the glinet-privacy watchdog (iptables). GL.iNet stock firmware may also offer a VPN kill switch under VPN Dashboard — see below."))
+	translate("Configure the glinet-privacy watchdog (iptables). <strong>VPN first:</strong> set up Mullvad or another provider in the GL.iNet admin using the built-in <strong>WireGuard</strong> or <strong>OpenVPN</strong> client (stock firmware supports Mullvad). This LuCI app does not store VPN credentials. <strong>Then</strong> set the WireGuard interface name below to match the interface that is up when the tunnel is connected (check <em>Network → Interfaces</em> or <code>ip link</code> — often <code>wgclient</code> on GL.iNet, sometimes <code>wg0</code>). Turn off <strong>Require WG interface UP</strong> if you use only OpenVPN or no VPN. The <strong>Overview</strong> tab shows whether that interface is up. GL.iNet may also offer a vendor kill switch under VPN Dashboard — see below."))
 
 s = m:section(NamedSection, "main", "privacy", translate("Privacy watchdog (glinet-privacy)"))
 s.addremove = false
@@ -15,7 +15,8 @@ s.addremove = false
 s:option(Flag, "enabled", translate("Enable watchdog"),
 	translate("If disabled, killswitch rules are flushed.")).rmempty = false
 
-s:option(Value, "wg_if", translate("WireGuard interface"), translate("e.g. wg0")).rmempty = true
+s:option(Value, "wg_if", translate("WireGuard interface"),
+	translate("Must match the interface name when your stock VPN client has brought WireGuard up (e.g. wgclient, wg0). Preconfigure the VPN in the GL.iNet UI first.")).rmempty = true
 s:option(Flag, "require_wg", translate("Require WG interface UP")).rmempty = false
 s:option(Flag, "require_tor", translate("Require Tor running")).rmempty = false
 s:option(Value, "lan_dev", translate("LAN bridge / device"), translate("e.g. br-lan; leave empty to use network.lan.device")).rmempty = true

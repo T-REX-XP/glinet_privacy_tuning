@@ -15,6 +15,30 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.18 (2026-04-08)
+
+### Changed
+
+- **`install.sh`** — **Idempotent re-runs:** skips **`opkg update`** when all dependency packages are already installed (unless **`GLINET_PRIVACY_SKIP_OPKG_UPDATE`** is unset and something is missing); **telemetry** UCI defaults (`block_domains`, `disable_vendor_cloud`) are applied **once** (marker **`/etc/glinet-privacy/.telemetry-seeded`**) unless **`GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1`**; **`dhcp.@dnsmasq[0].confdir`** is not duplicated. **Kernel:** skips **`kmod-wireguard`** when WireGuard is already loaded or **`/sys/module/wireguard`** exists. **Downloads:** tarball must be non-empty; **git** clone must contain **`package/glinet-privacy/files`**; **piped** `curl|sh` without **`GLINET_PRIVACY_TARBALL_URL`** / **`GLINET_PRIVACY_SRC`** fails with an explicit error. **`maybe_mullvad`** no longer spams the log when Mullvad env is unset. **`remove.sh`** removes **`.telemetry-seeded`**. **`README.md`** / **`install.sh --help`** document re-run behavior and env vars.
+
+---
+
+## 1.1.17 (2026-04-08)
+
+### Added
+
+- **`remove.sh`** — Uninstall helper for router installs: stops **`privacy-killswitch`** (flush rules), disables init scripts, deletes **`firewall.glinet_privacy`**, strips **`glinet-privacy`** lines from **`/etc/firewall.user`**, removes cron lines for **`privacy-killswitch-watchdog.sh`** / **`rotate_imei.sh`**, removes Tor **`torrc`** include for **`99-transparent.conf`**, **`/etc/dnsmasq.d/glinet-block.conf`**, all **`package/glinet-privacy/files`** paths (from source tree or built-in list), optional LuCI files, optional **`opkg remove`** for **`luci-app-glinet-privacy`** / **`glinet-privacy`**. **`README.md`** documents usage.
+
+---
+
+## 1.1.16 (2026-04-08)
+
+### Changed
+
+- **LuCI** — Removed the **WireGuard / Mullvad** tab; VPN/Mullvad is expected to be **preconfigured in stock GL.iNet** (WireGuard/OpenVPN clients; Mullvad supported). Guidance moved to **Kill switch** (map description + WireGuard interface help) and **`README.md`**. **`apply-mullvad-wireguard.sh`** remains available from the shell only. Removed **`wireguard.htm`**; **`install.sh`** installs **`overview.htm`** only.
+
+---
+
 ## 1.1.15 (2026-04-08)
 
 ### Added

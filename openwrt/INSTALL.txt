@@ -12,6 +12,13 @@ From a git clone on the router:
 
   sh install.sh --with-luci
 
+To remove (from the same clone, or set GLINET_PRIVACY_SRC to the repo root):
+
+  sh remove.sh
+  sh remove.sh --opkg    # if you installed luci-app-glinet-privacy / glinet-privacy via opkg
+
+See remove.sh --help. Does not remove tor, wireguard-tools, etc., unless you use opkg for our ipks.
+
 What install.sh does by default (not --minimal)
 -----------------------------------------------
 - Copies package/glinet-privacy/files to /, chmod scripts, installs /usr/share/glinet-privacy/version.mk

@@ -29,7 +29,7 @@ endef
 
 define Package/luci-app-glinet-privacy/description
   Web UI for glinet-privacy: kill switch, IMEI rotation, Tor transparent NAT,
-  telemetry blocking, and Mullvad helper reference.
+  and telemetry blocking.
 endef
 
 define Build/Compile

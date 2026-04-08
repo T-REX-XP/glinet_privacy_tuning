@@ -26,8 +26,12 @@
 #
 # Env: GLINET_PRIVACY_SRC, GLINET_PRIVACY_GIT_URL, GLINET_PRIVACY_TARBALL_URL,
 #      GLINET_PRIVACY_BRANCH (default main)
+#      GLINET_PRIVACY_SKIP_OPKG_UPDATE=1 — skip opkg update (faster re-runs; install may fail if feeds stale)
+#      GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1 — re-apply installer telemetry UCI defaults (normally once only)
 #
 # Package version: package/version.mk
+#
+# Uninstall: see remove.sh (stops services, removes hooks, files, and UCI configs).
 
 set -eu
 
@@ -57,6 +61,10 @@ telemetry blocklist + dnsmasq confdir, init.d services.
   --with-imei-cron    Add cron every 6h for rotate_imei.sh (same; optional ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 in crontab)
 
 Remote: GLINET_PRIVACY_TARBALL_URL=... or GLINET_PRIVACY_GIT_URL=...
+
+Re-runs: safe (skips opkg update when deps satisfied; telemetry seed once; dhcp confdir not duplicated).
+
+Env: GLINET_PRIVACY_SKIP_OPKG_UPDATE=1  GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1
 
 Mullvad: export MULLVAD_PRIVATE_KEY MULLVAD_ADDRESS MULLVAD_PUBLIC_KEY MULLVAD_ENDPOINT
 EOF
@@ -115,6 +123,8 @@ resolve_source() {
 		git clone --depth 1 --branch "$BRANCH" "$GLINET_PRIVACY_GIT_URL" "$CLEANUP_DIR/repo" \
 			|| git clone --depth 1 "$GLINET_PRIVACY_GIT_URL" "$CLEANUP_DIR/repo" \
 			|| die "git clone failed"
+		[ -d "$CLEANUP_DIR/repo/package/glinet-privacy/files" ] \
+			|| die "git clone invalid: missing package/glinet-privacy/files"
 		REPO_ROOT="$CLEANUP_DIR/repo"
 		return
 	fi
@@ -131,6 +141,7 @@ resolve_source() {
 		else
 			die "Need wget or curl"
 		fi
+		[ -s "$_tgz" ] || die "Download is empty (check GLINET_PRIVACY_TARBALL_URL)"
 		( cd "$CLEANUP_DIR/out" && tar xzf "$_tgz" ) || die "tar extract failed"
 		_extracted=""
 		for _d in "$CLEANUP_DIR/out"/*; do
@@ -139,10 +150,20 @@ resolve_source() {
 			break
 		done
 		[ -n "$_extracted" ] && [ -d "$_extracted/package/glinet-privacy/files" ] \
-			|| die "Archive must contain package/glinet-privacy/files"
+			|| die "Archive must contain package/glinet-privacy/files (use a source tree tarball, not a release asset without package/)"
 		REPO_ROOT="$_extracted"
 		return
 	fi
+
+	# Piped from curl|sh: $0 is often "sh" — require explicit URL or SRC
+	case "${0##*/}" in
+		install.sh) ;;
+		*)
+			if [ -z "${GLINET_PRIVACY_SRC:-}" ] && [ -z "${GLINET_PRIVACY_TARBALL_URL:-}" ] && [ -z "${GLINET_PRIVACY_GIT_URL:-}" ]; then
+				die "When piping the script, set GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz (or GLINET_PRIVACY_SRC=/path/to/clone)"
+			fi
+			;;
+	esac
 
 	die "Set GLINET_PRIVACY_SRC, GLINET_PRIVACY_GIT_URL, or GLINET_PRIVACY_TARBALL_URL."
 }
@@ -152,15 +173,71 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
+# True if opkg reports the package as installed (exact name).
+pkg_installed() {
+	_p="$1"
+	opkg list-installed "$_p" 2>/dev/null | grep -q "^${_p} "
+}
+
+# WireGuard is built-in, loaded, or kmod package already installed — skip kmod-wireguard opkg.
+wireguard_kernel_ok() {
+	[ -d /sys/module/wireguard ] && return 0
+	lsmod 2>/dev/null | grep -q '^wireguard ' && return 0
+	pkg_installed kmod-wireguard && return 0
+	return 1
+}
+
+# Install one package if missing; log failures (non-fatal except when opkg missing).
+opkg_install_one() {
+	_pkg="$1"
+	pkg_installed "$_pkg" && return 0
+	log "opkg: installing $_pkg"
+	opkg install -V 0 "$_pkg" 2>/dev/null || log "opkg install failed (optional): $_pkg"
+}
+
 install_opkg_packages() {
 	[ "$MINIMAL" -eq 0 ] || return 0
 	command -v opkg >/dev/null 2>&1 || { log "opkg not found; skip package installs"; return 0; }
-	log "opkg update"
-	opkg update || log "opkg update failed (offline?)"
-	_pkgs="iptables iptables-mod-nat iptables-mod-extra iptables-mod-comment wireguard-tools kmod-wireguard tor tor-fw-helper dnsmasq-full ca-bundle"
-	for _p in $_pkgs; do
-		opkg install -V 0 "$_p" 2>/dev/null || log "Optional package not installed: $_p"
+
+	_needs_install=0
+	for _p in iptables iptables-mod-nat iptables-mod-extra iptables-mod-comment tor tor-fw-helper ca-bundle wireguard-tools; do
+		pkg_installed "$_p" || _needs_install=1
 	done
+	if ! wireguard_kernel_ok && ! pkg_installed kmod-wireguard; then
+		_needs_install=1
+	fi
+	if ! pkg_installed dnsmasq-full && ! pkg_installed dnsmasq; then
+		_needs_install=1
+	fi
+
+	if [ "$_needs_install" -eq 1 ]; then
+		if [ "${GLINET_PRIVACY_SKIP_OPKG_UPDATE:-0}" = "1" ]; then
+			log "Skipping opkg update (GLINET_PRIVACY_SKIP_OPKG_UPDATE=1)"
+		else
+			log "opkg update"
+			opkg update || log "opkg update failed (offline? feeds may be stale)"
+		fi
+	else
+		log "opkg: dependencies satisfied; skipping opkg update"
+	fi
+
+	for _p in iptables iptables-mod-nat iptables-mod-extra iptables-mod-comment tor tor-fw-helper ca-bundle; do
+		opkg_install_one "$_p"
+	done
+
+	opkg_install_one wireguard-tools
+
+	if wireguard_kernel_ok; then
+		log "WireGuard kernel support present; skipping kmod-wireguard"
+	else
+		opkg_install_one kmod-wireguard
+	fi
+
+	if pkg_installed dnsmasq-full || pkg_installed dnsmasq; then
+		: dnsmasq already present
+	else
+		opkg_install_one dnsmasq-full
+	fi
 }
 
 install_core() {
@@ -250,24 +327,33 @@ setup_cron() {
 	/etc/init.d/cron restart 2>/dev/null || true
 }
 
-	setup_telemetry() {
+setup_telemetry() {
 	[ "$MINIMAL" -eq 0 ] || return 0
 	[ -f /etc/config/glinet_privacy ] || return 0
-	uci set glinet_privacy.tel.block_domains='1' 2>/dev/null || true
-	uci set glinet_privacy.tel.disable_vendor_cloud='1' 2>/dev/null || true
-	uci commit glinet_privacy 2>/dev/null || true
+	# Seed blocklist + vendor-cloud defaults once (safe re-runs; override with GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1)
+	if [ "${GLINET_PRIVACY_FORCE_TELEMETRY_SEED:-0}" = "1" ] || [ ! -f /etc/glinet-privacy/.telemetry-seeded ]; then
+		mkdir -p /etc/glinet-privacy 2>/dev/null || true
+		uci set glinet_privacy.tel.block_domains='1' 2>/dev/null || true
+		uci set glinet_privacy.tel.disable_vendor_cloud='1' 2>/dev/null || true
+		uci commit glinet_privacy 2>/dev/null || true
+		touch /etc/glinet-privacy/.telemetry-seeded 2>/dev/null || true
+		log "Telemetry defaults applied (first run or forced); marker: /etc/glinet-privacy/.telemetry-seeded"
+	fi
 	# GL.iNet images may omit /etc/dnsmasq.d; apply-telemetry.sh also mkdir -p, belt-and-suspenders for stock layouts
 	mkdir -p /etc/dnsmasq.d 2>/dev/null || true
 	if [ -x /usr/libexec/glinet-privacy/apply-telemetry.sh ]; then
 		/usr/libexec/glinet-privacy/apply-telemetry.sh || true
 	fi
-	# dnsmasq reads /etc/dnsmasq.d when confdir lists it
+	# dnsmasq reads /etc/dnsmasq.d when confdir lists it (idempotent: no duplicate list entries)
 	if uci -q get dhcp.@dnsmasq[0] >/dev/null 2>&1; then
-		if ! uci show dhcp 2>/dev/null | grep -q "confdir.*dnsmasq.d"; then
+		if uci show dhcp.@dnsmasq[0] 2>/dev/null | grep -qF "/etc/dnsmasq.d"; then
+			: already has confdir for dnsmasq.d
+		else
 			uci add_list dhcp.@dnsmasq[0].confdir='/etc/dnsmasq.d' 2>/dev/null \
 				|| uci set dhcp.@dnsmasq[0].confdir='/etc/dnsmasq.d' 2>/dev/null || true
+			uci commit dhcp 2>/dev/null || true
+			log "dhcp: set dnsmasq confdir /etc/dnsmasq.d"
 		fi
-		uci commit dhcp 2>/dev/null || true
 	fi
 }
 
@@ -294,10 +380,7 @@ maybe_mullvad() {
 	[ -n "${MULLVAD_ENDPOINT:-}" ] && _have_ep=1
 	[ -n "${MULLVAD_ENDPOINT_HOST:-}" ] && _have_ep=1
 	[ -n "${MULLVAD_PRIVATE_KEY:-}" ] && [ -n "${MULLVAD_ADDRESS:-}" ] \
-		&& [ -n "${MULLVAD_PUBLIC_KEY:-}" ] && [ "$_have_ep" -eq 1 ] || {
-		log "Mullvad: set MULLVAD_PRIVATE_KEY, ADDRESS, PUBLIC_KEY, and ENDPOINT (or ENDPOINT_HOST+PORT)"
-		return 0
-	}
+		&& [ -n "${MULLVAD_PUBLIC_KEY:-}" ] && [ "$_have_ep" -eq 1 ] || return 0
 	log "Applying Mullvad WireGuard (env credentials set)"
 	/usr/bin/apply-mullvad-wireguard.sh || log "apply-mullvad-wireguard.sh failed"
 	/etc/init.d/network reload 2>/dev/null || true
@@ -330,7 +413,7 @@ install_luci() {
 			"/usr/lib/lua/luci/model/cbi/glinet_privacy/$_f" 0644
 	done
 	mkdir -p /usr/lib/lua/luci/view/glinet_privacy
-	for _v in overview.htm wireguard.htm; do
+	for _v in overview.htm; do
 		[ -f "$_LUCI/luasrc/view/glinet_privacy/$_v" ] || continue
 		install_file "$_LUCI/luasrc/view/glinet_privacy/$_v" \
 			"/usr/lib/lua/luci/view/glinet_privacy/$_v" 0644
