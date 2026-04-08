@@ -212,6 +212,8 @@ remove_files_builtin() {
 		usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh \
 		usr/libexec/glinet-privacy/apply-vendor-vpn-killswitch.sh \
 		usr/libexec/glinet-privacy/fw-plugin.sh \
+		usr/libexec/glinet-privacy/killswitch-drop-active.sh \
+		usr/libexec/glinet-privacy/tor-transparent-nat-active.sh \
 		usr/share/glinet-privacy/version.mk
 	do
 		if [ -f "/$_r" ] || [ -L "/$_r" ]; then

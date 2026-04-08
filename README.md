@@ -6,6 +6,13 @@ Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by defau
 
 **Stock GL.iNet web UI:** this project’s UI is **LuCI** (and CLI). GL.iNet does not currently ship a public SDK for custom stock-admin pages; vendor adoption or a future official SDK would be separate — see [docs/glinet-stock-ui.md](docs/glinet-stock-ui.md).
 
+## Privilege model & network exposure
+
+- **Root on the router** — **`install.sh`** / **`remove.sh`**, **`etc/init.d/*`**, **`usr/bin/*`**, **`usr/libexec/glinet-privacy/*`**, cron lines, and **`uci-defaults`** run as **root**. **LuCI** is served by **uhttpd** (or the stock web server); saving forms runs controller code that calls **`luci.sys.call`** / **`sys.exec`** — on stock OpenWrt that still executes shell as **root** for service and firewall actions.
+- **UCI packages touched** — Primary: **`privacy`**, **`glinet_privacy`**, **`rotate_imei`**. Installer and **`apply-vendor-vpn-killswitch.sh`** may change **`glvpn`** when present. **`firewall`** gains **`firewall.glinet_privacy`** (include path). **`apply-dns-policy.sh`** / stock **`/etc/config/dhcp`** may adjust **dnsmasq** options when you enable Tor DNS policy or telemetry blocklist paths. Do not expose LuCI or these UCI editors to untrusted users.
+- **Outbound URLs (optional / user-driven)** — **Verify** can call **api.ipify.org** from the browser or from the router (**`verify_ip`**). Optional browser geo (**e.g. ipwho.is**) is documented on the Verify page. **Remote install** uses URLs you set (**`GLINET_PRIVACY_TARBALL_URL`**, **`GLINET_PRIVACY_GIT_URL`**, **`raw.githubusercontent.com`** for `install.sh`). No other standing phone-home is required for core operation.
+- **Diagnostics** — The **Overview** **syslog** strip shows recent **`logread`** lines for this project’s **`logger -t`** tags; many **`sys.call`** apply helpers still discard stderr (`>/dev/null`); check **System log** after a failed save if something looks wrong.
+
 ## Features
 
 - **Kill switch** — Watchdog script and iptables rules to block forwarded traffic when VPN/Tor health checks fail; optional integration with GL.iNet stock `glvpn` “block non-VPN” where present.

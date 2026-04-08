@@ -7,5 +7,5 @@
 #
 # Policy: document every change request in /changes.md (root).
 
-GLINET_PRIVACY_VERSION:=1.2.23
+GLINET_PRIVACY_VERSION:=1.2.24
 GLINET_PRIVACY_RELEASE:=1

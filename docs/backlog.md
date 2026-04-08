@@ -35,7 +35,7 @@ Implementation status for **`glinet-privacy`** / **`luci-app-glinet-privacy`**. 
 
 **Open / follow-up**
 
-- [x] **nft / iptables-nft LuCI status** — **`firewall_status.lua`** extends Overview + Tor badge checks (**v1.2.23**).
+- [x] **nft / iptables-nft LuCI status** — **`killswitch-drop-active.sh`** / **`tor-transparent-nat-active.sh`** + **`firewall_status.lua`** (Overview, Kill switch, Tor badge; **v1.2.23**–**v1.2.24**).
 - [ ] **nftables-native watchdog** — **`privacy-killswitch-watchdog.sh`** / **`firewall.privacy-tor.sh`** still assume **`iptables`** (xtables-nft on stock); raw **nft-only** drop/redirect not implemented in shell.
 
 ---

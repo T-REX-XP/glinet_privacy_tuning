@@ -14,6 +14,15 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.24 (2026-04-08)
+
+### Changed
+
+- **Single-source firewall probes** — **`killswitch-drop-active.sh`** and **`tor-transparent-nat-active.sh`** under **`usr/libexec/glinet-privacy/`** (iptables / **`iptables-save`** / **nft**); **`firewall_status.lua`** invokes them when present, with inline fallback for missing files (e.g. partial checkout). Watchdog **`KS_COMMENT`** cross-referenced in script header.
+- **Documentation** — README **Privilege model & network exposure** (root, UCI surfaces, outbound URLs, syslog vs silent **`sys.call`**). **`docs/contributor-review.md`** best-practices list aligned.
+
+---
+
 ## 1.2.23 (2026-04-08)
 
 ### Changed

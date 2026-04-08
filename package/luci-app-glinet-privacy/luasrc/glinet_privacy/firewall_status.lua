@@ -1,17 +1,33 @@
 --[[
 SPDX-License-Identifier: GPL-2.0-only
 Copyright (c) 2026 GL.iNet Privacy contributors
-Status probes for killswitch + Tor NAT when only iptables-nft or raw nft tooling reflects reality.
+Status probes for killswitch + Tor NAT. Prefers shared libexec scripts (single
+source with nft fallbacks); duplicates that logic in Lua only when scripts are missing.
 ]]
 
 local sys = require "luci.sys"
+
+local KS_SCRIPT = "/usr/libexec/glinet-privacy/killswitch-drop-active.sh"
+local TOR_SCRIPT = "/usr/libexec/glinet-privacy/tor-transparent-nat-active.sh"
 
 local function sh_ok(cmd)
 	return sys.call(cmd .. " >/dev/null 2>&1") == 0
 end
 
+local function script_executable(path)
+	return sys.call("[ -x " .. path .. " ] >/dev/null 2>&1") == 0
+end
+
+local function safe_port_str(s, fallback)
+	local n = tonumber(s)
+	if n and n >= 1 and n <= 65535 then
+		return tostring(n)
+	end
+	return fallback
+end
+
 --- FORWARD DROP with comment privacy-killswitch-drop (iptables / xtables-nft / nft ruleset).
-local function killswitch_drop_active()
+local function killswitch_drop_active_inline()
 	if sh_ok("iptables -L FORWARD -n 2>/dev/null | grep -qF privacy-killswitch-drop") then
 		return true
 	end
@@ -24,12 +40,16 @@ local function killswitch_drop_active()
 	return false
 end
 
---- Tor transparent NAT: PREROUTING REDIRECT (iptables) or nft redirect/dnat to TransPort/DNSPort.
---- @param trans_port string|number e.g. 9040
---- @param dns_port string|number e.g. 9053
-local function tor_transparent_redirect_present(trans_port, dns_port)
-	local tp = tostring(trans_port or "9040")
-	local dp = tostring(dns_port or "9053")
+local function killswitch_drop_active()
+	if script_executable(KS_SCRIPT) then
+		return sys.call(KS_SCRIPT .. " >/dev/null 2>&1") == 0
+	end
+	return killswitch_drop_active_inline()
+end
+
+local function tor_transparent_redirect_present_inline(trans_port, dns_port)
+	local tp = safe_port_str(trans_port, "9040")
+	local dp = safe_port_str(dns_port, "9053")
 	if sh_ok("iptables -t nat -L PREROUTING -n 2>/dev/null | grep -q REDIRECT") then
 		return true
 	end
@@ -49,6 +69,16 @@ local function tor_transparent_redirect_present(trans_port, dns_port)
 		end
 	end
 	return false
+end
+
+--- Tor transparent NAT: PREROUTING REDIRECT (iptables) or nft redirect/dnat to TransPort/DNSPort.
+local function tor_transparent_redirect_present(trans_port, dns_port)
+	local tp = safe_port_str(trans_port, "9040")
+	local dp = safe_port_str(dns_port, "9053")
+	if script_executable(TOR_SCRIPT) then
+		return sys.call(TOR_SCRIPT .. " " .. tp .. " " .. dp .. " >/dev/null 2>&1") == 0
+	end
+	return tor_transparent_redirect_present_inline(trans_port, dns_port)
 end
 
 return {

@@ -1,6 +1,6 @@
 # GL.iNet Privacy — Contributor review
 
-**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, **`csrf.lua`**, `net_probe.lua`, **`firewall_status.lua`** (iptables / **nft** status fallbacks), **`vpn_probe.lua`** (ifstatus / ubus VPN), **`vendor_ubus.lua`** (opt-in documented ubus readout), **`privacy_log_excerpt.lua`**, **`root/usr/share/luci/menu.d/luci-app-glinet-privacy.json`** (OpenWrt 22.03+ pagetree), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`, `vendor_ubus_card`, `csrf_field`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
+**Scope:** `luci-app-glinet-privacy`, `sanitize.lua`, **`csrf.lua`**, `net_probe.lua`, **`firewall_status.lua`**, **`killswitch-drop-active.sh`** / **`tor-transparent-nat-active.sh`** (shared status probes), **`vpn_probe.lua`** (ifstatus / ubus VPN), **`vendor_ubus.lua`** (opt-in documented ubus readout), **`privacy_log_excerpt.lua`**, **`root/usr/share/luci/menu.d/luci-app-glinet-privacy.json`** (OpenWrt 22.03+ pagetree), controller actions, templates (`overview`, `killswitch`, `imei`, `tor_dns`, `verify`, `vendor_ubus_card`, `csrf_field`), authenticated **`verify_ip`** JSON endpoint, `install.sh`, rpcd ACL.  
 **Perspectives:** security hardening, OpenWrt packaging / upstream norms, maintainability / best practices, **composition with GL.iNet stock (OOTB) features**.  
 **Companion backlog:** epic-level tasks live in **`docs/backlog.md`**; this file adds reviewer lens, security notes, and the **P0–P3** feature backlog.
 
@@ -93,10 +93,10 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 
 ## Best practices / maintainability
 
-1. **Single source for “is watchdog dropping?”** — *LuCI:* **`firewall_status.killswitch_drop_active()`** (`iptables`, **`iptables-save`**, **`nft list ruleset`**) — **v1.2.23+**. *Shell watchdog* still uses **`iptables`** only; optional future **nft** apply script.  
+1. **Single source for “is watchdog dropping?”** — *Done:* **`/usr/libexec/glinet-privacy/killswitch-drop-active.sh`** (iptables, **`iptables-save`**, **`nft`**) — **`firewall_status.lua`** calls it when installed, else inline mirror (**v1.2.24+**). **`tor-transparent-nat-active.sh`** is the analogous probe for Tor NAT status. *Watchdog apply* still uses **`iptables`** only.  
 2. **Centralize validators** — *Done for input hardening:* **`luci/glinet_privacy/sanitize.lua`** (ifnames, modem tty, IPv4, CIDR, ports) shared by **`glinet_privacy.lua`** and **`net_probe.lua`**.  
-3. **Privilege documentation** — README section: what runs as root, what UCI keys are written, what external URLs are contacted.  
-4. **Error handling** — `sys.call` failures are often ignored (`>/dev/null`); consider surfaced **logread** hints on Overview for last apply failure (backlog).
+3. **Privilege documentation** — *Done:* README **Privilege model & network exposure** (**v1.2.24+**): root surfaces, UCI packages, outbound URLs, syslog diagnostics.  
+4. **Error handling** — Many **`sys.call`** paths still discard stderr; **Overview** **`privacy_log_excerpt`** surfaces recent tagged **logread** lines; use **Status → System log** after failed applies (see README).
 
 ---
 
@@ -182,4 +182,4 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **custom-form CSRF** (**authtoken**) in **v1.2.17**; **LuCI nft-aware status** in **v1.2.23**; **GL.iNet OOTB** checklist and **nft-native shell** rules remain follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile** / **SPDX** / feed docs landed **v1.2.19**–**v1.2.20**; **nft** next step is **watchdog/Tor shell** on **nft-only** images.
 
-*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.23** (`package/version.mk`). Re-check **`changes.md`** on each release.*
+*Document version: 2026-04-08 — aligned with **`docs/backlog.md`** and `GLINET_PRIVACY_VERSION` **1.2.24** (`package/version.mk`). Re-check **`changes.md`** on each release.*

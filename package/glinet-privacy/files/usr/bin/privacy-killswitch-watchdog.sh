@@ -4,6 +4,7 @@
 #
 # privacy-killswitch-watchdog.sh — Block LAN→WAN forward when WireGuard and/or Tor are unhealthy.
 # Uses iptables (xtables-nft on OpenWrt). Requires comment match (kmod-ipt-comment).
+# Status probe (LuCI / nft fallbacks): keep KS_COMMENT in sync with killswitch-drop-active.sh.
 
 set -eu
 
