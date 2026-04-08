@@ -1,13 +1,15 @@
-Privacy router (GL-XE300 Puli, GL-AXT1800 Slate AX / OpenWrt)
-==============================================================
+GL.iNet Privacy — supported on GL.iNet stock firmware only
+===========================================================
 
-All steps below are automated by install.sh unless you use --minimal.
+install.sh refuses non-GL.iNet images. All steps below are automated unless you use --minimal.
 
 One command (replace USER/REPO; one line avoids broken copy-paste with \):
 
   curl -fsSL https://raw.githubusercontent.com/USER/REPO/main/install.sh | GLINET_PRIVACY_TARBALL_URL=https://github.com/USER/REPO/archive/refs/heads/main.tar.gz sh -s --
 
 Do not paste installer log lines back into the shell. GLINET_PRIVACY_TARBALL_URL must end in .tar.gz (source tree archive).
+
+LuCI requires luci-lua-runtime; install.sh installs it with opkg and aborts if LuCI is enabled but the package cannot be installed. Default: Lua index menu; GLINET_PRIVACY_LUCI_MENU_JSON=1 installs menu.d JSON.
 
 From a git clone on the router:
 
@@ -25,17 +27,15 @@ What install.sh does by default (not --minimal)
 - Copies package/glinet-privacy/files to /, chmod scripts, installs /usr/share/glinet-privacy/version.mk
 - Registers firewall.glinet_privacy → fw-plugin.sh; runs apply-device-profile.sh (WAN per device)
 - opkg update + install: iptables, iptables-mod-*, wireguard-tools, kmod-wireguard, tor, tor-fw-helper,
-  dnsmasq-full, ca-bundle (best-effort if offline)
+  dnsmasq-full, ca-bundle, luci-lua-runtime when LuCI is enabled (best-effort if offline; LuCI step fails hard if missing)
 - Tor: ensures %include /etc/tor/torrc.d/99-transparent.conf in /etc/tor/torrc; enables and starts tor
 - Kill switch: enables /etc/init.d/privacy-killswitch; adds cron */1 for privacy-killswitch-watchdog.sh
 - Telemetry: uci glinet_privacy.tel.block_domains=1 and disable_vendor_cloud=1; apply-telemetry.sh
   (dnsmasq.d black-holes for goodcloud.xyz / gldns.com, glconfig.cloud.enable=0, gl_cloud stop/disable);
   optional remove_cloud_packages removes gl-cloud via opkg; dhcp dnsmasq confdir /etc/dnsmasq.d when possible
 - LuCI: copies luci-app-glinet-privacy into /usr/lib/lua/luci/... (Services → GL.iNet Privacy), unless --without-luci.
-  When /etc/openwrt_release parses as OpenWrt 22.03+ or stock LuCI already ships JSON under /usr/share/luci/menu.d/,
-  also installs /usr/share/luci/menu.d/luci-app-glinet-privacy.json
-  and marker /usr/share/glinet-privacy/luci-use-menu-d so the ucode pagetree registers the menu (Lua index() skipped).
-  Override: GLINET_PRIVACY_LUCI_MENU_JSON=1|0|auto. After install, delete /tmp/luci-indexcache* if the menu is stale.
+  Default: Lua index() only; GLINET_PRIVACY_LUCI_MENU_JSON=1 installs menu.d JSON + luci-use-menu-d (Lua index() skipped).
+  After menu changes, delete /tmp/luci-indexcache* if stale.
 - Restarts network, firewall, dnsmasq, rpcd, uhttpd
 
 Optional flags

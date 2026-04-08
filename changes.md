@@ -14,6 +14,30 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.29 (2026-04-08)
+
+### Changed
+
+- **GL.iNet–only target** — **`install.sh`** exits unless **`/etc/config/glconfig`** exists or **`/etc/openwrt_release`** identifies **GL.iNet** stock firmware. Removed generic **OpenWrt** **`menu.d`** auto-detection (**`openwrt_release_ge`**, non-GL **`menu.d`** heuristics). **`install_luci_menu_json`**: default **Lua `index()`** only; **`GLINET_PRIVACY_LUCI_MENU_JSON=1`** for JSON menu. README, **`openwrt/INSTALL.txt`**, **`docs/devices.md`**, **`feeds.conf.example`**, **`package/OPENWRT-BUILD.txt`**, **`remove.sh`** header, **`docs/contributor-review.md`** updated for dedicated-router scope.
+
+---
+
+## 1.2.28 (2026-04-08)
+
+### Changed
+
+- **GL.iNet OOTB LuCI** — **`install.sh`** detects **GL.iNet** stock (**`/etc/config/glconfig`** or **GL.iNet** in **`/etc/openwrt_release`**) and **skips `menu.d` JSON** by default so the app registers like typical vendor Lua LuCI (**`index()`** only, no **`luci-use-menu-d`** marker). **`GLINET_PRIVACY_LUCI_MENU_JSON=1`** still forces JSON menu. **`luci-lua-runtime`** is a **hard** prerequisite when LuCI is enabled: included in the main **`opkg`** dependency pass, and **`install.sh` aborts** if **`opkg`** cannot install it (instead of optional log-only install).
+
+---
+
+## 1.2.27 (2026-04-08)
+
+### Fixed
+
+- **LuCI “No Lua runtime installed”** — On **ucode**-first LuCI (**OpenWrt 22.03+**, **GL.iNet 4.x**), **`menu.d`** alone does not run Lua **`call()`** handlers. **`install.sh`** now **`opkg install`s `luci-lua-runtime`** before copying LuCI files (with **`opkg update`** unless **`GLINET_PRIVACY_SKIP_OPKG_UPDATE=1`**). **`luci-app-glinet-privacy` Makefile** **`DEPENDS`** includes **`+luci-lua-runtime`**. README troubleshooting for manual fix.
+
+---
+
 ## 1.2.26 (2026-04-08)
 
 ### Fixed

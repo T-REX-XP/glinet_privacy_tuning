@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2026 GL.iNet Privacy contributors
 #
-# glinet_puli_privacy — one-shot installer for OpenWrt / GL.iNet (POSIX sh).
+# glinet_puli_privacy — one-shot installer for GL.iNet routers (POSIX sh; stock GL.iNet / OpenWrt-based firmware).
 #
 # Default: copies package files, registers firewall, applies device profile, installs
 # optional opkg packages, merges Tor config, enables services, cron watchdog, telemetry.
@@ -30,7 +30,7 @@
 # opkg: uses "iptables-nft" as satisfying the iptables stack when present; tor-fw-helper is optional (not in all feeds).
 #      Install uses plain "opkg install" (no -V0); some vendor opkg builds reject "-V 0" and print usage.
 #      GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1 — re-apply installer telemetry UCI defaults (normally once only)
-#      GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0 — menu.d for ucode LuCI (default auto: OpenWrt 22.03+ per /etc/openwrt_release)
+#      GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0 — menu.d JSON (default auto: off, Lua index(); use 1 for JSON menu)
 #
 # Package version: package/version.mk
 #
@@ -55,8 +55,8 @@ glinet_puli_privacy install.sh
 
   sh install.sh [--without-luci] [--minimal] [--with-imei-boot] [--with-imei-cron]
 
-Default install applies: opkg deps (if available), Tor torrc merge, killswitch cron,
-telemetry blocklist + dnsmasq confdir, init.d services, LuCI UI files.
+Supported: GL.iNet routers with stock firmware only. Default install applies: opkg deps (if available),
+Tor torrc merge, killswitch cron, telemetry blocklist + dnsmasq confdir, init.d services, LuCI UI files.
 
   --minimal           Skip opkg/Tor/cron/telemetry automation (files + firewall only)
   --without-luci      Do not install LuCI UI files
@@ -69,6 +69,7 @@ Remote: GLINET_PRIVACY_TARBALL_URL=... or GLINET_PRIVACY_GIT_URL=...
 Re-runs: safe (skips opkg update when deps satisfied; telemetry seed once; dhcp confdir not duplicated).
 
 Env: GLINET_PRIVACY_SKIP_OPKG_UPDATE=1  GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1  GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0
+  LuCI requires luci-lua-runtime (installed automatically when opkg is available; install aborts if missing when LuCI is enabled).
 EOF
 }
 
@@ -86,7 +87,21 @@ done
 
 [ "$(id -u)" -eq 0 ] || die "Run as root (e.g. ssh root@router && sh install.sh)"
 
-[ -f /etc/openwrt_release ] || log "Warning: /etc/openwrt_release not found — not OpenWrt?"
+# This project targets GL.iNet hardware + stock firmware only (not generic OpenWrt builds).
+require_glinet_router() {
+	[ -f /etc/config/glconfig ] && return 0
+	[ -f /etc/openwrt_release ] || die "GL.iNet Privacy: /etc/openwrt_release missing — use a GL.iNet router with stock firmware."
+	# shellcheck disable=SC1091
+	. /etc/openwrt_release
+	_m="${DISTRIB_ID:-} ${DISTRIB_DESCRIPTION:-}"
+	case "$_m" in
+		*[Gg][Ll].[Ii][Nn][Ee][Tt]*) return 0 ;;
+		*[Gg][Ll][Ii][Nn][Ee][Tt]*) return 0 ;;
+	esac
+	die "GL.iNet Privacy: unsupported image — install only on GL.iNet stock firmware (need /etc/config/glconfig or GL.iNet in /etc/openwrt_release)."
+}
+
+require_glinet_router
 
 mktemp_dir() {
 	if command -v mktemp >/dev/null 2>&1; then
@@ -247,6 +262,9 @@ install_opkg_packages() {
 	if ! pkg_installed dnsmasq-full && ! pkg_installed dnsmasq; then
 		_needs_install=1
 	fi
+	if [ "$INSTALL_LUCI" -eq 1 ] && ! pkg_installed luci-lua-runtime; then
+		_needs_install=1
+	fi
 
 	if [ "$_needs_install" -eq 1 ]; then
 		if [ "${GLINET_PRIVACY_SKIP_OPKG_UPDATE:-0}" = "1" ]; then
@@ -282,6 +300,10 @@ install_opkg_packages() {
 		: dnsmasq already present
 	else
 		opkg_install_one dnsmasq-full
+	fi
+
+	if [ "$INSTALL_LUCI" -eq 1 ]; then
+		opkg_install_missing_from_list luci-lua-runtime
 	fi
 }
 
@@ -445,66 +467,47 @@ install_file() {
 	chmod "$_mode" "$_dst"
 }
 
-# OpenWrt DISTRIB_RELEASE major.minor >= need_maj.need_min (e.g. 22.03.5-rc3 → 22.03)
-openwrt_release_ge() {
-	_need_maj="$1"
-	_need_min="$2"
-	[ -f /etc/openwrt_release ] || return 1
-	# shellcheck disable=SC1091
-	. /etc/openwrt_release
-	_rel="${DISTRIB_RELEASE%%-*}"
-	_maj="${_rel%%.*}"
-	_rest="${_rel#*.}"
-	_min="${_rest%%.*}"
-	case "$_maj" in '' | *[!0-9]*) return 1 ;; esac
-	case "$_min" in '' | *[!0-9]*) _min=0 ;; esac
-	if [ "$_maj" -gt "$_need_maj" ] 2>/dev/null; then
-		return 0
+# LuCI Lua controllers require luci-lua-runtime on ucode-first LuCI (GL.iNet 4.x). Hard prerequisite when LuCI is installed.
+require_luci_lua_runtime_for_luci() {
+	[ "$INSTALL_LUCI" -eq 1 ] || return 0
+	pkg_installed luci-lua-runtime && return 0
+	command -v opkg >/dev/null 2>&1 || die "LuCI install requires opkg package luci-lua-runtime; opkg not found. Use --without-luci or install luci-lua-runtime manually."
+	if [ "${GLINET_PRIVACY_SKIP_OPKG_UPDATE:-0}" != "1" ]; then
+		opkg update || true
 	fi
-	if [ "$_maj" -eq "$_need_maj" ] 2>/dev/null && [ "$_min" -ge "$_need_min" ] 2>/dev/null; then
-		return 0
-	fi
-	return 1
+	log "opkg: installing luci-lua-runtime (required for LuCI Lua controllers)"
+	opkg_install_quiet luci-lua-runtime || true
+	pkg_installed luci-lua-runtime || die "Could not install luci-lua-runtime (required for this LuCI app). Online router: opkg update && opkg install luci-lua-runtime. Or: sh install.sh --without-luci"
 }
 
-# LuCI ucode dispatcher: /usr/share/luci/menu.d/*.json merged into pagetree (see OpenWrt luci-base dispatcher.uc).
+# LuCI: default Lua index() (vendor-style). Optional menu.d JSON + marker when GLINET_PRIVACY_LUCI_MENU_JSON=1.
 install_luci_menu_json() {
 	_LUCI="$REPO_ROOT/package/luci-app-glinet-privacy"
 	_json="$_LUCI/root/usr/share/luci/menu.d/luci-app-glinet-privacy.json"
 	[ -f "$_json" ] || return 0
 
-	_use=0
 	if [ "${GLINET_PRIVACY_LUCI_MENU_JSON:-auto}" = "1" ]; then
-		_use=1
-	elif [ "${GLINET_PRIVACY_LUCI_MENU_JSON:-auto}" = "0" ]; then
+		mkdir -p /usr/share/luci/menu.d
+		install_file "$_json" /usr/share/luci/menu.d/luci-app-glinet-privacy.json 0644
+		mkdir -p /usr/share/glinet-privacy
+		: > /usr/share/glinet-privacy/luci-use-menu-d
+		log "LuCI menu.d installed; Lua controller index() skipped. Clear /tmp/luci-indexcache* if menu is stale."
+		return 0
+	fi
+
+	rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json 2>/dev/null || true
+	rm -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null || true
+	if [ "${GLINET_PRIVACY_LUCI_MENU_JSON:-auto}" = "0" ]; then
 		log "LuCI menu.d: skipped (GLINET_PRIVACY_LUCI_MENU_JSON=0)"
-		rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json 2>/dev/null || true
-		rm -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null || true
-		return 0
-	elif openwrt_release_ge 22 3; then
-		_use=1
-	elif ls /usr/share/luci/menu.d/*.json >/dev/null 2>&1; then
-		# GL.iNet etc.: DISTRIB_RELEASE may be vendor "4.x" while ucode LuCI merges menu.d from stock JSON.
-		_use=1
+	else
+		log "LuCI menu.d: skipped (default Lua index(); GLINET_PRIVACY_LUCI_MENU_JSON=1 for JSON menu)"
 	fi
-
-	if [ "$_use" -eq 0 ]; then
-		rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json 2>/dev/null || true
-		rm -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null || true
-		log "LuCI menu.d: skipped (no OpenWrt 22.03+ in /etc/openwrt_release and no stock menu.d JSON; use GLINET_PRIVACY_LUCI_MENU_JSON=1 to force)"
-		return 0
-	fi
-
-	mkdir -p /usr/share/luci/menu.d
-	install_file "$_json" /usr/share/luci/menu.d/luci-app-glinet-privacy.json 0644
-	mkdir -p /usr/share/glinet-privacy
-	: > /usr/share/glinet-privacy/luci-use-menu-d
-	log "LuCI menu.d installed (OpenWrt 22.03+ / forced); Lua controller index() skipped. Clear /tmp/luci-indexcache* if menu is stale."
 }
 
 install_luci() {
 	_LUCI="$REPO_ROOT/package/luci-app-glinet-privacy"
 	[ -d "$_LUCI/luasrc" ] || { log "LuCI sources missing; skip"; return 0; }
+	require_luci_lua_runtime_for_luci
 	log "Installing LuCI: $_LUCI"
 	mkdir -p /usr/lib/lua/luci/controller
 	install_file "$_LUCI/luasrc/controller/glinet_privacy.lua" /usr/lib/lua/luci/controller/glinet_privacy.lua 0644

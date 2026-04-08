@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2026 GL.iNet Privacy contributors
 #
-# Add one line to your OpenWrt buildroot feeds.conf (copy path/URL as needed).
+# Add one line to your OpenWrt SDK buildroot feeds.conf (GL.iNet target devices only at runtime).
 #
 # Recommended: clone the whole repo but index only package/ (version.mk stays next to both Makefiles).
 # src-git glinet_privacy https://github.com/T-REX-XP/glinet_privacy_tuning.git;subdir=package

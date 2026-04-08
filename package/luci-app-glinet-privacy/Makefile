@@ -26,7 +26,7 @@ define Package/luci-app-glinet-privacy
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=LuCI GL.iNet Privacy UI
-  DEPENDS:=+luci-base +glinet-privacy
+  DEPENDS:=+luci-base +luci-lua-runtime +glinet-privacy
   URL:=https://github.com/T-REX-XP/glinet_privacy_tuning
   PKGARCH:=all
 endef

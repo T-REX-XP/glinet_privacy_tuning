@@ -18,9 +18,8 @@ local csrf = require "luci.glinet_privacy.csrf"
 local fwst = require "luci.glinet_privacy.firewall_status"
 
 function index()
-	-- When install.sh drops /usr/share/glinet-privacy/luci-use-menu-d (OpenWrt 22.03+), the
-	-- ucode LuCI dispatcher loads /usr/share/luci/menu.d/luci-app-glinet-privacy.json — skip Lua
-	-- entry() to avoid duplicate menu nodes (pagetree merges JSON then Lua).
+	-- When install.sh installs menu.d JSON + marker (GLINET_PRIVACY_LUCI_MENU_JSON=1), skip Lua menu registration
+	-- to avoid duplicate nodes. Default install: no marker — register here.
 	if luci.sys.call("test -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null") == 0 then
 		return
 	end

@@ -1,6 +1,8 @@
-# GL.iNet Privacy tuning (OpenWrt)
+# GL.iNet Privacy tuning
 
-Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by default; **`install.sh --without-luci`** skips it) for GL.iNet routers running OpenWrt: kill switch watchdog, Tor transparent NAT, optional dnsmasq→Tor DNS policy, telemetry blocking, and optional Quectel IMEI rotation (cellular models). **VPN** is configured in **stock GL.iNet** (WireGuard/OpenVPN); this project only watches the tunnel interface you name in UCI.
+**Supported target:** **GL.iNet routers** running **stock GL.iNet firmware** (OpenWrt-based). This project is **not** intended for generic OpenWrt builds or non-GL.iNet hardware; **`install.sh`** aborts if the image is not recognized as GL.iNet.
+
+Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by default; **`install.sh --without-luci`** skips it): kill switch watchdog, Tor transparent NAT, optional dnsmasq→Tor DNS policy, telemetry blocking, and optional Quectel IMEI rotation (cellular models). **VPN** is configured in **stock GL.iNet** (WireGuard/OpenVPN); this project only watches the tunnel interface you name in UCI.
 
 **Repository:** [https://github.com/T-REX-XP/glinet_privacy_tuning](https://github.com/T-REX-XP/glinet_privacy_tuning)
 
@@ -8,7 +10,7 @@ Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by defau
 
 ## Privilege model & network exposure
 
-- **Root on the router** — **`install.sh`** / **`remove.sh`**, **`etc/init.d/*`**, **`usr/bin/*`**, **`usr/libexec/glinet-privacy/*`**, cron lines, and **`uci-defaults`** run as **root**. **LuCI** is served by **uhttpd** (or the stock web server); saving forms runs controller code that calls **`luci.sys.call`** / **`sys.exec`** — on stock OpenWrt that still executes shell as **root** for service and firewall actions.
+- **Root on the router** — **`install.sh`** / **`remove.sh`**, **`etc/init.d/*`**, **`usr/bin/*`**, **`usr/libexec/glinet-privacy/*`**, cron lines, and **`uci-defaults`** run as **root**. **LuCI** is served by **uhttpd** (stock GL.iNet); saving forms runs controller code that calls **`luci.sys.call`** / **`sys.exec`** — still **root** for service and firewall actions.
 - **UCI packages touched** — Primary: **`privacy`**, **`glinet_privacy`**, **`rotate_imei`**. Installer and **`apply-vendor-vpn-killswitch.sh`** may change **`glvpn`** when present. **`firewall`** gains **`firewall.glinet_privacy`** (include path). **`apply-dns-policy.sh`** / stock **`/etc/config/dhcp`** may adjust **dnsmasq** options when you enable Tor DNS policy or telemetry blocklist paths. Do not expose LuCI or these UCI editors to untrusted users.
 - **Outbound URLs (optional / user-driven)** — **Verify** can call **api.ipify.org** from the browser or from the router (**`verify_ip`**). Optional browser geo (**e.g. ipwho.is**) is documented on the Verify page. **Remote install** uses URLs you set (**`GLINET_PRIVACY_TARBALL_URL`**, **`GLINET_PRIVACY_GIT_URL`**, **`raw.githubusercontent.com`** for `install.sh`). No other standing phone-home is required for core operation.
 - **Diagnostics** — The **Overview** **syslog** strip shows recent **`logread`** lines for this project’s **`logger -t`** tags; many **`sys.call`** apply helpers still discard stderr (`>/dev/null`); check **System log** after a failed save if something looks wrong.
@@ -22,15 +24,15 @@ Privacy-oriented scripts, UCI, firewall hooks, and a LuCI UI (installed by defau
 - **Telemetry** — Disable cloud features where possible, optional package removal, dnsmasq blocklist for known GL.iNet endpoints.
 - **IMEI rotation** (LTE hardware only) — Script + init/cron examples; **high legal risk** on public networks — read [docs/devices.md](docs/devices.md) before enabling.
 - **LuCI** — `luci-app-glinet-privacy` under **Services → GL.iNet Privacy** (overview, kill switch, IMEI, Tor/DNS/telemetry).
-- **i18n** — Standard LuCI domain **`glinet_privacy`**: gettext **`po/`** + **`po2lmo`** in the OpenWrt **`luci-app-glinet-privacy`** Makefile (installs **`glinet_privacy.<lang>.lmo`**); **`install.sh`** compiles **`.lmo`** when **`po2lmo`** exists on the router. Regenerate strings with **`tools/extract-luci-i18n-strings.py`** / **`tools/i18n-build-po-from-pot.py`**; Weblate-oriented notes in [package/luci-app-glinet-privacy/po/README](package/luci-app-glinet-privacy/po/README).
+- **i18n** — Standard LuCI domain **`glinet_privacy`**: gettext **`po/`** + **`po2lmo`** in **`package/luci-app-glinet-privacy/Makefile`** (installs **`glinet_privacy.<lang>.lmo`**); **`install.sh`** compiles **`.lmo`** when **`po2lmo`** exists on the router. Regenerate strings with **`tools/extract-luci-i18n-strings.py`** / **`tools/i18n-build-po-from-pot.py`**; Weblate-oriented notes in [package/luci-app-glinet-privacy/po/README](package/luci-app-glinet-privacy/po/README).
 
-## OpenWrt package build (optional)
+## Package build from SDK (optional)
 
-To build **`glinet-privacy`** and **`luci-app-glinet-privacy`** `.ipk` files in an OpenWrt tree, see [**`feeds.conf.example`**](feeds.conf.example) and [**`package/OPENWRT-BUILD.txt`](package/OPENWRT-BUILD.txt)** (and [**`openwrt/INSTALL.txt`](openwrt/INSTALL.txt)**).
+To compile **`glinet-privacy`** / **`luci-app-glinet-privacy`** **`.ipk`** files (for installation via **`opkg`** on GL.iNet devices), use an OpenWrt-compatible SDK aligned with your router’s firmware. See [**`feeds.conf.example`**](feeds.conf.example) and [**`package/OPENWRT-BUILD.txt`](package/OPENWRT-BUILD.txt)** (and [**`openwrt/INSTALL.txt`](openwrt/INSTALL.txt)**). Runtime install on the router remains **`install.sh`** from this repo.
 
 ## Quick install (on the router)
 
-Requires **OpenWrt** (e.g. GL.iNet stock firmware based on OpenWrt). Run as **root**.
+Requires a **GL.iNet router** with **stock firmware**. Run as **root**.
 
 **Remote install** — the script must be **downloaded** first. Start the line with `curl` or `wget`; pasting only the `https://…` URL makes the shell try to run the URL as a command (`not found`).
 
@@ -64,9 +66,11 @@ sh install.sh
 
 Useful flags: `--without-luci` (skip LuCI files; default is to install them), `--minimal` (files + firewall/profile only), `--with-imei-boot`, `--with-imei-cron` (enables scheduled IMEI rotation; default 6h, set **`cron_interval_hours`** in LuCI → IMEI rotation). Full options and environment variables are documented in the [install.sh](install.sh) header.
 
-**Re-running `install.sh`** is safe: **`opkg update`** runs only when at least one dependency is missing (including **`iptables-nft`** as the iptables stack on current OpenWrt); **`kmod-wireguard`** is skipped if the WireGuard module is already present; telemetry defaults are seeded **once** (see **`/etc/glinet-privacy/.telemetry-seeded`**); **`dhcp` `confdir`** is not duplicated. **`GLINET_PRIVACY_SKIP_OPKG_UPDATE=1`** skips the feed update (faster repeat installs; may fail offline if a package is missing). **`GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1`** re-applies the installer telemetry UCI toggles.
+**Re-running `install.sh`** is safe: **`opkg update`** runs only when at least one dependency is missing (including **`iptables-nft`** as the iptables stack on current firmware); **`kmod-wireguard`** is skipped if the WireGuard module is already present; telemetry defaults are seeded **once** (see **`/etc/glinet-privacy/.telemetry-seeded`**); **`dhcp` `confdir`** is not duplicated. **`GLINET_PRIVACY_SKIP_OPKG_UPDATE=1`** skips the feed update (faster repeat installs; may fail offline if a package is missing). **`GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1`** re-applies the installer telemetry UCI toggles.
 
 **Piping the script** (`curl … | sh`) requires **`GLINET_PRIVACY_TARBALL_URL`** pointing at a **source tree** archive (must contain **`package/glinet-privacy/files`**), or **`GLINET_PRIVACY_SRC`**.
+
+**LuCI** on **ucode**-first GL.iNet images (**4.x**) needs the **`luci-lua-runtime`** package for Lua controllers. **`install.sh`** installs it when LuCI is enabled and **aborts** if **`opkg`** cannot install it. Use **`--without-luci`** for CLI-only. Default LuCI install uses **Lua `index()`** menu registration; set **`GLINET_PRIVACY_LUCI_MENU_JSON=1`** for **`menu.d`** JSON menu.
 
 ## Remove (uninstall on the router)
 
