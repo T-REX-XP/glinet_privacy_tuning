@@ -14,6 +14,22 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.10 (2026-04-08)
+
+### Changed
+
+- **LuCI Tor, DNS & telemetry** — Replaced CBI **`plugins.lua`** with **`action_tor_dns`** + **`tor_dns.htm`**: status strip with three **badges** (Tor NAT state, router DNS policy, telemetry blocklist) plus Tor hint; **cards** for device profile (read-only slug/board + **Auto WAN** switch), **Transparent Tor**, **Telemetry**, **DNS leak reduction**; **inline switches** and styled inputs; intro links to **Verify** for external checks. Single **Save & apply**; post-save runs **`apply-dns-policy.sh`**, **firewall reload**, **`apply-telemetry.sh`**, **dnsmasq restart**. **`install.sh`** ships **`tor_dns.htm`** and drops the CBI `model/cbi` copy loop.
+
+---
+
+## 1.2.9 (2026-04-08)
+
+### Changed
+
+- **LuCI IMEI rotation** — Replaced CBI with **`action_imei`** + **`imei.htm`**: status strip (**Modem port readable** / **No modem serial port**), profile + detection text in one block, **cards** for schedule/boot/cron ( **`Hours between cron rotations`** select 1–24 always visible), optional **TAC**, modem/WWAN **dropdowns** with **Suggested** hints, **inline switches** matching Overview/Kill switch. Shared probes in **`luci/glinet_privacy/imei_detect.lua`**. **`install.sh`** installs **`imei.htm`** + **`imei_detect.lua`**; **`imei.lua`** removed from CBI copy list.
+
+---
+
 ## 1.2.8 (2026-04-08)
 
 ### Changed

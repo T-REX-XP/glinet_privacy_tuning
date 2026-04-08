@@ -143,28 +143,73 @@ msgstr ""
 msgid "No emergency DROP — path looks healthy."
 msgstr ""
 
-msgid "WireGuard (%s)"
-msgstr ""
-
-msgid "Boot-time or cron rotation for Quectel modems via AT+EGMR. Altering IMEI may be unlawful outside operator-authorized or lab use; you are responsible for compliance. See docs/devices.md (IMEI section) in the project repository. Firmware may reject writes. Optional: set ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 on cron after you have verified compliance."
-msgstr ""
-
-msgid "Settings"
-msgstr ""
-
-msgid "Auto-detection"
-msgstr ""
-
 msgid "Cellular (Puli) — IMEI rotation applies when modem is present."
 msgstr ""
 
 msgid "Travel router profile — no built-in modem; leave rotation off unless you use USB cellular."
 msgstr ""
 
-msgid "No readable /dev/ttyUSB* or /dev/ttyACM* — modem not connected or permissions."
+msgid "Tor NAT off"
 msgstr ""
 
-msgid "No network interfaces in UCI."
+msgid "Transparent redirects are disabled in UCI."
+msgstr ""
+
+msgid "NAT redirects present"
+msgstr ""
+
+msgid "PREROUTING REDIRECT rules present (Tor TransPort path)."
+msgstr ""
+
+msgid "Tor NAT — check firewall"
+msgstr ""
+
+msgid "UCI is on but no REDIRECT seen yet — save & apply or reload firewall."
+msgstr ""
+
+msgid "Router DNS: default"
+msgstr ""
+
+msgid "Router DNS → Tor"
+msgstr ""
+
+msgid "Telemetry blocklist off"
+msgstr ""
+
+msgid "Telemetry blocklist on"
+msgstr ""
+
+msgid "WireGuard (%s)"
+msgstr ""
+
+msgid "Boot-time or scheduled rotation for Quectel-class modems (AT+EGMR). Altering IMEI may be unlawful outside operator-authorized or lab use — see docs/devices.md (IMEI). Optional:"
+msgstr ""
+
+msgid "on the cron line after compliance review."
+msgstr ""
+
+msgid "Modem port readable"
+msgstr ""
+
+msgid "No modem serial port"
+msgstr ""
+
+msgid "Device profile:"
+msgstr ""
+
+msgid "Serial:"
+msgstr ""
+
+msgid "No readable /dev/ttyUSB* or /dev/ttyACM* (modem absent or permissions)."
+msgstr ""
+
+msgid "Network (UCI):"
+msgstr ""
+
+msgid "none"
+msgstr ""
+
+msgid "Schedule & boot"
 msgstr ""
 
 msgid "Run on boot"
@@ -176,151 +221,55 @@ msgstr ""
 msgid "Cron: rotate on a schedule"
 msgstr ""
 
-msgid "Adds one line to /etc/crontabs/root for /usr/bin/rotate_imei.sh. Requires a system cron daemon (scheduled tasks). Interval is configured below."
+msgid "Writes one line in /etc/crontabs/root. Requires a system cron daemon."
 msgstr ""
 
 msgid "Hours between cron rotations"
 msgstr ""
 
-msgid "Crontab runs at minute 0 each period (1 = every hour at :00; 24 = once daily at midnight; other values use 0 */N * * *)."
+msgid "Minute 0 of each period (e.g. 6 → 0 */6 * * *). Used when cron is enabled."
+msgstr ""
+
+msgid "hours"
 msgstr ""
 
 msgid "Suppress legal notice in syslog (cron)"
 msgstr ""
 
-msgid "Prefixes the cron command with ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 (use only after you have verified legal compliance)."
+msgid "Adds ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 to the cron command only."
+msgstr ""
+
+msgid "Identity & modem"
+msgstr ""
+
+msgid "Optional 8-digit TAC"
+msgstr ""
+
+msgid "Leave empty for fully random Luhn-valid IMEI body."
 msgstr ""
 
 msgid "Modem serial device"
 msgstr ""
 
-msgid "AT port for Quectel (often ttyUSB2). Empty = same scan order as rotate_imei.sh."
+msgid "AT port (often ttyUSB2). Auto uses the same scan order as rotate_imei.sh."
 msgstr ""
 
-msgid "Auto (scan /dev/ttyUSB* then /dev/ttyACM*)"
+msgid "Suggested:"
 msgstr ""
 
-msgid "saved"
+msgid "Auto (scan USB / ACM)"
 msgstr ""
 
 msgid "WWAN logical interface"
 msgstr ""
 
-msgid "Which Network → Interfaces section to restart after IMEI write. Empty = same auto-detect as rotate_imei.sh (wwan / 4g / modem / cellular, or first wwan/3g/qmi/mbim/ncm)."
+msgid "Interface to restart after IMEI write (Network → Interfaces)."
 msgstr ""
 
 msgid "Auto (from network config)"
 msgstr ""
 
-msgid "Device profile: %s"
-msgstr ""
-
-msgid "Serial ports found: %s"
-msgstr ""
-
-msgid "Network interfaces (uci): %s"
-msgstr ""
-
-msgid "Tor transparent NAT uses the firewall plugin. Optional dnsmasq policy sends LAN DNS to Tor. Telemetry uses dnsmasq blocklists and optional vendor toggles. Device profile: apply-device-profile.sh."
-msgstr ""
-
-msgid "Detected profile"
-msgstr ""
-
-msgid "puli_xe300 = cellular; slate_ax1800 / gl_ax1800 = Ethernet travel routers (no LTE modem)."
-msgstr ""
-
-msgid "Board hint"
-msgstr ""
-
-msgid "Auto WAN device"
-msgstr ""
-
-msgid "When on, apply-device-profile sets privacy.main.wan_dev for Puli (wwan0) or clears mistaken wwan0 on Slate/Flint."
-msgstr ""
-
-msgid "Transparent Tor"
-msgstr ""
-
-msgid "Enable Tor NAT redirects"
-msgstr ""
-
-msgid "When enabled, fw-plugin runs /etc/firewall.privacy-tor.sh on firewall reload."
-msgstr ""
-
-msgid "LAN CIDR"
-msgstr ""
-
-msgid "Exclude local destinations from TCP redirect."
-msgstr ""
-
-msgid "Router LAN IP"
-msgstr ""
-
-msgid "DNS redirect exception."
-msgstr ""
-
-msgid "LAN device"
-msgstr ""
-
-msgid "Empty = network.lan.device."
-msgstr ""
-
-msgid "Tor TransPort"
-msgstr ""
-
-msgid "Default 9040"
-msgstr ""
-
-msgid "Tor DNSPort"
-msgstr ""
-
-msgid "Default 9053"
-msgstr ""
-
-msgid "Telemetry"
-msgstr ""
-
-msgid "Enable dnsmasq blocklist"
-msgstr ""
-
-msgid "Symlinks /etc/glinet-privacy/glinet-block.conf into /etc/dnsmasq.d/."
-msgstr ""
-
-msgid "Disable GL.iNet cloud (UCI + services)"
-msgstr ""
-
-msgid "Sets glconfig.cloud.enable=0 where present, stops gl_cloud / goodcloud init scripts, and installs DNS black-holes via /etc/dnsmasq.d/glinet-block.conf (same as reference: goodcloud.xyz, gldns.com)."
-msgstr ""
-
-msgid "Remove cloud packages (opkg)"
-msgstr ""
-
-msgid "When saving telemetry settings, best-effort uninstall of gl-cloud and related packages (optional; may affect stock GL.iNet features)."
-msgstr ""
-
-msgid "DNS leak reduction"
-msgstr ""
-
-msgid "Router DNS (dnsmasq)"
-msgstr ""
-
-msgid "No automatic change (use Network → DHCP/DNS or stock UI for VPN DNS)"
-msgstr ""
-
-msgid "Forward to Tor (127.0.0.1 → DNSPort)"
-msgstr ""
-
-msgid "Redirect LAN TCP/53 to Tor"
-msgstr ""
-
-msgid "When transparent Tor is enabled, send LAN TCP DNS to Tor DNSPort (UDP was already redirected)."
-msgstr ""
-
-msgid "Block LAN DNS-over-TLS (port 853)"
-msgstr ""
-
-msgid "Drop forwarded TCP/853 from LAN to non-router destinations. Can break DoT to public resolvers; use only if you accept that tradeoff."
+msgid "Save & apply"
 msgstr ""
 
 msgid "Privacy kill switch"
@@ -389,9 +338,6 @@ msgstr ""
 msgid "Off (block_non_vpn=0)"
 msgstr ""
 
-msgid "Save & apply"
-msgstr ""
-
 msgid "GL.iNet Privacy — overview"
 msgstr ""
 
@@ -417,6 +363,120 @@ msgid "N/A"
 msgstr ""
 
 msgid "Toggle"
+msgstr ""
+
+msgid "Transparent Tor uses the firewall plugin and optional NAT script. Telemetry uses dnsmasq blocklists and vendor toggles. Device fields are set by apply-device-profile. For browser-side leak checks use the"
+msgstr ""
+
+msgid "tab."
+msgstr ""
+
+msgid "Tor NAT:"
+msgstr ""
+
+msgid "Detected profile"
+msgstr ""
+
+msgid "puli_xe300 = cellular; slate_ax1800 / gl_ax1800 = travel routers without LTE."
+msgstr ""
+
+msgid "not set"
+msgstr ""
+
+msgid "Board hint"
+msgstr ""
+
+msgid "Auto WAN device"
+msgstr ""
+
+msgid "When on, apply-device-profile sets privacy.main.wan_dev for Puli (wwan0) or fixes mistaken wwan0 on Slate/Flint-style images."
+msgstr ""
+
+msgid "Transparent Tor"
+msgstr ""
+
+msgid "Enable Tor NAT redirects"
+msgstr ""
+
+msgid "When enabled, the firewall include runs /etc/firewall.privacy-tor.sh on reload."
+msgstr ""
+
+msgid "LAN CIDR"
+msgstr ""
+
+msgid "Exclude local destinations from TCP redirect."
+msgstr ""
+
+msgid "Router LAN IP"
+msgstr ""
+
+msgid "DNS redirect exception."
+msgstr ""
+
+msgid "LAN device"
+msgstr ""
+
+msgid "Empty uses network.lan.device."
+msgstr ""
+
+msgid "Tor TransPort"
+msgstr ""
+
+msgid "Default 9040."
+msgstr ""
+
+msgid "Tor DNSPort"
+msgstr ""
+
+msgid "Default 9053."
+msgstr ""
+
+msgid "Telemetry"
+msgstr ""
+
+msgid "Enable dnsmasq blocklist"
+msgstr ""
+
+msgid "Symlinks /etc/glinet-privacy/glinet-block.conf into /etc/dnsmasq.d/."
+msgstr ""
+
+msgid "Disable GL.iNet cloud (UCI + services)"
+msgstr ""
+
+msgid "Stops cloud/goodcloud where possible and aligns DNS black-holes."
+msgstr ""
+
+msgid "Remove cloud packages (opkg)"
+msgstr ""
+
+msgid "Best-effort uninstall of gl-cloud–style packages; may affect stock GL.iNet features."
+msgstr ""
+
+msgid "DNS leak reduction"
+msgstr ""
+
+msgid "Router DNS (dnsmasq)"
+msgstr ""
+
+msgid "Tor forward policy applies when Tor is running."
+msgstr ""
+
+msgid "No automatic change (use Network → DHCP/DNS or stock UI for VPN DNS)"
+msgstr ""
+
+msgid "Forward to Tor (127.0.0.1 → DNSPort)"
+msgstr ""
+
+msgid "Redirect LAN TCP/53 to Tor"
+msgstr ""
+
+msgid "When transparent Tor is enabled, send LAN TCP DNS to the Tor DNSPort."
+msgstr ""
+
+msgid "Block LAN DNS-over-TLS (port 853)"
+msgstr ""
+
+msgid "Drops forwarded TCP/853 from LAN (can break DoT to public resolvers)."
 msgstr ""
 
 msgid "Verify connection"

@@ -21,9 +21,9 @@ function index()
 	entry({"admin", "services", "glinet_privacy", "killswitch"},
 		call("action_killswitch"), translate("Kill switch"), 2)
 	entry({"admin", "services", "glinet_privacy", "imei"},
-		cbi("glinet_privacy/imei"), translate("IMEI rotation"), 3)
+		call("action_imei"), translate("IMEI rotation"), 3)
 	entry({"admin", "services", "glinet_privacy", "plugins"},
-		cbi("glinet_privacy/plugins"), translate("Tor, DNS & telemetry"), 4)
+		call("action_tor_dns"), translate("Tor, DNS & telemetry"), 4)
 	entry({"admin", "services", "glinet_privacy", "verify"},
 		call("action_verify"), translate("Verify"), 5)
 end
@@ -314,6 +314,234 @@ function action_killswitch()
 			lan_dev = uci:get("privacy", "main", "lan_dev") or "",
 			wan_dev = uci:get("privacy", "main", "wan_dev") or "",
 			vendor_gl_vpn_killswitch = uci:get("privacy", "main", "vendor_gl_vpn_killswitch") or "leave",
+		},
+	})
+end
+
+function action_imei()
+	local http = require "luci.http"
+	local uci = require "luci.model.uci".cursor()
+	local disp = require "luci.dispatcher"
+	local sys = require "luci.sys"
+	local detect = require "luci.glinet_privacy.imei_detect"
+
+	local function yn(name)
+		local v = http.formvalue(name)
+		if type(v) == "table" then
+			v = v[#v]
+		end
+		return v == "1" and "1" or "0"
+	end
+
+	local function str1(name)
+		local v = http.formvalue(name)
+		if type(v) == "table" then
+			v = v[#v]
+		end
+		if type(v) ~= "string" then
+			return ""
+		end
+		return v:gsub("^%s+", ""):gsub("%s+$", "")
+	end
+
+	if http.formvalue("submit") == "1" then
+		uci:set("rotate_imei", "main", "enabled", yn("enabled"))
+		uci:set("rotate_imei", "main", "cron_enabled", yn("cron_enabled"))
+		local hrs = tonumber(http.formvalue("cron_interval_hours") or 6) or 6
+		if hrs < 1 then
+			hrs = 1
+		end
+		if hrs > 24 then
+			hrs = 24
+		end
+		uci:set("rotate_imei", "main", "cron_interval_hours", tostring(hrs))
+		uci:set("rotate_imei", "main", "cron_suppress_legal_log", yn("cron_suppress_legal_log"))
+		local tac = str1("imei_tac"):gsub("%D", "")
+		if #tac > 8 then
+			tac = tac:sub(1, 8)
+		end
+		uci:set("rotate_imei", "main", "imei_tac", tac)
+		uci:set("rotate_imei", "main", "modem_tty", str1("modem_tty"))
+		uci:set("rotate_imei", "main", "wwan_if", str1("wwan_if"))
+		uci:commit("rotate_imei")
+		sys.call("/etc/init.d/rotate_imei enable 2>/dev/null")
+		sys.call("/usr/libexec/glinet-privacy/apply-rotate-imei-cron.sh 2>/dev/null || true")
+		luci.http.redirect(disp.build_url("admin/services/glinet_privacy/imei"))
+		return
+	end
+
+	local preview = detect.get_preview()
+	local saved_m = uci:get("rotate_imei", "main", "modem_tty") or ""
+	local modem_opts = {}
+	local seen_m = {}
+	for _, d in ipairs(preview.tty_scan) do
+		table.insert(modem_opts, d)
+		seen_m[d] = true
+	end
+	if saved_m ~= "" and not seen_m[saved_m] then
+		table.insert(modem_opts, saved_m)
+	end
+	local saved_w = uci:get("rotate_imei", "main", "wwan_if") or ""
+	local wwan_opts = {}
+	local seen_w = {}
+	for _, n in ipairs(preview.iface_list) do
+		table.insert(wwan_opts, n)
+		seen_w[n] = true
+	end
+	if saved_w ~= "" and not seen_w[saved_w] then
+		table.insert(wwan_opts, saved_w)
+	end
+
+	local slug = preview.slug
+	local profile_blurb = ""
+	if slug == "puli_xe300" then
+		profile_blurb = translate("Cellular (Puli) — IMEI rotation applies when modem is present.")
+	elseif slug == "slate_ax1800" or slug == "gl_ax1800" or slug == "generic" then
+		profile_blurb =
+			translate("Travel router profile — no built-in modem; leave rotation off unless you use USB cellular.")
+	end
+
+	luci.template.render("glinet_privacy/imei", {
+		preview = preview,
+		profile_blurb = profile_blurb,
+		modem_opts = modem_opts,
+		wwan_opts = wwan_opts,
+		form = {
+			enabled = uci:get("rotate_imei", "main", "enabled") or "0",
+			cron_enabled = uci:get("rotate_imei", "main", "cron_enabled") or "0",
+			cron_interval_hours = uci:get("rotate_imei", "main", "cron_interval_hours") or "6",
+			cron_suppress_legal_log = uci:get("rotate_imei", "main", "cron_suppress_legal_log") or "0",
+			imei_tac = uci:get("rotate_imei", "main", "imei_tac") or "",
+			modem_sel = saved_m,
+			wwan_sel = saved_w,
+			preferred_modem = preview.preferred_modem or "",
+			preferred_wwan = preview.preferred_wwan or "",
+		},
+	})
+end
+
+function action_tor_dns()
+	local http = require "luci.http"
+	local uci = require "luci.model.uci".cursor()
+	local disp = require "luci.dispatcher"
+	local sys = require "luci.sys"
+
+	local function yn(name)
+		local v = http.formvalue(name)
+		if type(v) == "table" then
+			v = v[#v]
+		end
+		return v == "1" and "1" or "0"
+	end
+
+	local function str1(name)
+		local v = http.formvalue(name)
+		if type(v) == "table" then
+			v = v[#v]
+		end
+		if type(v) ~= "string" then
+			return ""
+		end
+		return v:gsub("^%s+", ""):gsub("%s+$", "")
+	end
+
+	if http.formvalue("submit") == "1" then
+		uci:set("glinet_privacy", "hw", "auto_wan", yn("auto_wan"))
+		uci:set("glinet_privacy", "tor", "tor_transparent", yn("tor_transparent"))
+		uci:set("glinet_privacy", "tor", "lan_cidr", str1("lan_cidr"))
+		uci:set("glinet_privacy", "tor", "router_lan_ip", str1("router_lan_ip"))
+		uci:set("glinet_privacy", "tor", "lan_dev", str1("lan_dev"))
+		local ttp = str1("tor_trans_port")
+		if ttp == "" then
+			ttp = "9040"
+		end
+		local tdp = str1("tor_dns_port")
+		if tdp == "" then
+			tdp = "9053"
+		end
+		uci:set("glinet_privacy", "tor", "tor_trans_port", ttp)
+		uci:set("glinet_privacy", "tor", "tor_dns_port", tdp)
+
+		uci:set("glinet_privacy", "tel", "block_domains", yn("block_domains"))
+		uci:set("glinet_privacy", "tel", "disable_vendor_cloud", yn("disable_vendor_cloud"))
+		uci:set("glinet_privacy", "tel", "remove_cloud_packages", yn("remove_cloud_packages"))
+
+		local pol = str1("dns_policy")
+		if pol ~= "default" and pol ~= "tor_dnsmasq" then
+			pol = "default"
+		end
+		uci:set("glinet_privacy", "dns", "dns_policy", pol)
+		uci:set("glinet_privacy", "dns", "redirect_tcp_dns", yn("redirect_tcp_dns"))
+		uci:set("glinet_privacy", "dns", "block_lan_dot", yn("block_lan_dot"))
+
+		uci:commit("glinet_privacy")
+		sys.call("/usr/libexec/glinet-privacy/apply-dns-policy.sh >/dev/null 2>&1")
+		sys.call("/etc/init.d/firewall reload >/dev/null 2>&1")
+		sys.call("/usr/libexec/glinet-privacy/apply-telemetry.sh >/dev/null 2>&1")
+		sys.call("/etc/init.d/dnsmasq restart >/dev/null 2>&1")
+		luci.http.redirect(disp.build_url("admin/services/glinet_privacy/plugins"))
+		return
+	end
+
+	local tt = uci:get("glinet_privacy", "tor", "tor_transparent") or "0"
+	local tor_badge_class, tor_badge_label, tor_hint
+	if tt ~= "1" then
+		tor_badge_class = "default"
+		tor_badge_label = translate("Tor NAT off")
+		tor_hint = translate("Transparent redirects are disabled in UCI.")
+	else
+		if sh_ok("iptables -t nat -L PREROUTING -n 2>/dev/null | grep -q REDIRECT") then
+			tor_badge_class = "success"
+			tor_badge_label = translate("NAT redirects present")
+			tor_hint = translate("PREROUTING REDIRECT rules present (Tor TransPort path).")
+		else
+			tor_badge_class = "warning"
+			tor_badge_label = translate("Tor NAT — check firewall")
+			tor_hint = translate("UCI is on but no REDIRECT seen yet — save & apply or reload firewall.")
+		end
+	end
+
+	local dns_pol = uci:get("glinet_privacy", "dns", "dns_policy") or "default"
+	local dns_badge_class = "default"
+	local dns_badge_label = translate("Router DNS: default")
+	if dns_pol == "tor_dnsmasq" then
+		dns_badge_class = "info"
+		dns_badge_label = translate("Router DNS → Tor")
+	end
+
+	local blk = uci:get("glinet_privacy", "tel", "block_domains") or "0"
+	local tel_badge_class = "default"
+	local tel_badge_label = translate("Telemetry blocklist off")
+	if blk == "1" then
+		tel_badge_class = "success"
+		tel_badge_label = translate("Telemetry blocklist on")
+	end
+
+	luci.template.render("glinet_privacy/tor_dns", {
+		verify_url = disp.build_url("admin/services/glinet_privacy/verify"),
+		tor_badge_class = tor_badge_class,
+		tor_badge_label = tor_badge_label,
+		tor_hint = tor_hint,
+		dns_badge_class = dns_badge_class,
+		dns_badge_label = dns_badge_label,
+		tel_badge_class = tel_badge_class,
+		tel_badge_label = tel_badge_label,
+		profile_slug = uci:get("glinet_privacy", "hw", "slug") or "",
+		profile_board = uci:get("glinet_privacy", "hw", "board_hint") or "",
+		form = {
+			auto_wan = uci:get("glinet_privacy", "hw", "auto_wan") or "1",
+			tor_transparent = uci:get("glinet_privacy", "tor", "tor_transparent") or "0",
+			lan_cidr = uci:get("glinet_privacy", "tor", "lan_cidr") or "192.168.8.0/24",
+			router_lan_ip = uci:get("glinet_privacy", "tor", "router_lan_ip") or "192.168.8.1",
+			lan_dev = uci:get("glinet_privacy", "tor", "lan_dev") or "",
+			tor_trans_port = uci:get("glinet_privacy", "tor", "tor_trans_port") or "9040",
+			tor_dns_port = uci:get("glinet_privacy", "tor", "tor_dns_port") or "9053",
+			block_domains = uci:get("glinet_privacy", "tel", "block_domains") or "0",
+			disable_vendor_cloud = uci:get("glinet_privacy", "tel", "disable_vendor_cloud") or "0",
+			remove_cloud_packages = uci:get("glinet_privacy", "tel", "remove_cloud_packages") or "0",
+			dns_policy = dns_pol,
+			redirect_tcp_dns = uci:get("glinet_privacy", "dns", "redirect_tcp_dns") or "1",
+			block_lan_dot = uci:get("glinet_privacy", "dns", "block_lan_dot") or "0",
 		},
 	})
 end
