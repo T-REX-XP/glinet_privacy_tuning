@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.7 (2026-04-08)
+
+### Changed
+
+- **LuCI Overview** — Matches reference **list + inline switches**: **OK** / **ISSUE** (orange) / **N/A** badges, **Passed x/y** line, progress bar, section header with **“X OK”** and **“Y ISSUE”** summary pills, divider rows, title + grey status line, **iOS-style toggles** tied to the same UCI fields as before. **Verify** tab with external checklist links. **Controller:** inline `toggle` per row; **GL.iNet cloud**, **Cloud packages**, **IMEI rotation** status rows; **Firewall plugin** label/details; **install.sh** copies **`verify.htm`**. **i18n** refreshed.
+
+---
+
 ## 1.2.6 (2026-04-08)
 
 ### Changed

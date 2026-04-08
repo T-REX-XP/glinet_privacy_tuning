@@ -1,0 +1,40 @@
+<%#
+ Copyright 2026 — External verification links (opens in new tab)
+-%>
+<%+header%>
+<% require "luci.glinet_privacy.i18n" %>
+
+<div class="cbi-map glp-verify">
+	<h2><%:Verify connection%></h2>
+	<div class="cbi-map-descr"><%:Open these in a new tab from a client that uses this router. Results reflect that client’s path (VPN/Tor/DNS), not the router admin session alone.%></div>
+
+	<div class="cbi-section">
+		<div class="row" style="margin: 0 -6px;">
+			<div class="col-sm-6 col-md-3">
+				<div style="padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; min-height: 5.5em;">
+					<a href="https://ipleak.net/" target="_blank" rel="noopener noreferrer"><%:IP leak / WebRTC checks%></a>
+					<br /><small class="text-muted"><%:Public IP and basic leak hints.%></small>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div style="padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; min-height: 5.5em;">
+					<a href="https://dnsleaktest.com/" target="_blank" rel="noopener noreferrer"><%:DNS leak test%></a>
+					<br /><small class="text-muted"><%:Use extended test when possible.%></small>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div style="padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; min-height: 5.5em;">
+					<a href="https://www.cloudflare.com/cdn-cgi/trace/" target="_blank" rel="noopener noreferrer"><%:Cloudflare trace%></a>
+					<br /><small class="text-muted"><%:IP and path as seen by Cloudflare.%></small>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-3">
+				<div style="padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fafafa; min-height: 5.5em;">
+					<a href="https://check.torproject.org/" target="_blank" rel="noopener noreferrer"><%:Tor check%></a>
+					<br /><small class="text-muted"><%:Whether this browser appears to use Tor.%></small>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<%+footer%>

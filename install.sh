@@ -446,7 +446,7 @@ install_luci() {
 			"/usr/lib/lua/luci/model/cbi/glinet_privacy/$_f" 0644
 	done
 	mkdir -p /usr/lib/lua/luci/view/glinet_privacy
-	for _v in overview.htm; do
+	for _v in overview.htm verify.htm; do
 		[ -f "$_LUCI/luasrc/view/glinet_privacy/$_v" ] || continue
 		install_file "$_LUCI/luasrc/view/glinet_privacy/$_v" \
 			"/usr/lib/lua/luci/view/glinet_privacy/$_v" 0644

@@ -26,10 +26,16 @@ msgstr ""
 msgid "Tor, DNS & telemetry"
 msgstr ""
 
+msgid "Verify"
+msgstr ""
+
 msgid "Device profile"
 msgstr ""
 
-msgid "Firewall plugin registered"
+msgid "Firewall plugin"
+msgstr ""
+
+msgid "Registered"
 msgstr ""
 
 msgid "Missing UCI firewall.glinet_privacy"
@@ -99,6 +105,24 @@ msgid "Present"
 msgstr ""
 
 msgid "Missing"
+msgstr ""
+
+msgid "GL.iNet cloud"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Cloud packages (opkg)"
+msgstr ""
+
+msgid "Removal enabled"
+msgstr ""
+
+msgid "Installed"
+msgstr ""
+
+msgid "Enabled on boot"
 msgstr ""
 
 msgid "WireGuard (%s)"
@@ -338,113 +362,59 @@ msgstr ""
 msgid "GL.iNet Privacy — overview"
 msgstr ""
 
-msgid "Health of each component, quick toggles, and links to verify your IP / DNS / Tor from this browser."
+msgid "Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks."
 msgstr ""
 
-msgid "Setup progress"
-msgstr ""
-
-msgid "Checks passed:"
+msgid "Passed:"
 msgstr ""
 
 msgid "Skipped:"
 msgstr ""
 
-msgid "Green = checks that are OK. Amber/red = something to fix or review. “Skipped” means not applicable with your settings."
+msgid "Components & settings"
 msgstr ""
 
-msgid "Summary:"
+msgid "OK"
 msgstr ""
 
-msgid "OK:"
+msgid "ISSUE"
 msgstr ""
 
-msgid "Issues:"
+msgid "N/A"
 msgstr ""
 
-msgid "Verify from this browser"
+msgid "Toggle"
 msgstr ""
 
-msgid "Open in a new tab. Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path."
+msgid "Save & apply"
+msgstr ""
+
+msgid "Verify connection"
+msgstr ""
+
+msgid "Open these in a new tab from a client that uses this router. Results reflect that client’s path (VPN/Tor/DNS), not the router admin session alone."
 msgstr ""
 
 msgid "IP leak / WebRTC checks"
 msgstr ""
 
-msgid "Shows public IP and basic leak tests (IPv4/IPv6/DNS hints)."
+msgid "Public IP and basic leak hints."
 msgstr ""
 
 msgid "DNS leak test"
 msgstr ""
 
-msgid "Extended DNS leak check (run extended test when possible)."
+msgid "Use extended test when possible."
 msgstr ""
 
 msgid "Cloudflare trace"
 msgstr ""
 
-msgid "Shows IP, location, and connection path as seen by Cloudflare (sanity check)."
+msgid "IP and path as seen by Cloudflare."
 msgstr ""
 
 msgid "Tor check"
 msgstr ""
 
-msgid "Confirms whether this browser’s traffic appears to use the Tor network."
-msgstr ""
-
-msgid "Component status"
-msgstr ""
-
-msgid "This check passed"
-msgstr ""
-
-msgid "Good"
-msgstr ""
-
-msgid "Fix this in settings or on the device"
-msgstr ""
-
-msgid "Needs attention"
-msgstr ""
-
-msgid "Review — may be expected in some setups"
-msgstr ""
-
-msgid "Review"
-msgstr ""
-
-msgid "Not required with your current configuration"
-msgstr ""
-
-msgid "Not applicable"
-msgstr ""
-
-msgid "Unknown"
-msgstr ""
-
-msgid "Quick settings"
-msgstr ""
-
-msgid "Toggle core options here; use the other tabs for advanced fields."
-msgstr ""
-
-msgid "Kill switch enabled"
-msgstr ""
-
-msgid "Require WireGuard interface up"
-msgstr ""
-
-msgid "Telemetry DNS blocklist"
-msgstr ""
-
-msgid "Disable GL.iNet cloud (GoodCloud + DNS block)"
-msgstr ""
-
-msgid "Remove GL.iNet cloud packages (opkg)"
-msgstr ""
-
-msgid "IMEI rotation enabled"
-msgstr ""
-
-msgid "Save & apply"
+msgid "Whether this browser appears to use Tor."
 msgstr ""
