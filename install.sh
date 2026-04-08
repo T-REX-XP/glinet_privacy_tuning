@@ -246,12 +246,14 @@ setup_cron() {
 	/etc/init.d/cron restart 2>/dev/null || true
 }
 
-setup_telemetry() {
+	setup_telemetry() {
 	[ "$MINIMAL" -eq 0 ] || return 0
 	[ -f /etc/config/glinet_privacy ] || return 0
 	uci set glinet_privacy.tel.block_domains='1' 2>/dev/null || true
 	uci set glinet_privacy.tel.disable_vendor_cloud='1' 2>/dev/null || true
 	uci commit glinet_privacy 2>/dev/null || true
+	# GL.iNet images may omit /etc/dnsmasq.d; apply-telemetry.sh also mkdir -p, belt-and-suspenders for stock layouts
+	mkdir -p /etc/dnsmasq.d 2>/dev/null || true
 	if [ -x /usr/libexec/glinet-privacy/apply-telemetry.sh ]; then
 		/usr/libexec/glinet-privacy/apply-telemetry.sh || true
 	fi
@@ -312,6 +314,11 @@ install_luci() {
 	log "Installing LuCI: $_LUCI"
 	mkdir -p /usr/lib/lua/luci/controller
 	install_file "$_LUCI/luasrc/controller/glinet_privacy.lua" /usr/lib/lua/luci/controller/glinet_privacy.lua 0644
+	if [ -f "$_LUCI/luasrc/glinet_privacy/i18n.lua" ]; then
+		mkdir -p /usr/lib/lua/luci/glinet_privacy
+		install_file "$_LUCI/luasrc/glinet_privacy/i18n.lua" \
+			/usr/lib/lua/luci/glinet_privacy/i18n.lua 0644
+	fi
 	mkdir -p /usr/lib/lua/luci/model/cbi/glinet_privacy
 	for _f in killswitch.lua imei.lua plugins.lua; do
 		[ -f "$_LUCI/luasrc/model/cbi/glinet_privacy/$_f" ] || continue

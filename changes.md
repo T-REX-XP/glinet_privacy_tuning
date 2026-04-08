@@ -15,6 +15,22 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.11 (2026-04-08)
+
+### Fixed
+
+- **`install.sh --with-luci`**: install **`luasrc/glinet_privacy/i18n.lua`** to **`/usr/lib/lua/luci/glinet_privacy/i18n.lua`** (was omitted; LuCI then failed with **`module 'luci.glinet_privacy.i18n' not found`**). Translations **`.lmo`** still come from the **`luci-app-glinet-privacy`** **ipk** build if you need non-English catalogs on the device.
+
+---
+
+## 1.1.10 (2026-04-08)
+
+### Fixed
+
+- **Telemetry / dnsmasq**: **`apply-telemetry.sh`** now **`mkdir -p /etc/dnsmasq.d`** before linking or copying **`glinet-block.conf`** (fixes `cp: can't create '/etc/dnsmasq.d/glinet-block.conf': No such file or directory` on GL.iNet firmware where **`/etc/dnsmasq.d`** is absent). **`install.sh`** **`setup_telemetry`** also ensures the directory exists before calling the script.
+
+---
+
 ## 1.1.9 (2026-04-08)
 
 ### Added

@@ -16,6 +16,7 @@ case "$DIS" in 1|true|yes|on) _want=1 ;; *) ;; esac
 case "$_want" in
 	1)
 		if [ -f "$SRC" ]; then
+			mkdir -p "$(dirname "$DST")"
 			ln -sf "$SRC" "$DST" 2>/dev/null || cp -f "$SRC" "$DST"
 		fi
 		;;
