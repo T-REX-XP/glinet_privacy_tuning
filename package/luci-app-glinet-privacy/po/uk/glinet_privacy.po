@@ -41,6 +41,12 @@ msgstr ""
 msgid "Missing UCI firewall.glinet_privacy"
 msgstr ""
 
+msgid "WireGuard"
+msgstr ""
+
+msgid "Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped)."
+msgstr ""
+
 msgid "Not required"
 msgstr ""
 
@@ -533,6 +539,9 @@ msgstr ""
 msgid "If this IP is not your VPN/Tor exit, the client may not be routed through the router."
 msgstr ""
 
+msgid "Router mode contacts api.ipify.org from the router’s WAN (not from this browser). No browser geo lookup."
+msgstr ""
+
 msgid "Verify from this browser"
 msgstr ""
 
@@ -548,7 +557,7 @@ msgstr ""
 msgid "LAN subnet"
 msgstr ""
 
-msgid "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."
+msgid "Quick check can use your browser (ipify + optional ipwho.is for geo) or the router’s WAN (ipify only). External sites still apply; choose router mode to avoid teaching your admin browser’s IP to geo services."
 msgstr ""
 
 msgid "Quick IP check"
@@ -557,7 +566,13 @@ msgstr ""
 msgid "Public IP &amp; location hint"
 msgstr ""
 
-msgid "Click the button to fetch your current public IP as seen from this browser. You can compare it with your expected VPN or Tor exit."
+msgid "Choose where the lookup runs, then click Check. Browser mode may contact ipwho.is for a coarse location hint."
+msgstr ""
+
+msgid "This device’s browser"
+msgstr ""
+
+msgid "Router WAN (ipify only, same-origin to LuCI)"
 msgstr ""
 
 msgid "Check my IP"

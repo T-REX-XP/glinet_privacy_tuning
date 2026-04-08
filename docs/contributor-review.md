@@ -48,28 +48,33 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 1. **Command injection via UCI-sourced strings in shell one-liners**  
    - **Controller:** `build_status()` runs `ip link show " .. wg_if .. "` — `wg_if` comes from UCI (`privacy.main.wg_if`). A value containing shell metacharacters could alter the command (admin-only, still violates defense-in-depth).  
    - **`net_probe.lua`:** `ip … show dev " .. dev` — `dev` is derived from UCI / composed LAN name; same class of issue.  
-   - **Recommendation:** Validate against a strict pattern (e.g. Linux iface: `^[a-zA-Z0-9._-]+$`, length cap ~15–32) before any `sys.call` / `sys.exec` that interpolates the value; reject or strip invalid input on **save** and **before probes**.
+   - **Recommendation:** Validate against a strict pattern (e.g. Linux iface: `^[a-zA-Z0-9._-]+$`, length cap ~15–32) before any `sys.call` / `sys.exec` that interpolates the value; reject or strip invalid input on **save** and **before probes**.  
+   - **Status:** Implemented — `luci/glinet_privacy/sanitize.lua` (ifnames, modem tty path, IPv4, LAN CIDR, ports); used in **`glinet_privacy.lua`** (all relevant POST handlers + `build_status` WG check), **`net_probe.lua`** (all `ip` invocations, WAN hint list). **`install.sh`** installs **`sanitize.lua`**.
 
 2. **rpcd ACL grants wide UCI write** (`luci-app-glinet-privacy.json`)  
    - **Write** access includes **`network`**, **`firewall`**, **`dhcp`** in addition to `privacy` / `glinet_privacy` / `rotate_imei` / `glvpn`.  
    - If this ACL is attached to roles beyond the intended admin surface, impact is large.  
-   - **Recommendation:** Restrict to the packages this app actually **commits**; add **read-only** where sufficient (e.g. `network` read for probes if your stack enforces ACL on UBI). Document why each stanza is needed.
+   - **Recommendation:** Restrict to the packages this app actually **commits**; add **read-only** where sufficient (e.g. `network` read for probes if your stack enforces ACL on UBI). Document why each stanza is needed.  
+   - **Status:** Implemented — **write** UCI limited to `privacy`, `rotate_imei`, `glinet_privacy`, `glvpn`; **read** still includes `network`, `firewall`, `dhcp`, `glvpn` for probes and status. Description field documents rationale.
 
 ### Medium priority
 
 3. **Verify tab: third-party endpoints**  
    - Browser `fetch()` to **api.ipify.org** and **ipwho.is** from a logged-in LuCI session leaks **client public IP** to those operators and depends on their **availability / CORS / trust**.  
-   - **Recommendation:** Document in UI copy; optionally proxy via router (uhttpd/cgi — higher effort) or offer “offline / no external check” mode; consider **Content-Security-Policy** implications if LuCI tightens CSP globally.
+   - **Recommendation:** Document in UI copy; optionally proxy via router (uhttpd/cgi — higher effort) or offer “offline / no external check” mode; consider **Content-Security-Policy** implications if LuCI tightens CSP globally.  
+   - **Status:** Partially implemented — **Router WAN** mode: authenticated **`verify_ip`** `call()` fetches **ipify** from the router (no browser→ipify; still router→ipify). **Browser** mode unchanged (ipify + optional ipwho.is); strip text explains trade-offs; JS escapes `& < > "` for injected HTML.
 
 4. **CSRF / session**  
    - Standard LuCI POST forms rely on session cookie and admin trust model.  
-   - **Recommendation:** Align with target LuCI major version (ucode/JS) and any **anti-CSRF** helpers if upstream requires them for new apps.
+   - **Recommendation:** Align with target LuCI major version (ucode/JS) and any **anti-CSRF** helpers if upstream requires them for new apps.  
+   - **Status:** Deferred — same model as stock LuCI `call()` + POST; **SameSite** session cookies are the main browser mitigation. **`verify_ip`** uses **same-origin** `fetch` with session cookie (admin-only path).
 
 ### Lower priority
 
 5. **XSS residual surface**  
    - Translated strings and `it.detail` / badge hints rendered with `<%= %>` in places — LuCI `translate` output is usually safe, but any future dynamic HTML in details should use `pcdata()`.  
-   - Verify: prefer `textContent` for dynamic bits where possible (already used for badge text in JS).
+   - Verify: prefer `textContent` for dynamic bits where possible (already used for badge text in JS).  
+   - **Status:** Implemented for **Overview** component rows — **`it.detail`** rendered with **`pcdata()`**. Verify page uses **`esc()`** before `innerHTML`.
 
 ---
 
@@ -90,7 +95,7 @@ Reference material for wording and menu paths: [GL.iNet firmware features](https
 ## Best practices / maintainability
 
 1. **Single source for “is watchdog dropping?”** — Today: `iptables` greps in Lua mirror shell. Extract a tiny **shared probe** (lua require or one `sh -c` script) and use **nft** fallback when `iptables` is absent.  
-2. **Centralize validators** — `sanitize_ifname()`, `sanitize_port()`, CIDR parser shared between controller + `net_probe`.  
+2. **Centralize validators** — *Done for input hardening:* **`luci/glinet_privacy/sanitize.lua`** (ifnames, modem tty, IPv4, CIDR, ports) shared by **`glinet_privacy.lua`** and **`net_probe.lua`**.  
 3. **Privilege documentation** — README section: what runs as root, what UCI keys are written, what external URLs are contacted.  
 4. **Error handling** — `sys.call` failures are often ignored (`>/dev/null`); consider surfaced **logread** hints on Overview for last apply failure (backlog).
 
@@ -106,8 +111,8 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 #### Shell & ACL hardening
 
-- [ ] **Validate `wg_if`, `lan_dev`, `wan_dev`, `wwan_if`, Tor `lan_dev`** before shell/OS use (regex + length).  
-- [ ] **Narrow rpcd ACL** to minimal UCI read/write; document exceptions.
+- [x] **Validate `wg_if`, `lan_dev`, `wan_dev`, `wwan_if`, Tor `lan_dev`** (and related POST fields: **modem tty**, **LAN CIDR**, **router LAN IP**, **Tor ports**) before shell/UCI use — see **`sanitize.lua`** (v1.2.13+).  
+- [x] **Narrow rpcd ACL** — write **`privacy`**, **`rotate_imei`**, **`glinet_privacy`**, **`glvpn`** only; read retains **`network`**, **`firewall`**, **`dhcp`** for probes; description in JSON.
 
 #### Firewall stack fidelity
 
@@ -121,9 +126,9 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 
 #### In-app UX & transparency
 
-- [ ] **Verify:** toggle “no third-party requests”; optional router-side check (e.g. `curl` / busybox) with explicit user consent.  
+- [x] **Verify — router-side quick IP** — authenticated **`verify_ip`** `call()` (router → **api.ipify.org** via `uclient-fetch` / `wget` / `curl`); LuCI **Router WAN** vs **Browser** mode; browser path still optional **ipwho.is** geo; strip text explains trade-offs. *Remaining:* true **“no external requests”** mode (fully offline / LAN-only).  
 - [ ] **Overview:** link or tooltip to **last script exit** / `logread -e privacy` (or equivalent) excerpt.  
-- [ ] **Kill switch:** show **effective** `_lan` / `_wan` the watchdog will use (same algorithm as `privacy-killswitch-watchdog.sh`) beside the live probe.
+- [ ] **Kill switch:** show **effective** `_lan` / `_wan` the watchdog will use (same algorithm as `privacy-killswitch-watchdog.sh`) beside the live **`net_probe`** strip (today: detected path; watchdog-specific `_lan`/`_wan` resolution not duplicated in UI).
 
 #### GL.iNet OOTB — privacy checkpoints & handoff
 
@@ -167,10 +172,15 @@ Items are ordered by **priority band** (P0 → P3). **Themes** under each band g
 - [ ] **CI:** `shellcheck`, lua static checks, mock UCI fixtures.  
 - [ ] **GL.iNet:** optional **`ubus` / `rpcd`** wrappers for VPN/DNS UI state (read-only, version-gated) only when documented (e.g. GSDK / vendor docs).
 
+#### Security / hygiene (ongoing)
+
+- [x] **Overview dynamic detail** — **`pcdata(it.detail)`**; **Verify** dynamic HTML via **`esc()`**.  
+- [ ] **CSRF tokens** on custom POST forms — deferred; same trust model as stock LuCI `call()` / session cookie (see Security findings §4).
+
 ---
 
 ## Conclusion
 
-The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them — the new backlog block tracks that explicitly. For **security best practices**, **ifname sanitization** and **ACL scoping** remain first-order; for **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
+The implementation is **appropriate for a vendor-targeted privacy bundle** and shows good structure between LuCI and shell. **P0 shell/ACL hardening** and **partial Verify third-party mitigation** landed in **v1.2.13**; **nft coexistence** and **GL.iNet OOTB** checklist work remain the largest follow-ups. **GL.iNet OOTB** value is highest when this app **orchestrates and explains** stock **VPN Dashboard**, **Network → DNS** / **Encrypted DNS**, and **privacy checkpoints** instead of silently overlapping them. For **upstream contribution**, **Makefile split**, **SPDX**, and **nft-aware status** are the main structural follow-ups.
 
-*Document version: 2026-04-08 (repo state `GLINET_PRIVACY_VERSION` in `package/version.mk`).*
+*Document version: 2026-04-09 — backlog synced to `GLINET_PRIVACY_VERSION` **1.2.13** (`package/version.mk`).*

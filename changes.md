@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.13 (2026-04-08)
+
+### Security / Changed
+
+- **LuCI hardening (contributor review)** — New **`sanitize.lua`**: Linux ifname (**IFNAMSIZ**-safe), modem **`/dev/tty…`** paths, IPv4, **LAN CIDR**, **ports**; applied on **POST** (kill switch, IMEI, Tor/DNS) and in **`net_probe`** / **`build_status`** shell paths; invalid **WireGuard** UCI shows Overview issue without running **`ip link`**. **rpcd ACL** write scope reduced to **`privacy`**, **`rotate_imei`**, **`glinet_privacy`**, **`glvpn`** (read still includes **network** / **firewall** / **dhcp**). **Verify**: **Router WAN** quick check via authenticated **`verify_ip`** (router→ipify); browser mode optional; **`esc()`** for HTML snippets; **Overview** **`pcdata(it.detail)`**. **`install.sh`** installs **`sanitize.lua`**.
+
+---
+
 ## 1.2.12 (2026-04-08)
 
 ### Changed

@@ -77,8 +77,8 @@ function build_status()
 	if wg_safe == nil and wg_raw ~= "" then
 		add(
 			"wg",
-			translatef("WireGuard (%s)", wg_raw),
-			translate("Invalid interface name — fix on Kill switch (shell-safe check skipped)."),
+			translate("WireGuard"),
+			translate("Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped).") .. " (" .. wg_raw .. ")",
 			"bad",
 			"f_require_wg"
 		)
@@ -641,6 +641,6 @@ function action_verify_ip()
 			return
 		end
 	end
-	http.status(503, "Unavailable")
+	http.status(503, "Service Unavailable")
 	http.write('{"error":"router_fetch_failed"}')
 end

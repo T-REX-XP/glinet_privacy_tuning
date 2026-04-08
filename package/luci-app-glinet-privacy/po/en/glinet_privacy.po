@@ -41,6 +41,12 @@ msgstr "Registered"
 msgid "Missing UCI firewall.glinet_privacy"
 msgstr "Missing UCI firewall.glinet_privacy"
 
+msgid "WireGuard"
+msgstr "WireGuard"
+
+msgid "Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped)."
+msgstr "Invalid interface name in UCI — fix on Kill switch (shell-safe check skipped)."
+
 msgid "Not required"
 msgstr "Not required"
 
@@ -533,6 +539,9 @@ msgstr "Lookup failed (offline or blocked)"
 msgid "If this IP is not your VPN/Tor exit, the client may not be routed through the router."
 msgstr "If this IP is not your VPN/Tor exit, the client may not be routed through the router."
 
+msgid "Router mode contacts api.ipify.org from the router’s WAN (not from this browser). No browser geo lookup."
+msgstr "Router mode contacts api.ipify.org from the router’s WAN (not from this browser). No browser geo lookup."
+
 msgid "Verify from this browser"
 msgstr "Verify from this browser"
 
@@ -548,8 +557,8 @@ msgstr "Typical client gateway / LuCI:"
 msgid "LAN subnet"
 msgstr "LAN subnet"
 
-msgid "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."
-msgstr "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."
+msgid "Quick check can use your browser (ipify + optional ipwho.is for geo) or the router’s WAN (ipify only). External sites still apply; choose router mode to avoid teaching your admin browser’s IP to geo services."
+msgstr "Quick check can use your browser (ipify + optional ipwho.is for geo) or the router’s WAN (ipify only). External sites still apply; choose router mode to avoid teaching your admin browser’s IP to geo services."
 
 msgid "Quick IP check"
 msgstr "Quick IP check"
@@ -557,8 +566,14 @@ msgstr "Quick IP check"
 msgid "Public IP &amp; location hint"
 msgstr "Public IP &amp; location hint"
 
-msgid "Click the button to fetch your current public IP as seen from this browser. You can compare it with your expected VPN or Tor exit."
-msgstr "Click the button to fetch your current public IP as seen from this browser. You can compare it with your expected VPN or Tor exit."
+msgid "Choose where the lookup runs, then click Check. Browser mode may contact ipwho.is for a coarse location hint."
+msgstr "Choose where the lookup runs, then click Check. Browser mode may contact ipwho.is for a coarse location hint."
+
+msgid "This device’s browser"
+msgstr "This device’s browser"
+
+msgid "Router WAN (ipify only, same-origin to LuCI)"
+msgstr "Router WAN (ipify only, same-origin to LuCI)"
 
 msgid "Check my IP"
 msgstr "Check my IP"
