@@ -1,4 +1,7 @@
 # rotate_imei UCI — copy to /etc/config/rotate_imei on the router
+#
+# Legal: IMEI changes may be illegal in your jurisdiction; use only where authorized
+# (operators, labs, explicit written permission). See docs/devices.md in the source tree.
 
 config rotate_imei 'main'
 	option enabled '0'

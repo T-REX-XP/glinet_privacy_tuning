@@ -4,8 +4,8 @@ Tor NAT + telemetry — single Map for glinet_privacy (avoids wiping sibling sec
 
 local sys = require "luci.sys"
 
-m = Map("glinet_privacy", translate("Tor & telemetry"),
-	translate("Tor transparent NAT is applied by the glinet-privacy firewall plugin. Telemetry uses dnsmasq black-holes and optional vendor UCI toggles. Device profile (GL-XE300 Puli vs GL-AXT1800 Slate AX, etc.) is set by /usr/libexec/glinet-privacy/apply-device-profile.sh."))
+m = Map("glinet_privacy", translate("Tor, DNS & telemetry"),
+	translate("Tor transparent NAT runs via the firewall plugin. DNS policy can forward dnsmasq to Tor or Mullvad. Telemetry uses dnsmasq black-holes and optional vendor toggles. Device profile is set by /usr/libexec/glinet-privacy/apply-device-profile.sh."))
 
 h = m:section(NamedSection, "hw", "device", translate("Device profile"))
 h.addremove = false
@@ -39,7 +39,27 @@ t:option(Flag, "disable_vendor_cloud", translate("Disable GL.iNet cloud (UCI + s
 t:option(Flag, "remove_cloud_packages", translate("Remove cloud packages (opkg)"),
 	translate("When saving telemetry settings, best-effort uninstall of gl-cloud and related packages (optional; may affect stock GL.iNet features).")).rmempty = false
 
+d = m:section(NamedSection, "dns", "dns", translate("DNS leak reduction"))
+d.addremove = false
+
+dp = d:option(ListValue, "dns_policy", translate("Router DNS (dnsmasq)"))
+dp:value("default", translate("No automatic change (manual / Mullvad apply script)"))
+dp:value("tor_dnsmasq", translate("Forward to Tor (127.0.0.1 → DNSPort)"))
+dp:value("mullvad_dnsmasq", translate("Forward to Mullvad DNS IP"))
+dp.default = "default"
+dp.rmempty = false
+
+d:option(Value, "mullvad_dns", translate("Mullvad DNS address"),
+	translate("Used when policy is Mullvad; default matches Mullvad WireGuard DNS (10.64.0.1).")).rmempty = true
+
+d:option(Flag, "redirect_tcp_dns", translate("Redirect LAN TCP/53 to Tor"),
+	translate("When transparent Tor is enabled, send LAN TCP DNS to Tor DNSPort (UDP was already redirected).")).rmempty = false
+
+d:option(Flag, "block_lan_dot", translate("Block LAN DNS-over-TLS (port 853)"),
+	translate("Drop forwarded TCP/853 from LAN to non-router destinations. Can break DoT to public resolvers; use only if you accept that tradeoff.")).rmempty = false
+
 function m.on_commit(self)
+	sys.call("/usr/libexec/glinet-privacy/apply-dns-policy.sh >/dev/null 2>&1")
 	sys.call("/etc/init.d/firewall reload >/dev/null 2>&1")
 	sys.call("/usr/libexec/glinet-privacy/apply-telemetry.sh >/dev/null 2>&1")
 	sys.call("/etc/init.d/dnsmasq restart >/dev/null 2>&1")

@@ -1,2 +1,4 @@
 # Example: rotate IMEI every 6 hours (install as /etc/crontabs/root or merge).
 # 0 */6 * * * /usr/bin/rotate_imei.sh
+# After you have documented legal compliance, you may silence repeated syslog legal lines:
+# 0 */6 * * * ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 /usr/bin/rotate_imei.sh

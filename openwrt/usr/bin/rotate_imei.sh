@@ -1,7 +1,20 @@
 #!/bin/sh
 # rotate_imei.sh — Generate a valid 15-digit IMEI (Luhn) and write to Quectel EG25-G NV.
 # Requires: busybox awk, stty. Optional: TAC (8 digits) via env IMEI_TAC.
-# WARNING: Altering IMEI may be illegal in your jurisdiction; use only where permitted.
+#
+# --- Legal (not legal advice) ---
+# Altering or assigning a non-factory IMEI may violate criminal law, telecom rules, or
+# carrier contracts in your country. Lawful use is typically limited to: mobile network
+# operators, manufacturers, certified labs, or test equipment under explicit written
+# authorization. "Operator-only" here means the same class of authorized parties — not
+# merely "the user who pays the bill" on a public mobile network.
+# Do not run this on production subscriber equipment unless you are sure you are allowed.
+# You are solely responsible for compliance; this project authors provide software only.
+#
+# Human-readable detail: docs/devices.md in the source repository (IMEI section).
+# To avoid repeating a syslog line on every cron run after you have confirmed compliance:
+#   export ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1
+# (e.g. prefix the crontab command with that assignment).
 
 set -eu
 
@@ -128,7 +141,16 @@ restart_modem_iface() {
 	fi
 }
 
+legal_notice() {
+	# One line per run unless suppressed (e.g. cron after operator review).
+	if [ "${ROTATE_IMEI_SUPPRESS_LEGAL_LOG:-0}" = "1" ]; then
+		return 0
+	fi
+	log "Legal notice: IMEI changes may be unlawful outside operator-authorized or lab use; see docs/devices.md in the project source."
+}
+
 main() {
+	legal_notice
 	# Busybox ash has RANDOM when built with it; fallback.
 	if [ "${RANDOM:-0}" -eq 0 ] 2>/dev/null; then
 		RANDOM="$(awk 'BEGIN{srand(); print int(32767*rand())}')"

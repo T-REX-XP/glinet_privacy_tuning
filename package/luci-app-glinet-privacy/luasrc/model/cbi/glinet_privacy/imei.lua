@@ -5,7 +5,7 @@ IMEI rotation — UCI: rotate_imei
 local sys = require "luci.sys"
 
 m = Map("rotate_imei", translate("IMEI rotation"),
-	translate("Boot-time or cron rotation for Quectel modems via AT+EGMR. May be illegal in your jurisdiction; firmware may reject writes."))
+	translate("Boot-time or cron rotation for Quectel modems via AT+EGMR. Altering IMEI may be unlawful outside operator-authorized or lab use; you are responsible for compliance. See docs/devices.md (IMEI section) in the project repository. Firmware may reject writes. Optional: set ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 on cron after you have verified compliance."))
 
 s = m:section(NamedSection, "main", "rotate_imei", translate("Settings"))
 s.addremove = false

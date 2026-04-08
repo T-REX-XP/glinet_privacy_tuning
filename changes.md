@@ -15,6 +15,30 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.7 (2026-04-08)
+
+### Added
+
+- **Task 3.1 — GL.iNet vendor VPN kill switch**: UCI **`privacy.main.vendor_gl_vpn_killswitch`** (`leave` / `on` / `off`), script **`apply-vendor-vpn-killswitch.sh`** (sets **`glvpn.general.block_non_vpn`** when **`/etc/config/glvpn`** exists), LuCI **Kill switch** option, **`docs/devices.md`** coexistence notes. **rpcd** ACL extended with **`glvpn`**.
+
+---
+
+## 1.1.6 (2026-04-08)
+
+### Added
+
+- **DNS leak reduction (Task 2.4)**: UCI **`glinet_privacy.dns`** — **`dns_policy`** (`default` / `tor_dnsmasq` / `mullvad_dnsmasq`), **`mullvad_dns`**, **`redirect_tcp_dns`**, **`block_lan_dot`**; **`/usr/libexec/glinet-privacy/apply-dns-policy.sh`** configures **dnsmasq** to use **127.0.0.1#DNSPort** (Tor) or Mullvad DNS with **`noresolv=1`**. **`firewall.privacy-tor.sh`** redirects **LAN TCP/53** to Tor DNSPort (optional) and optional **FORWARD DROP** for **TCP/853** (DoT). LuCI **Tor, DNS & telemetry**; **`apply-mullvad-wireguard.sh`** syncs **`mullvad_dnsmasq`** when **`/etc/config/glinet_privacy`** exists. **`install.sh`**: **`setup_dns_policy`**.
+
+---
+
+## 1.1.5 (2026-04-08)
+
+### Added
+
+- **IMEI legal documentation**: expanded **`docs/devices.md`** (jurisdiction, operator/lab-only framing, responsibility); **`rotate_imei.sh`** header + per-run syslog notice (`legal_notice()`); optional **`ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1`** for cron after compliance review. LuCI IMEI page, UCI/init/crontab examples, and **`install.sh`** help text updated accordingly.
+
+---
+
 ## 1.1.4 (2026-04-08)
 
 ### Added

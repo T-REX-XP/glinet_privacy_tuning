@@ -49,8 +49,8 @@ telemetry blocklist + dnsmasq confdir, init.d services.
 
   --minimal           Skip opkg/Tor/cron/telemetry automation (files + firewall only)
   --with-luci         Install LuCI UI files
-  --with-imei-boot    Enable IMEI rotation on boot (cellular routers)
-  --with-imei-cron    Add cron every 6h for rotate_imei.sh
+  --with-imei-boot    Enable IMEI rotation on boot (cellular routers; legal risk — see docs/devices.md)
+  --with-imei-cron    Add cron every 6h for rotate_imei.sh (same; optional ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 in crontab)
 
 Remote: GLINET_PRIVACY_TARBALL_URL=... or GLINET_PRIVACY_GIT_URL=...
 
@@ -261,6 +261,12 @@ setup_telemetry() {
 	fi
 }
 
+setup_dns_policy() {
+	[ "$MINIMAL" -eq 0 ] || return 0
+	[ -x /usr/libexec/glinet-privacy/apply-dns-policy.sh ] || return 0
+	/usr/libexec/glinet-privacy/apply-dns-policy.sh || true
+}
+
 setup_imei_boot() {
 	[ "$IMEI_BOOT" -eq 1 ] || return 0
 	[ -f /etc/config/rotate_imei ] || return 0
@@ -269,7 +275,7 @@ setup_imei_boot() {
 	[ -x /etc/init.d/rotate_imei ] || return 0
 	/etc/init.d/rotate_imei enable 2>/dev/null || true
 	/etc/init.d/rotate_imei start 2>/dev/null || true
-	log "IMEI rotation enabled on boot (legal compliance is your responsibility)"
+	log "IMEI rotation enabled on boot — read docs/devices.md (IMEI legal use); compliance is your responsibility"
 }
 
 maybe_mullvad() {
@@ -357,6 +363,7 @@ setup_cron
 setup_telemetry
 setup_imei_boot
 maybe_mullvad
+setup_dns_policy
 
 if [ "$INSTALL_LUCI" -eq 1 ]; then
 	install_luci

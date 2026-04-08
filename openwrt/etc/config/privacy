@@ -8,3 +8,4 @@ config privacy 'main'
 	# Logical interfaces (see ip link); Puli: wwan0 via apply-device-profile; Slate AX: often empty
 	option lan_dev 'br-lan'
 	option wan_dev ''
+	option vendor_gl_vpn_killswitch 'leave'

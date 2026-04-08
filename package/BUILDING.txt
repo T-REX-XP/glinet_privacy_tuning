@@ -20,6 +20,9 @@ From a git clone on the device:
 See install.sh header for GLINET_PRIVACY_SRC / GLINET_PRIVACY_GIT_URL.
 
 Supported models (WAN defaults): see docs/devices.md (GL-XE300 Puli, GL-AXT1800 Slate AX, GL-AX1800 Flint).
+IMEI rotation: same file, **IMEI rotation — legal use** section, before using --with-imei-*.
+DNS: **Services → GL.iNet Privacy → Tor, DNS & telemetry** (`glinet_privacy.dns.dns_policy`); see `apply-dns-policy.sh` and `changes.md` 1.1.6.
+Vendor VPN kill switch (GL.iNet `glvpn`): **Kill switch** page (`privacy.main.vendor_gl_vpn_killswitch`); see `docs/devices.md` and `changes.md` 1.1.7.
 
 Versioning: edit package/version.mk and changes.md for each release; see changes.md.
 

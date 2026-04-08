@@ -51,7 +51,7 @@ uci set "network.${PEER_SECTION}.persistent_keepalive='25'"
 
 # Attach ${WG_IF} to firewall wan zone
 WAN_ZONE="$(uci show firewall 2>/dev/null | sed -n "s/^firewall\.\([^.]*\)\.name='wan'$/\1/p" | head -1)"
-	if [ -n "$WAN_ZONE" ]; then
+if [ -n "$WAN_ZONE" ]; then
 	_netlist="$(uci -q get "firewall.${WAN_ZONE}.network" 2>/dev/null || true)"
 	case " ${_netlist} " in
 		*" ${WG_IF} "*) ;;
@@ -81,6 +81,16 @@ fi
 uci -q delete dhcp.@dnsmasq[0].server 2>/dev/null || true
 uci add_list "dhcp.@dnsmasq[0].server=${MULLVAD_DNS}"
 uci set dhcp.@dnsmasq[0].noresolv='1'
+
+# Keep glinet_privacy DNS policy in sync when the package is installed (LuCI / apply-dns-policy.sh)
+if [ -f /etc/config/glinet_privacy ]; then
+	if ! uci -q show glinet_privacy.dns >/dev/null 2>&1; then
+		uci set glinet_privacy.dns=dns
+	fi
+	uci set glinet_privacy.dns.dns_policy='mullvad_dnsmasq'
+	uci set glinet_privacy.dns.mullvad_dns="${MULLVAD_DNS}"
+	uci commit glinet_privacy
+fi
 
 uci commit network
 uci commit firewall

@@ -2,10 +2,10 @@
 	"luci-app-glinet-privacy": {
 		"description": "Grant UCI access to GL.iNet Privacy",
 		"read": {
-			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp"]
+			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp", "glvpn"]
 		},
 		"write": {
-			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp"]
+			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp", "glvpn"]
 		}
 	}
 }
