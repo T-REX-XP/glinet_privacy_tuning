@@ -11,6 +11,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "GL.iNet Privacy"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Kill switch"
+msgstr ""
+
+msgid "IMEI rotation"
+msgstr ""
+
+msgid "Tor, DNS & telemetry"
+msgstr ""
+
+msgid "WireGuard / Mullvad"
+msgstr ""
+
 msgid "Device profile"
 msgstr ""
 
@@ -53,9 +71,6 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-msgid "Kill switch"
-msgstr ""
-
 msgid "Emergency DROP active (VPN/Tor unhealthy?)"
 msgstr ""
 
@@ -90,21 +105,6 @@ msgid "Missing"
 msgstr ""
 
 msgid "WireGuard (%s)"
-msgstr ""
-
-msgid "GL.iNet Privacy"
-msgstr ""
-
-msgid "Overview"
-msgstr ""
-
-msgid "IMEI rotation"
-msgstr ""
-
-msgid "Tor, DNS & telemetry"
-msgstr ""
-
-msgid "WireGuard / Mullvad"
 msgstr ""
 
 msgid "Boot-time or cron rotation for Quectel modems via AT+EGMR. Altering IMEI may be unlawful outside operator-authorized or lab use; you are responsible for compliance. See docs/devices.md (IMEI section) in the project repository. Firmware may reject writes. Optional: set ROTATE_IMEI_SUPPRESS_LEGAL_LOG=1 on cron after you have verified compliance."

@@ -1,8 +1,9 @@
 --[[
 IMEI rotation — UCI: rotate_imei
 ]]
-require "luci.glinet_privacy.i18n"
 
+local i18n = require "luci.glinet_privacy.i18n"
+local translate = i18n.translate
 local sys = require "luci.sys"
 
 m = Map("rotate_imei", translate("IMEI rotation"),

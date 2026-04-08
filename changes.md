@@ -15,6 +15,22 @@ Both **`glinet-privacy`** and **`luci-app-glinet-privacy`** use the same `PKG_VE
 
 ---
 
+## 1.1.13 (2026-04-08)
+
+### Fixed
+
+- **LuCI (ucode) — translations on all pages**: **`luci.glinet_privacy.i18n`** now **`return`s `luci.i18n`** after **`loadc`**. **CBI** maps (**`killswitch.lua`**, **`plugins.lua`**, **`imei.lua`**) bind **`local translate = i18n.translate`** from that module so **`translate(...)`** is never nil outside the controller. **Controller** uses the same **`require("luci.glinet_privacy.i18n")`** for **`translate`** / **`translatef`**.
+
+---
+
+## 1.1.12 (2026-04-08)
+
+### Fixed
+
+- **LuCI controller** (`glinet_privacy.lua`): bind **`translate`** / **`translatef`** from **`luci.i18n`** and use **`translate(...)`** in **`index()`** instead of **`_(...)`**. On ucode-based LuCI (e.g. GL.iNet), **`build_status()`** no longer sees a global **`translate`**, which caused **`attempt to call global 'translate' (a nil value)`** on the overview page.
+
+---
+
 ## 1.1.11 (2026-04-08)
 
 ### Fixed

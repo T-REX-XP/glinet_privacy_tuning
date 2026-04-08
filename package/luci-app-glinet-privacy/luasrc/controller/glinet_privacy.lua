@@ -4,23 +4,28 @@ LuCI: GL.iNet Privacy — Services menu
 
 module("luci.controller.glinet_privacy", package.seeall)
 
-require "luci.glinet_privacy.i18n"
+-- ucode-based LuCI does not inject translate/translatef; load catalog and bind from luci.i18n.
+local i18n = require "luci.glinet_privacy.i18n"
+local translate = i18n.translate
+local translatef = i18n.translatef or function(fmt, ...)
+	return i18n.translate(string.format(fmt, ...))
+end
 
 function index()
 	entry({"admin", "services", "glinet_privacy"},
 		alias("admin", "services", "glinet_privacy", "overview"),
-		_("GL.iNet Privacy"), 60)
+		translate("GL.iNet Privacy"), 60)
 
 	entry({"admin", "services", "glinet_privacy", "overview"},
-		call("action_overview"), _("Overview"), 1)
+		call("action_overview"), translate("Overview"), 1)
 	entry({"admin", "services", "glinet_privacy", "killswitch"},
-		cbi("glinet_privacy/killswitch"), _("Kill switch"), 2)
+		cbi("glinet_privacy/killswitch"), translate("Kill switch"), 2)
 	entry({"admin", "services", "glinet_privacy", "imei"},
-		cbi("glinet_privacy/imei"), _("IMEI rotation"), 3)
+		cbi("glinet_privacy/imei"), translate("IMEI rotation"), 3)
 	entry({"admin", "services", "glinet_privacy", "plugins"},
-		cbi("glinet_privacy/plugins"), _("Tor, DNS & telemetry"), 4)
+		cbi("glinet_privacy/plugins"), translate("Tor, DNS & telemetry"), 4)
 	entry({"admin", "services", "glinet_privacy", "wireguard"},
-		template("glinet_privacy/wireguard"), _("WireGuard / Mullvad"), 5)
+		template("glinet_privacy/wireguard"), translate("WireGuard / Mullvad"), 5)
 end
 
 local function sh_ok(cmd)
