@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.2.12 (2026-04-08)
+
+### Changed
+
+- **LuCI system-aware defaults** — New **`net_probe.lua`**: reads **`network.lan`** (device, live IPv4, **scope link** subnet), **WAN device** candidates (`wan` / `wwan` / `modem` + default route), **WireGuard** ifnames (`ip link type wireguard`), and **`glvpn.general.block_non_vpn`** when present. **Overview** shows a compact **live path** line; **Kill switch** shows detected LAN→WAN, WAN interface list, **datalist** for WG, placeholders + vendor **glvpn** UCI hint; **Tor, DNS & telemetry** prefill **lan_cidr** / **router_lan_ip** from runtime when UCI options are unset, plus a detected-values strip and placeholders; **Verify** shows this router’s **LAN IP** / subnet. **`install.sh`** installs **`net_probe.lua`**.
+
+---
+
 ## 1.2.11 (2026-04-08)
 
 ### Changed

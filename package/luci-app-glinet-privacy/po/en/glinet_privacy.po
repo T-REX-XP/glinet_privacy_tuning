@@ -278,6 +278,18 @@ msgstr "Privacy kill switch"
 msgid "The glinet-privacy watchdog schedules iptables FORWARD rules. Configure WireGuard or OpenVPN in the GL.iNet admin first, then set the tunnel interface name below (often <code>wgclient</code> or <code>wg0</code>). The <strong>Overview</strong> tab shows live interface status. Stock firmware may expose a separate VPN kill switch — see the vendor section at the bottom."
 msgstr "The glinet-privacy watchdog schedules iptables FORWARD rules. Configure WireGuard or OpenVPN in the GL.iNet admin first, then set the tunnel interface name below (often <code>wgclient</code> or <code>wg0</code>). The <strong>Overview</strong> tab shows live interface status. Stock firmware may expose a separate VPN kill switch — see the vendor section at the bottom."
 
+msgid "Detected on router:"
+msgstr "Detected on router:"
+
+msgid "LAN"
+msgstr "LAN"
+
+msgid "WAN egress"
+msgstr "WAN egress"
+
+msgid "Leave LAN/WAN fields empty to use the same auto-detection as the watchdog (UCI network.* + default route)."
+msgstr "Leave LAN/WAN fields empty to use the same auto-detection as the watchdog (UCI network.* + default route)."
+
 msgid "Privacy watchdog (glinet-privacy)"
 msgstr "Privacy watchdog (glinet-privacy)"
 
@@ -338,11 +350,29 @@ msgstr "On (block_non_vpn=1)"
 msgid "Off (block_non_vpn=0)"
 msgstr "Off (block_non_vpn=0)"
 
+msgid "Current UCI (glvpn.general.block_non_vpn):"
+msgstr "Current UCI (glvpn.general.block_non_vpn):"
+
+msgid "not set"
+msgstr "not set"
+
+msgid "No /etc/config/glvpn on this system (vendor option may be elsewhere)."
+msgstr "No /etc/config/glvpn on this system (vendor option may be elsewhere)."
+
 msgid "GL.iNet Privacy — overview"
 msgstr "GL.iNet Privacy — overview"
 
 msgid "Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks."
 msgstr "Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks."
+
+msgid "Live path"
+msgstr "Live path"
+
+msgid "WAN"
+msgstr "WAN"
+
+msgid "GW"
+msgstr "GW"
 
 msgid "Passed:"
 msgstr "Passed:"
@@ -380,9 +410,6 @@ msgstr "Detected profile"
 msgid "puli_xe300 = cellular; slate_ax1800 / gl_ax1800 = travel routers without LTE."
 msgstr "puli_xe300 = cellular; slate_ax1800 / gl_ax1800 = travel routers without LTE."
 
-msgid "not set"
-msgstr "not set"
-
 msgid "Board hint"
 msgstr "Board hint"
 
@@ -391,6 +418,21 @@ msgstr "Auto WAN device"
 
 msgid "When on, apply-device-profile sets privacy.main.wan_dev for Puli (wwan0) or fixes mistaken wwan0 on Slate/Flint-style images."
 msgstr "When on, apply-device-profile sets privacy.main.wan_dev for Puli (wwan0) or fixes mistaken wwan0 on Slate/Flint-style images."
+
+msgid "Detected from router:"
+msgstr "Detected from router:"
+
+msgid "LAN device"
+msgstr "LAN device"
+
+msgid "client subnet"
+msgstr "client subnet"
+
+msgid "router LAN IP"
+msgstr "router LAN IP"
+
+msgid "Tor fields below use UCI when set; otherwise they are prefilled from these live values. Save once to persist."
+msgstr "Tor fields below use UCI when set; otherwise they are prefilled from these live values. Save once to persist."
 
 msgid "Transparent Tor"
 msgstr "Transparent Tor"
@@ -412,9 +454,6 @@ msgstr "Router LAN IP"
 
 msgid "DNS redirect exception."
 msgstr "DNS redirect exception."
-
-msgid "LAN device"
-msgstr "LAN device"
 
 msgid "Empty uses network.lan.device."
 msgstr "Empty uses network.lan.device."
@@ -499,6 +538,15 @@ msgstr "Verify from this browser"
 
 msgid "Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path. This page runs checks in the browser you are using now, not on the router itself."
 msgstr "Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path. This page runs checks in the browser you are using now, not on the router itself."
+
+msgid "This router"
+msgstr "This router"
+
+msgid "Typical client gateway / LuCI:"
+msgstr "Typical client gateway / LuCI:"
+
+msgid "LAN subnet"
+msgstr "LAN subnet"
 
 msgid "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."
 msgstr "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."

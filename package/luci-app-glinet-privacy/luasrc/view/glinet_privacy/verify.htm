@@ -3,6 +3,7 @@
 -%>
 <%+header%>
 <% require "luci.glinet_privacy.i18n" %>
+<% local N = net or self.net %>
 
 <style type="text/css">
 	.glp-vfy .glp-intro { color: #666; line-height: 1.45; margin-bottom: 1rem; font-size: 0.95rem; }
@@ -63,6 +64,13 @@
 	<p class="glp-intro">
 		<%:Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path. This page runs checks in the browser you are using now, not on the router itself.%>
 	</p>
+	<% if N and (N.router_lan_ip or "") ~= "" then %>
+	<p class="glp-intro" style="margin-top:-0.35rem">
+		<span class="label label-info" style="font-size:0.72rem;margin-right:6px"><%:This router%></span>
+		<%:Typical client gateway / LuCI:%> <code><%= pcdata(N.router_lan_ip) %></code>
+		<% if (N.lan_cidr_guess or "") ~= "" then %> · <%:LAN subnet%>: <code><%= pcdata(N.lan_cidr_guess) %></code><% end %>
+	</p>
+	<% end %>
 
 	<div class="glp-strip">
 		<span id="glp-vfy-badge" class="label label-default"><%:Ready%></span>

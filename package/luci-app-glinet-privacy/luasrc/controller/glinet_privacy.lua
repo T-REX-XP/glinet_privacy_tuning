@@ -230,9 +230,12 @@ function action_overview()
 		form.f_rotate_imei = uci:get("rotate_imei", "main", "enabled") or "0"
 	end
 
+	local net = require("luci.glinet_privacy.net_probe").snapshot()
+
 	luci.template.render("glinet_privacy/overview", {
 		status = st,
-		form = form
+		form = form,
+		net = net,
 	})
 end
 
@@ -302,10 +305,13 @@ function action_killswitch()
 		end
 	end
 
+	local net = require("luci.glinet_privacy.net_probe").snapshot()
+
 	luci.template.render("glinet_privacy/killswitch", {
 		badge_label = badge_label,
 		badge_class = badge_class,
 		badge_hint = badge_hint,
+		net = net,
 		form = {
 			enabled = en,
 			wg_if = uci:get("privacy", "main", "wg_if") or "wg0",
@@ -517,6 +523,18 @@ function action_tor_dns()
 		tel_badge_label = translate("Telemetry blocklist on")
 	end
 
+	local net = require("luci.glinet_privacy.net_probe").snapshot()
+	local function tor_field(section, opt, fallback, runtime)
+		local v = uci:get("glinet_privacy", section, opt)
+		if v and v ~= "" then
+			return v
+		end
+		if runtime and runtime ~= "" then
+			return runtime
+		end
+		return fallback
+	end
+
 	luci.template.render("glinet_privacy/tor_dns", {
 		verify_url = disp.build_url("admin/services/glinet_privacy/verify"),
 		tor_badge_class = tor_badge_class,
@@ -528,11 +546,12 @@ function action_tor_dns()
 		tel_badge_label = tel_badge_label,
 		profile_slug = uci:get("glinet_privacy", "hw", "slug") or "",
 		profile_board = uci:get("glinet_privacy", "hw", "board_hint") or "",
+		net = net,
 		form = {
 			auto_wan = uci:get("glinet_privacy", "hw", "auto_wan") or "1",
 			tor_transparent = uci:get("glinet_privacy", "tor", "tor_transparent") or "0",
-			lan_cidr = uci:get("glinet_privacy", "tor", "lan_cidr") or "192.168.8.0/24",
-			router_lan_ip = uci:get("glinet_privacy", "tor", "router_lan_ip") or "192.168.8.1",
+			lan_cidr = tor_field("tor", "lan_cidr", "192.168.8.0/24", net.lan_cidr_guess),
+			router_lan_ip = tor_field("tor", "router_lan_ip", "192.168.8.1", net.router_lan_ip),
 			lan_dev = uci:get("glinet_privacy", "tor", "lan_dev") or "",
 			tor_trans_port = uci:get("glinet_privacy", "tor", "tor_trans_port") or "9040",
 			tor_dns_port = uci:get("glinet_privacy", "tor", "tor_dns_port") or "9053",
@@ -547,5 +566,8 @@ function action_tor_dns()
 end
 
 function action_verify()
-	luci.template.render("glinet_privacy/verify", {})
+	local net = require("luci.glinet_privacy.net_probe").snapshot()
+	luci.template.render("glinet_privacy/verify", {
+		net = net,
+	})
 end

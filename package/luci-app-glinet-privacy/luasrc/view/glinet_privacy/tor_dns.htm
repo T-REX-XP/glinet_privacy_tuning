@@ -4,6 +4,7 @@
 <%+header%>
 <% require "luci.glinet_privacy.i18n" %>
 <% local F = form or self.form %>
+<% local N = net or self.net %>
 <% local V = verify_url or self.verify_url or "#" %>
 <% local tbc = tor_badge_class or "default" %>
 <% local tbl = tor_badge_label or "" %>
@@ -67,6 +68,11 @@
 		.glp-tor .glp-field-ctrl { align-self: flex-start; }
 		.glp-tor .glp-text, .glp-tor .glp-select { max-width: none; }
 	}
+	.glp-tor .glp-probe {
+		font-size: 0.88rem; color: #555; line-height: 1.45; margin: 0 0 14px 0;
+		padding: 10px 14px; background: #f8f9fa; border: 1px solid #e3e6ea; border-radius: 8px;
+	}
+	.glp-tor .glp-probe code { background: #eef1f4; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; }
 </style>
 
 <div class="cbi-map glp-tor">
@@ -115,6 +121,16 @@
 			</div>
 		</div>
 
+		<% if N then %>
+		<p class="glp-probe">
+			<strong><%:Detected from router:%></strong>
+			<%:LAN device%>: <code><%= pcdata(N.lan_device_uci or "") %></code>
+			· <%:client subnet%>: <code><%= (N.lan_cidr_guess or "") ~= "" and pcdata(N.lan_cidr_guess) or "—" %></code>
+			· <%:router LAN IP%>: <code><%= (N.router_lan_ip or "") ~= "" and pcdata(N.router_lan_ip) or "—" %></code>
+			<br /><small class="text-muted"><%:Tor fields below use UCI when set; otherwise they are prefilled from these live values. Save once to persist.%></small>
+		</p>
+		<% end %>
+
 		<div class="glp-card">
 			<h3 class="glp-card-h"><%:Transparent Tor%></h3>
 			<div class="glp-field">
@@ -134,21 +150,21 @@
 				<div class="glp-field-main">
 					<p class="glp-field-title"><%:LAN CIDR%></p>
 					<p class="glp-field-help"><%:Exclude local destinations from TCP redirect.%></p>
-					<input class="glp-text" type="text" name="lan_cidr" value="<%= F.lan_cidr or "" %>" />
+					<input class="glp-text" type="text" name="lan_cidr" value="<%= F.lan_cidr or "" %>" placeholder="<%= N and (N.lan_cidr_guess or "") ~= '' and pcdata(N.lan_cidr_guess) or '' %>" />
 				</div>
 			</div>
 			<div class="glp-field">
 				<div class="glp-field-main">
 					<p class="glp-field-title"><%:Router LAN IP%></p>
 					<p class="glp-field-help"><%:DNS redirect exception.%></p>
-					<input class="glp-text" type="text" name="router_lan_ip" value="<%= F.router_lan_ip or "" %>" />
+					<input class="glp-text" type="text" name="router_lan_ip" value="<%= F.router_lan_ip or "" %>" placeholder="<%= N and (N.router_lan_ip or "") ~= '' and pcdata(N.router_lan_ip) or '' %>" />
 				</div>
 			</div>
 			<div class="glp-field">
 				<div class="glp-field-main">
 					<p class="glp-field-title"><%:LAN device%></p>
 					<p class="glp-field-help"><%:Empty uses network.lan.device.%></p>
-					<input class="glp-text" type="text" name="lan_dev" value="<%= F.lan_dev or "" %>" placeholder="" />
+					<input class="glp-text" type="text" name="lan_dev" value="<%= F.lan_dev or "" %>" placeholder="<%= N and pcdata(N.lan_device_uci or '') %>" />
 				</div>
 			</div>
 			<div class="glp-field">

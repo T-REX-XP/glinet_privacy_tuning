@@ -278,6 +278,18 @@ msgstr ""
 msgid "The glinet-privacy watchdog schedules iptables FORWARD rules. Configure WireGuard or OpenVPN in the GL.iNet admin first, then set the tunnel interface name below (often <code>wgclient</code> or <code>wg0</code>). The <strong>Overview</strong> tab shows live interface status. Stock firmware may expose a separate VPN kill switch — see the vendor section at the bottom."
 msgstr ""
 
+msgid "Detected on router:"
+msgstr ""
+
+msgid "LAN"
+msgstr ""
+
+msgid "WAN egress"
+msgstr ""
+
+msgid "Leave LAN/WAN fields empty to use the same auto-detection as the watchdog (UCI network.* + default route)."
+msgstr ""
+
 msgid "Privacy watchdog (glinet-privacy)"
 msgstr ""
 
@@ -338,10 +350,28 @@ msgstr ""
 msgid "Off (block_non_vpn=0)"
 msgstr ""
 
+msgid "Current UCI (glvpn.general.block_non_vpn):"
+msgstr ""
+
+msgid "not set"
+msgstr ""
+
+msgid "No /etc/config/glvpn on this system (vendor option may be elsewhere)."
+msgstr ""
+
 msgid "GL.iNet Privacy — overview"
 msgstr ""
 
 msgid "Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks."
+msgstr ""
+
+msgid "Live path"
+msgstr ""
+
+msgid "WAN"
+msgstr ""
+
+msgid "GW"
 msgstr ""
 
 msgid "Passed:"
@@ -380,9 +410,6 @@ msgstr ""
 msgid "puli_xe300 = cellular; slate_ax1800 / gl_ax1800 = travel routers without LTE."
 msgstr ""
 
-msgid "not set"
-msgstr ""
-
 msgid "Board hint"
 msgstr ""
 
@@ -390,6 +417,21 @@ msgid "Auto WAN device"
 msgstr ""
 
 msgid "When on, apply-device-profile sets privacy.main.wan_dev for Puli (wwan0) or fixes mistaken wwan0 on Slate/Flint-style images."
+msgstr ""
+
+msgid "Detected from router:"
+msgstr ""
+
+msgid "LAN device"
+msgstr ""
+
+msgid "client subnet"
+msgstr ""
+
+msgid "router LAN IP"
+msgstr ""
+
+msgid "Tor fields below use UCI when set; otherwise they are prefilled from these live values. Save once to persist."
 msgstr ""
 
 msgid "Transparent Tor"
@@ -411,9 +453,6 @@ msgid "Router LAN IP"
 msgstr ""
 
 msgid "DNS redirect exception."
-msgstr ""
-
-msgid "LAN device"
 msgstr ""
 
 msgid "Empty uses network.lan.device."
@@ -498,6 +537,15 @@ msgid "Verify from this browser"
 msgstr ""
 
 msgid "Your PC or phone must use this router as the gateway for results to match the router’s VPN/Tor path. This page runs checks in the browser you are using now, not on the router itself."
+msgstr ""
+
+msgid "This router"
+msgstr ""
+
+msgid "Typical client gateway / LuCI:"
+msgstr ""
+
+msgid "LAN subnet"
 msgstr ""
 
 msgid "Quick check uses public APIs (ipify + optional geo). No data is sent through this LuCI session."

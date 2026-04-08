@@ -6,6 +6,7 @@
 <% require "luci.glinet_privacy.i18n" %>
 <% local st = status or self.status %>
 <% local F = form or self.form %>
+<% local N = net or self.net %>
 <% local pw = st.pct > 100 and 100 or st.pct %>
 <% local pclass = "progress-bar-success" %>
 <% if st.pct < 50 then pclass = "progress-bar-danger" elseif st.pct < 100 then pclass = "progress-bar-warning" end %>
@@ -70,6 +71,16 @@
 <div class="cbi-map glp-overview">
 	<h2 style="margin-bottom: 6px;"><%:GL.iNet Privacy — overview%></h2>
 	<p class="glp-intro"><%:Health of each component, inline toggles, and quick save. Use the Verify tab for external IP / DNS / Tor checks.%></p>
+	<% if N and (N.lan_device_effective or "") ~= "" then %>
+	<p class="glp-intro" style="margin-top:-0.5rem;font-size:0.9rem">
+		<span class="label label-default" style="font-size:0.72rem;margin-right:6px"><%:Live path%></span>
+		<%:LAN%>: <code style="font-size:0.88em"><%= pcdata(N.lan_device_effective) %></code>
+		→ <%:WAN%>: <code style="font-size:0.88em"><%= (N.wan_device_effective or "") ~= "" and pcdata(N.wan_device_effective) or "—" %></code>
+		<% if (N.router_lan_ip or "") ~= "" then %>
+		· <%:GW%>: <code style="font-size:0.88em"><%= pcdata(N.router_lan_ip) %></code>
+		<% end %>
+	</p>
+	<% end %>
 
 	<div class="glp-progress-block">
 		<div class="glp-passed-line">

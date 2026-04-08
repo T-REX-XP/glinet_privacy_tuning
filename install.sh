@@ -443,6 +443,10 @@ install_luci() {
 		install_file "$_LUCI/luasrc/glinet_privacy/imei_detect.lua" \
 			/usr/lib/lua/luci/glinet_privacy/imei_detect.lua 0644
 	fi
+	if [ -f "$_LUCI/luasrc/glinet_privacy/net_probe.lua" ]; then
+		install_file "$_LUCI/luasrc/glinet_privacy/net_probe.lua" \
+			/usr/lib/lua/luci/glinet_privacy/net_probe.lua 0644
+	fi
 	mkdir -p /usr/lib/lua/luci/view/glinet_privacy
 	for _v in overview.htm verify.htm killswitch.htm imei.htm tor_dns.htm; do
 		[ -f "$_LUCI/luasrc/view/glinet_privacy/$_v" ] || continue

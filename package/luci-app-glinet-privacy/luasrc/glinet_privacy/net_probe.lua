@@ -4,8 +4,6 @@ Runtime + UCI network hints for LuCI (aligned with privacy-killswitch-watchdog.s
 
 local sys = require "luci.sys"
 
-local bit_ok, bit = pcall(require, "bit")
-
 local function trim(s)
 	if type(s) ~= "string" then
 		return ""
@@ -64,41 +62,16 @@ local function ip_addr_on_dev(dev)
 	return string.format("%s.%s.%s.%s", a, b, c, d), ipcidr
 end
 
---- LAN network CIDR for Tor exclusion lists (network address with prefix).
-local function cidr_from_host_ipcidr(ipcidr)
-	if not ipcidr then
+--- Connected LAN subnet from kernel route (prefix-accurate, any mask).
+local function lan_subnet_route(dev)
+	if not dev or dev == "" then
 		return nil
 	end
-	local a, b, c, host, p =
-		ipcidr:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)/(%d+)$")
-	if not a then
-		return nil
-	end
-	p = tonumber(p)
-	local ha, hb, hc, hd = tonumber(a), tonumber(b), tonumber(c), tonumber(host)
-	if not ha or not p then
-		return nil
-	end
-	if p == 24 then
-		return string.format("%s.%s.%s.0/%d", a, b, c, p)
-	elseif p == 16 then
-		return string.format("%s.%s.0.0/%d", a, b, p)
-	elseif p == 8 then
-		return string.format("%s.0.0.0/%d", a, p)
-	elseif bit_ok and bit and p > 0 and p <= 32 then
-		local ipnum = ha * 16777216 + hb * 65536 + hc * 256 + hd
-		local mask = bit.rshift(0xffffffff % 0x100000000, 32 - p)
-		if p == 32 then
-			mask = 0xffffffff
-		end
-		local net = bit.band(ipnum, mask)
-		local o1 = math.floor(net / 16777216) % 256
-		local o2 = math.floor(net / 65536) % 256
-		local o3 = math.floor(net / 256) % 256
-		local o4 = net % 256
-		return string.format("%d.%d.%d.%d/%d", o1, o2, o3, o4, p)
-	end
-	return string.format("%s.%s.%s.0/%d", a, b, c, p)
+	local out = trim(
+		sys.exec("ip -o -f inet route show dev " .. dev .. " scope link 2>/dev/null | head -1") or ""
+	)
+	local cidr = out:match("^(%d+%.%d+%.%d+%.%d+/%d+)%s")
+	return cidr
 end
 
 local function list_wireguard_ifaces()
@@ -129,18 +102,25 @@ local function uci_wan_hint_list(uc)
 	return rows
 end
 
-local function glvpn_block_hint(uc)
-	if not uc:get("glvpn", "general") then
-		return nil
+local function glvpn_snapshot(uc)
+	if not uc:get_all("glvpn") then
+		return false, nil
 	end
-	local v = uc:get("glvpn", "general", "block_non_vpn")
-	if v == "1" or v == "true" or v == "yes" then
-		return "1"
+	local sid = uc:get_first("glvpn", "general")
+	if not sid then
+		return false, nil
 	end
-	if v == "0" or v == "false" or v == "no" then
-		return "0"
+	local v = uc:get("glvpn", sid, "block_non_vpn")
+	if v == nil or v == "" then
+		return true, nil
 	end
-	return v
+	if v == "1" or v == "true" or v == "yes" or v == "on" then
+		return true, "1"
+	end
+	if v == "0" or v == "false" or v == "no" or v == "off" then
+		return true, "0"
+	end
+	return true, tostring(v)
 end
 
 --- @return table fields for templates / controllers
@@ -153,11 +133,12 @@ local function snapshot()
 
 	local lan_eff = privacy_lan ~= "" and privacy_lan or lan_uci
 	local hostip, ipcidr = ip_addr_on_dev(lan_eff)
-	local lan_cidr_guess = cidr_from_host_ipcidr(ipcidr)
+	local lan_cidr_guess = lan_subnet_route(lan_eff) or ""
 	local router_ip_uci = uc:get("network", "lan", "ipaddr") or ""
 
 	local router_ip = hostip or router_ip_uci
 	local wg = list_wireguard_ifaces()
+	local glvpn_ok, glvpn_val = glvpn_snapshot(uc)
 
 	return {
 		lan_device_uci = lan_uci,
@@ -171,7 +152,8 @@ local function snapshot()
 		lan_cidr_guess = lan_cidr_guess or "",
 		wireguard_ifaces = wg,
 		wan_hints = uci_wan_hint_list(uc),
-		glvpn_block_non_vpn = glvpn_block_hint(uc),
+		glvpn_present = glvpn_ok,
+		glvpn_block_non_vpn = glvpn_val,
 	}
 end
 

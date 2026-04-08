@@ -4,6 +4,7 @@
 <%+header%>
 <% require "luci.glinet_privacy.i18n" %>
 <% local F = form or self.form %>
+<% local N = net or self.net %>
 <% local bl = badge_label or "" %>
 <% local bc = badge_class or "default" %>
 <% local bh = badge_hint or "" %>
@@ -62,6 +63,12 @@
 		.glp-ks .glp-field-ctrl { align-self: flex-start; }
 		.glp-ks .glp-text, .glp-ks .glp-select { max-width: none; }
 	}
+	.glp-ks .glp-probe {
+		font-size: 0.88rem; color: #555; line-height: 1.45; margin: 0 0 12px 0;
+		padding: 10px 14px; background: #f8faf8; border: 1px solid #e0ebe0; border-radius: 8px;
+	}
+	.glp-ks .glp-probe code { background: #eef5ee; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; }
+	.glp-ks .glp-probe-list { margin: 6px 0 0 0; padding-left: 1.15rem; }
 </style>
 
 <div class="cbi-map glp-ks">
@@ -74,6 +81,25 @@
 		<span class="label label-<%= bc %>"><%= bl %></span>
 		<p class="glp-status-hint"><%= bh %></p>
 	</div>
+
+	<% if N then %>
+	<p class="glp-probe">
+		<strong><%:Detected on router:%></strong>
+		<%:LAN%>: <code><%= pcdata(N.lan_device_effective or "?") %></code>
+		→ <%:WAN egress%>: <code><%= pcdata(N.wan_device_effective ~= "" and N.wan_device_effective or "—") %></code>
+		<% if (N.wan_source or "") ~= "" then %>
+			<span class="text-muted">(<%= pcdata(N.wan_source) %>)</span>
+		<% end %>
+		<br /><small class="text-muted"><%:Leave LAN/WAN fields empty to use the same auto-detection as the watchdog (UCI network.* + default route).%></small>
+		<% if N.wan_hints and #N.wan_hints > 0 then %>
+		<ul class="glp-probe-list text-muted">
+			<% for _, row in ipairs(N.wan_hints) do %>
+			<li><code><%= pcdata(row.iface) %></code> → <code><%= pcdata(row.dev) %></code></li>
+			<% end %>
+		</ul>
+		<% end %>
+	</p>
+	<% end %>
 
 	<form method="post" action="">
 		<input type="hidden" name="submit" value="1" />
@@ -99,7 +125,16 @@
 				<div class="glp-field-main">
 					<p class="glp-field-title"><%:WireGuard interface%></p>
 					<p class="glp-field-help"><%:Must match the interface name when the stock VPN client has brought WireGuard up. Check <em>Network → Interfaces</em> or run <code>ip link</code>.%></p>
-					<input class="glp-text" type="text" name="wg_if" value="<%= F.wg_if or "" %>" placeholder="wg0" />
+					<input class="glp-text" type="text" name="wg_if" value="<%= F.wg_if or "" %>" placeholder="wg0" list="glp-wg-if-datalist" autocomplete="off" />
+					<% if N and N.wireguard_ifaces and #N.wireguard_ifaces > 0 then %>
+					<datalist id="glp-wg-if-datalist">
+						<% for _, wgif in ipairs(N.wireguard_ifaces) do %>
+						<option value="<%= pcdata(wgif) %>"></option>
+						<% end %>
+					</datalist>
+					<% else %>
+					<datalist id="glp-wg-if-datalist"><option value="wg0"></option><option value="wgclient"></option></datalist>
+					<% end %>
 				</div>
 			</div>
 
@@ -138,14 +173,14 @@
 				<div class="glp-field-main">
 					<p class="glp-field-title"><%:LAN bridge / device%></p>
 					<p class="glp-field-help"><%:e.g. br-lan; leave empty to use <code>network.lan.device</code>.%></p>
-					<input class="glp-text" type="text" name="lan_dev" value="<%= F.lan_dev or "" %>" placeholder="br-lan" />
+					<input class="glp-text" type="text" name="lan_dev" value="<%= F.lan_dev or "" %>" placeholder="<%= N and pcdata(N.lan_device_uci) or "br-lan" %>" />
 				</div>
 			</div>
 			<div class="glp-field">
 				<div class="glp-field-main">
 					<p class="glp-field-title"><%:Physical WAN device%></p>
 					<p class="glp-field-help"><%:e.g. wwan0 or eth0 — needed for a correct FORWARD match.%></p>
-					<input class="glp-text" type="text" name="wan_dev" value="<%= F.wan_dev or "" %>" placeholder="" />
+					<input class="glp-text" type="text" name="wan_dev" value="<%= F.wan_dev or "" %>" placeholder="<%= N and N.wan_device_effective ~= "" and pcdata(N.wan_device_effective) or "" %>" />
 				</div>
 			</div>
 		</div>
@@ -161,6 +196,13 @@
 						<option value="on" <% if F.vendor_gl_vpn_killswitch == "on" then %>selected="selected" <% end %>><%:On (block_non_vpn=1)%></option>
 						<option value="off" <% if F.vendor_gl_vpn_killswitch == "off" then %>selected="selected" <% end %>><%:Off (block_non_vpn=0)%></option>
 					</select>
+					<% if N and N.glvpn_present then %>
+					<p class="glp-field-help" style="margin-top:8px"><%:Current UCI (glvpn.general.block_non_vpn):%>
+						<% if N.glvpn_block_non_vpn then %><code><%= pcdata(tostring(N.glvpn_block_non_vpn)) %></code><% else %><span class="text-muted"><%:not set%></span><% end %>
+					</p>
+					<% elseif N then %>
+					<p class="glp-field-help" style="margin-top:8px"><%:No /etc/config/glvpn on this system (vendor option may be elsewhere).%></p>
+					<% end %>
 				</div>
 			</div>
 		</div>
