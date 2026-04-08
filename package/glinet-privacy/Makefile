@@ -1,0 +1,67 @@
+#
+# Copyright (C) 2026
+# SPDX-License-Identifier: MIT
+#
+
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=glinet-privacy
+PKG_VERSION:=1.0.0
+PKG_RELEASE:=1
+
+PKG_MAINTAINER:=
+PKG_LICENSE:=MIT
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/glinet-privacy
+  SECTION:=net
+  CATEGORY:=Network
+  TITLE:=GL.iNet Privacy core (firewall plugin, scripts, UCI)
+  DEPENDS:=+iptables +iptables-mod-nat +iptables-mod-extra +iptables-mod-comment
+  PKGARCH:=all
+endef
+
+define Package/glinet-privacy/description
+  Firewall include plugin for Tor NAT redirects, kill switch watchdog, IMEI rotation
+  helpers, Mullvad apply script, and telemetry helpers. Integrates with OpenWrt firewall4/fw3.
+endef
+
+define Build/Compile
+endef
+
+define Package/glinet-privacy/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) ./files/usr/bin/* $(1)/usr/bin/
+	$(INSTALL_DIR) $(1)/usr/libexec/glinet-privacy
+	$(INSTALL_BIN) ./files/usr/libexec/glinet-privacy/* $(1)/usr/libexec/glinet-privacy/
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/etc/init.d/* $(1)/etc/init.d/
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_DATA) ./files/etc/config/* $(1)/etc/config/
+	$(INSTALL_BIN) ./files/etc/firewall.privacy-tor.sh $(1)/etc/firewall.privacy-tor.sh
+	$(INSTALL_DIR) $(1)/etc/tor/torrc.d
+	$(INSTALL_DATA) ./files/etc/tor/torrc.d/* $(1)/etc/tor/torrc.d/
+	$(INSTALL_DIR) $(1)/etc/crontabs
+	$(INSTALL_DATA) ./files/etc/crontabs/* $(1)/etc/crontabs/
+	$(INSTALL_DIR) $(1)/etc/glinet-privacy
+	$(INSTALL_DATA) ./files/etc/glinet-privacy/* $(1)/etc/glinet-privacy/
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults/
+endef
+
+define Package/glinet-privacy/postinst
+#!/bin/sh
+[ -n "$${IPKG_INSTROOT}" ] && exit 0
+if ! uci -q get firewall.glinet_privacy >/dev/null 2>&1; then
+	uci set firewall.glinet_privacy=include
+	uci set firewall.glinet_privacy.path='/usr/libexec/glinet-privacy/fw-plugin.sh'
+	uci set firewall.glinet_privacy.reload='1'
+	uci set firewall.glinet_privacy.enabled='1'
+	uci commit firewall
+fi
+/etc/init.d/firewall reload 2>/dev/null || true
+exit 0
+endef
+
+$(eval $(call BuildPackage,glinet-privacy))

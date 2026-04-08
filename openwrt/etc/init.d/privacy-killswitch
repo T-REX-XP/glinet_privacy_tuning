@@ -1,0 +1,12 @@
+#!/bin/sh /etc/rc.common
+# privacy-killswitch — periodic watchdog (cron) + boot-time check.
+
+START=99
+
+start() {
+	/usr/bin/privacy-killswitch-watchdog.sh
+}
+
+stop() {
+	/usr/bin/privacy-killswitch-watchdog.sh --flush
+}

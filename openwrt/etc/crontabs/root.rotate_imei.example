@@ -1,0 +1,2 @@
+# Example: rotate IMEI every 6 hours (install as /etc/crontabs/root or merge).
+# 0 */6 * * * /usr/bin/rotate_imei.sh

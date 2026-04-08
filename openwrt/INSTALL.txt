@@ -1,0 +1,81 @@
+Privacy router artifacts (GL-XE300 / OpenWrt)
+=============================================
+
+Copy files to the router root (scp/rsync), then chmod +x scripts and merge configs.
+
+Packages (opkg)
+---------------
+  opkg update
+  opkg install wireguard-tools kmod-wireguard tor tor-fw-helper iptables-mod-extra iptables-mod-comment dnsmasq-full ca-bundle
+
+Paths in this repo mirror the router: openwrt/usr/bin -> /usr/bin, etc.
+
+1) IMEI rotation
+----------------
+  chmod +x /usr/bin/rotate_imei.sh /etc/init.d/rotate_imei
+  cp etc/config/rotate_imei /etc/config/
+  uci set rotate_imei.main.enabled=1
+  uci commit rotate_imei
+  /etc/init.d/rotate_imei enable
+  /etc/init.d/rotate_imei start
+
+Cron (every 6 hours example):
+  echo '0 */6 * * * /usr/bin/rotate_imei.sh' >> /etc/crontabs/root
+  /etc/init.d/cron restart
+
+Optional env: IMEI_TAC (8 digits), MODEM_TTY, WWAN_IF.
+
+2) Mullvad WireGuard
+--------------------
+  export MULLVAD_PRIVATE_KEY='...'
+  export MULLVAD_ADDRESS='10.x.x.x/32'
+  export MULLVAD_PUBLIC_KEY='...'
+  export MULLVAD_ENDPOINT='198.x.x.x:51820'
+  chmod +x /usr/bin/apply-mullvad-wireguard.sh
+  /usr/bin/apply-mullvad-wireguard.sh
+  /etc/init.d/network reload
+  /etc/init.d/firewall reload
+  /etc/init.d/dnsmasq restart
+
+3) Tor transparent proxy
+------------------------
+  opkg install tor
+  mkdir -p /etc/tor/torrc.d
+  cat /etc/tor/torrc.d/99-transparent.conf >> /etc/tor/torrc
+  # or: echo '%include /etc/tor/torrc.d/99-transparent.conf' >> /etc/tor/torrc
+  /etc/init.d/tor enable
+  /etc/init.d/tor start
+
+  chmod +x /etc/firewall.privacy-tor.sh
+  /usr/bin/apply-privacy-firewall-includes.sh
+  /etc/init.d/firewall reload
+
+Tune LAN_CIDR / ROUTER_LAN_IP for your LAN (defaults suit GL.iNet 192.168.8.x).
+
+4) Kill switch watchdog
+-----------------------
+  chmod +x /usr/bin/privacy-killswitch-watchdog.sh /etc/init.d/privacy-killswitch
+  cp etc/config/privacy /etc/config/
+  uci set privacy.main.wan_dev='wwan0'   # adjust: ip route show default
+  uci commit privacy
+  /etc/init.d/privacy-killswitch enable
+  /etc/init.d/privacy-killswitch start
+
+Cron:
+  echo '*/1 * * * * /usr/bin/privacy-killswitch-watchdog.sh' >> /etc/crontabs/root
+  /etc/init.d/cron restart
+
+5) GL.iNet telemetry
+---------------------
+  chmod +x /usr/bin/disable-glinet-telemetry.sh
+  /usr/bin/disable-glinet-telemetry.sh
+  cp /etc/dnsmasq.d/glinet-block.conf /etc/dnsmasq.d/
+  uci add_list dhcp.@dnsmasq[0].confdir='/etc/dnsmasq.d'
+  uci commit dhcp
+  /etc/init.d/dnsmasq restart
+
+Notes
+-----
+- IMEI changes may be unlawful where you live; use only if permitted.
+- Verify firewall order and interfaces (br-lan, wwan0, wg0) on your build.
+- Tor + Mullvad together: ensure default route sends Tor traffic via wg0 (policy routing) and resolve DNS conflicts (Tor DNS vs Mullvad).

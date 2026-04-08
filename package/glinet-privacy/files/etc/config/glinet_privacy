@@ -1,0 +1,13 @@
+# GL.iNet Privacy — Tor / firewall / telemetry (LuCI + CLI)
+
+config firewall 'main'
+	option tor_transparent '0'
+	option lan_cidr '192.168.8.0/24'
+	option router_lan_ip '192.168.8.1'
+	option lan_dev ''
+	option tor_trans_port '9040'
+	option tor_dns_port '9053'
+
+config telemetry 'main'
+	option block_domains '0'
+	option disable_vendor_cloud '0'
