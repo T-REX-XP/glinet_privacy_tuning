@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2026 GL.iNet Privacy contributors
 #
-# glinet_puli_privacy — remove glinet-privacy and LuCI app files from a GL.iNet router.
+# glinet_puli_privacy — remove glinet-privacy and LuCI app files from a GL.iNet router (JS views under /www).
 # Reverses a typical install.sh run: stops watchdog, flushes killswitch rules, removes
 # firewall hooks, crontab lines, Tor include, dnsmasq symlink, UCI configs, and package files.
 #
@@ -260,6 +260,7 @@ remove_luci() {
 	log "Removing LuCI app files"
 	rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json
 	rm -f /usr/share/glinet-privacy/luci-use-menu-d
+	rm -rf /www/luci-static/resources/view/glinet_privacy
 	rm -f /usr/lib/lua/luci/controller/glinet_privacy.lua
 	rm -rf /usr/lib/lua/luci/model/cbi/glinet_privacy
 	rm -rf /usr/lib/lua/luci/view/glinet_privacy

@@ -8,7 +8,7 @@ Layout (this directory)
 -----------------------
   version.mk                    — PKG_VERSION / PKG_RELEASE for both Makefiles
   glinet-privacy/Makefile       — shell, UCI, firewall helpers (no LuCI)
-  luci-app-glinet-privacy/Makefile — LuCI controller, views, rpcd ACL, menu.d JSON
+  luci-app-glinet-privacy/Makefile — LuCI JS views (htdocs/…/view/glinet_privacy/*.js), rpcd ACL, menu.d JSON
 
 Feed integration
 ----------------

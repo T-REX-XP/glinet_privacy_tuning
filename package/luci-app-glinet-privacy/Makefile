@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-only
 # Copyright (c) 2026 GL.iNet Privacy contributors
 #
-# LuCI application. Sits next to ../version.mk and depends on glinet-privacy (see ../OPENWRT-BUILD.txt).
+# LuCI application (JavaScript views + menu.d). Sits next to ../version.mk.
 
 include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/package.mk
@@ -14,7 +14,6 @@ PKG_MAINTAINER:=GL.iNet Privacy contributors
 PKG_LICENSE:=GPL-2.0-only
 PKG_LICENSE_FILES:=../../LICENSE
 
-# po2lmo from luci-base (same workflow as upstream luci-app-* packages).
 PKG_BUILD_DEPENDS:=luci-base/host
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
@@ -25,14 +24,15 @@ define Package/luci-app-glinet-privacy
   SECTION:=luci
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
-  TITLE:=LuCI GL.iNet Privacy UI
-  DEPENDS:=+luci-base +luci-lua-runtime +glinet-privacy
+  TITLE:=LuCI GL.iNet Privacy UI (JavaScript)
+  DEPENDS:=+luci-base +glinet-privacy
   URL:=https://github.com/T-REX-XP/glinet_privacy_tuning
   PKGARCH:=all
 endef
 
 define Package/luci-app-glinet-privacy/description
- LuCI UI: overview, kill switch, IMEI rotation, Tor/DNS/telemetry, verify (requires glinet-privacy).
+ LuCI JS UI: overview, kill switch, IMEI, Tor/DNS/telemetry, verify (requires glinet-privacy).
+ No Lua runtime required.
 endef
 
 define Package/luci-app-glinet-privacy/conffiles
@@ -59,19 +59,16 @@ define Build/Compile
 endef
 
 define Package/luci-app-glinet-privacy/install
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/controller
-	$(INSTALL_DATA) ./luasrc/controller/*.lua $(1)/usr/lib/lua/luci/controller/
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/glinet_privacy
-	$(INSTALL_DATA) ./luasrc/glinet_privacy/*.lua $(1)/usr/lib/lua/luci/glinet_privacy/
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/view/glinet_privacy
-	$(INSTALL_DATA) ./luasrc/view/glinet_privacy/*.htm $(1)/usr/lib/lua/luci/view/glinet_privacy/
+	$(INSTALL_DIR) $(1)/www/luci-static/resources/view/glinet_privacy
+	$(INSTALL_DATA) ./htdocs/luci-static/resources/view/glinet_privacy/*.js \
+		$(1)/www/luci-static/resources/view/glinet_privacy/
+	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
+	$(foreach lmo,$(wildcard $(PKG_BUILD_DIR)/i18n/$(LUCI_I18N_DOMAIN).*.lmo), \
+		$(INSTALL_DATA) $(lmo) $(1)/usr/lib/lua/luci/i18n/;)
 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d
 	$(INSTALL_DATA) ./root/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json $(1)/usr/share/rpcd/acl.d/
 	$(INSTALL_DIR) $(1)/usr/share/luci/menu.d
 	$(INSTALL_DATA) ./root/usr/share/luci/menu.d/luci-app-glinet-privacy.json $(1)/usr/share/luci/menu.d/
-	$(INSTALL_DIR) $(1)/usr/lib/lua/luci/i18n
-	$(foreach lmo,$(wildcard $(PKG_BUILD_DIR)/i18n/$(LUCI_I18N_DOMAIN).*.lmo), \
-		$(INSTALL_DATA) $(lmo) $(1)/usr/lib/lua/luci/i18n/;)
 endef
 
 define Package/luci-app-glinet-privacy/postinst

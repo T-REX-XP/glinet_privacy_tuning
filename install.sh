@@ -30,7 +30,7 @@
 # opkg: uses "iptables-nft" as satisfying the iptables stack when present; tor-fw-helper is optional (not in all feeds).
 #      Install uses plain "opkg install" (no -V0); some vendor opkg builds reject "-V 0" and print usage.
 #      GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1 — re-apply installer telemetry UCI defaults (normally once only)
-#      GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0 — menu.d JSON (default auto: off, Lua index(); use 1 for JSON menu)
+#      (LuCI is JavaScript views + menu.d; no Lua menu toggles.)
 #
 # Package version: package/version.mk
 #
@@ -68,8 +68,8 @@ Remote: GLINET_PRIVACY_TARBALL_URL=... or GLINET_PRIVACY_GIT_URL=...
 
 Re-runs: safe (skips opkg update when deps satisfied; telemetry seed once; dhcp confdir not duplicated).
 
-Env: GLINET_PRIVACY_SKIP_OPKG_UPDATE=1  GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1  GLINET_PRIVACY_LUCI_MENU_JSON=auto|1|0
-  LuCI requires luci-lua-runtime (installed automatically when opkg is available; install aborts if missing when LuCI is enabled).
+Env: GLINET_PRIVACY_SKIP_OPKG_UPDATE=1  GLINET_PRIVACY_FORCE_TELEMETRY_SEED=1
+  LuCI: JavaScript views + menu.d; backend JSON via /usr/libexec/glinet-privacy/luci-json.sh (rpcd file.exec). No luci-lua-runtime.
 EOF
 }
 
@@ -262,10 +262,6 @@ install_opkg_packages() {
 	if ! pkg_installed dnsmasq-full && ! pkg_installed dnsmasq; then
 		_needs_install=1
 	fi
-	if [ "$INSTALL_LUCI" -eq 1 ] && ! pkg_installed luci-lua-runtime; then
-		_needs_install=1
-	fi
-
 	if [ "$_needs_install" -eq 1 ]; then
 		if [ "${GLINET_PRIVACY_SKIP_OPKG_UPDATE:-0}" = "1" ]; then
 			log "Skipping opkg update (GLINET_PRIVACY_SKIP_OPKG_UPDATE=1)"
@@ -302,9 +298,6 @@ install_opkg_packages() {
 		opkg_install_one dnsmasq-full
 	fi
 
-	if [ "$INSTALL_LUCI" -eq 1 ]; then
-		opkg_install_missing_from_list luci-lua-runtime
-	fi
 }
 
 install_core() {
@@ -467,107 +460,38 @@ install_file() {
 	chmod "$_mode" "$_dst"
 }
 
-# LuCI Lua controllers require luci-lua-runtime on ucode-first LuCI (GL.iNet 4.x). Hard prerequisite when LuCI is installed.
-require_luci_lua_runtime_for_luci() {
-	[ "$INSTALL_LUCI" -eq 1 ] || return 0
-	pkg_installed luci-lua-runtime && return 0
-	command -v opkg >/dev/null 2>&1 || die "LuCI install requires opkg package luci-lua-runtime; opkg not found. Use --without-luci or install luci-lua-runtime manually."
-	if [ "${GLINET_PRIVACY_SKIP_OPKG_UPDATE:-0}" != "1" ]; then
-		opkg update || true
-	fi
-	log "opkg: installing luci-lua-runtime (required for LuCI Lua controllers)"
-	opkg_install_quiet luci-lua-runtime || true
-	pkg_installed luci-lua-runtime || die "Could not install luci-lua-runtime (required for this LuCI app). Online router: opkg update && opkg install luci-lua-runtime. Or: sh install.sh --without-luci"
-}
-
-# LuCI: default Lua index() (vendor-style). Optional menu.d JSON + marker when GLINET_PRIVACY_LUCI_MENU_JSON=1.
-install_luci_menu_json() {
-	_LUCI="$REPO_ROOT/package/luci-app-glinet-privacy"
-	_json="$_LUCI/root/usr/share/luci/menu.d/luci-app-glinet-privacy.json"
-	[ -f "$_json" ] || return 0
-
-	if [ "${GLINET_PRIVACY_LUCI_MENU_JSON:-auto}" = "1" ]; then
-		mkdir -p /usr/share/luci/menu.d
-		install_file "$_json" /usr/share/luci/menu.d/luci-app-glinet-privacy.json 0644
-		mkdir -p /usr/share/glinet-privacy
-		: > /usr/share/glinet-privacy/luci-use-menu-d
-		log "LuCI menu.d installed; Lua controller index() skipped. Clear /tmp/luci-indexcache* if menu is stale."
-		return 0
-	fi
-
-	rm -f /usr/share/luci/menu.d/luci-app-glinet-privacy.json 2>/dev/null || true
-	rm -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null || true
-	if [ "${GLINET_PRIVACY_LUCI_MENU_JSON:-auto}" = "0" ]; then
-		log "LuCI menu.d: skipped (GLINET_PRIVACY_LUCI_MENU_JSON=0)"
-	else
-		log "LuCI menu.d: skipped (default Lua index(); GLINET_PRIVACY_LUCI_MENU_JSON=1 for JSON menu)"
-	fi
-}
-
 install_luci() {
 	_LUCI="$REPO_ROOT/package/luci-app-glinet-privacy"
-	[ -d "$_LUCI/luasrc" ] || { log "LuCI sources missing; skip"; return 0; }
-	require_luci_lua_runtime_for_luci
-	log "Installing LuCI: $_LUCI"
-	mkdir -p /usr/lib/lua/luci/controller
-	install_file "$_LUCI/luasrc/controller/glinet_privacy.lua" /usr/lib/lua/luci/controller/glinet_privacy.lua 0644
-	if [ -f "$_LUCI/luasrc/glinet_privacy/i18n.lua" ]; then
-		mkdir -p /usr/lib/lua/luci/glinet_privacy
-		install_file "$_LUCI/luasrc/glinet_privacy/i18n.lua" \
-			/usr/lib/lua/luci/glinet_privacy/i18n.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/imei_detect.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/imei_detect.lua" \
-			/usr/lib/lua/luci/glinet_privacy/imei_detect.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/net_probe.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/net_probe.lua" \
-			/usr/lib/lua/luci/glinet_privacy/net_probe.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/firewall_status.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/firewall_status.lua" \
-			/usr/lib/lua/luci/glinet_privacy/firewall_status.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/privacy_log_excerpt.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/privacy_log_excerpt.lua" \
-			/usr/lib/lua/luci/glinet_privacy/privacy_log_excerpt.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/sanitize.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/sanitize.lua" \
-			/usr/lib/lua/luci/glinet_privacy/sanitize.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/csrf.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/csrf.lua" \
-			/usr/lib/lua/luci/glinet_privacy/csrf.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/vpn_probe.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/vpn_probe.lua" \
-			/usr/lib/lua/luci/glinet_privacy/vpn_probe.lua 0644
-	fi
-	if [ -f "$_LUCI/luasrc/glinet_privacy/vendor_ubus.lua" ]; then
-		install_file "$_LUCI/luasrc/glinet_privacy/vendor_ubus.lua" \
-			/usr/lib/lua/luci/glinet_privacy/vendor_ubus.lua 0644
-	fi
-	mkdir -p /usr/lib/lua/luci/view/glinet_privacy
-	for _v in overview.htm verify.htm killswitch.htm imei.htm tor_dns.htm vendor_ubus_card.htm csrf_field.htm; do
-		[ -f "$_LUCI/luasrc/view/glinet_privacy/$_v" ] || continue
-		install_file "$_LUCI/luasrc/view/glinet_privacy/$_v" \
-			"/usr/lib/lua/luci/view/glinet_privacy/$_v" 0644
+	_jsdir="$_LUCI/htdocs/luci-static/resources/view/glinet_privacy"
+	[ -d "$_jsdir" ] || { log "LuCI JS views missing ($_jsdir); skip"; return 0; }
+	log "Installing LuCI (JavaScript views): $_LUCI"
+	rm -rf /usr/lib/lua/luci/controller/glinet_privacy.lua \
+		/usr/lib/lua/luci/glinet_privacy \
+		/usr/lib/lua/luci/view/glinet_privacy 2>/dev/null || true
+	rm -f /usr/share/glinet-privacy/luci-use-menu-d 2>/dev/null || true
+	mkdir -p /www/luci-static/resources/view/glinet_privacy
+	for _f in "$_jsdir"/*.js; do
+		[ -f "$_f" ] || continue
+		install_file "$_f" "/www/luci-static/resources/view/glinet_privacy/$(basename "$_f")" 0644
 	done
 	if [ -f "$_LUCI/root/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json" ]; then
 		mkdir -p /usr/share/rpcd/acl.d
 		install_file "$_LUCI/root/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json" \
 			/usr/share/rpcd/acl.d/luci-app-glinet-privacy.json 0644
 	fi
+	if [ -f "$_LUCI/root/usr/share/luci/menu.d/luci-app-glinet-privacy.json" ]; then
+		mkdir -p /usr/share/luci/menu.d
+		install_file "$_LUCI/root/usr/share/luci/menu.d/luci-app-glinet-privacy.json" \
+			/usr/share/luci/menu.d/luci-app-glinet-privacy.json 0644
+	fi
 	install_luci_i18n_lmo "$_LUCI"
-	install_luci_menu_json
 }
 
 # Standard LuCI .lmo catalogs (same domain as luci.i18n.loadc("glinet_privacy")).
 install_luci_i18n_lmo() {
 	_LUCI="$1"
 	if ! command -v po2lmo >/dev/null 2>&1; then
-		log "po2lmo not found — skipping .lmo (English from Lua sources; use opkg ipk or SDK for translations)"
+		log "po2lmo not found — skipping .lmo (English default in JS; use opkg ipk or SDK for translations)"
 		return 0
 	fi
 	for _po in "$_LUCI/po"/*/glinet_privacy.po; do

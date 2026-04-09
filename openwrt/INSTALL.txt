@@ -9,7 +9,7 @@ One command (replace USER/REPO; one line avoids broken copy-paste with \):
 
 Do not paste installer log lines back into the shell. GLINET_PRIVACY_TARBALL_URL must end in .tar.gz (source tree archive).
 
-LuCI requires luci-lua-runtime; install.sh installs it with opkg and aborts if LuCI is enabled but the package cannot be installed. Default: Lua index menu; GLINET_PRIVACY_LUCI_MENU_JSON=1 installs menu.d JSON.
+LuCI: JavaScript views under /www/luci-static/resources/view/glinet_privacy/; status JSON from /usr/libexec/glinet-privacy/luci-json.sh (rpcd file.exec). No luci-lua-runtime.
 
 From a git clone on the router:
 
@@ -33,9 +33,8 @@ What install.sh does by default (not --minimal)
 - Telemetry: uci glinet_privacy.tel.block_domains=1 and disable_vendor_cloud=1; apply-telemetry.sh
   (dnsmasq.d black-holes for goodcloud.xyz / gldns.com, glconfig.cloud.enable=0, gl_cloud stop/disable);
   optional remove_cloud_packages removes gl-cloud via opkg; dhcp dnsmasq confdir /etc/dnsmasq.d when possible
-- LuCI: copies luci-app-glinet-privacy into /usr/lib/lua/luci/... (Services → GL.iNet Privacy), unless --without-luci.
-  Default: Lua index() only; GLINET_PRIVACY_LUCI_MENU_JSON=1 installs menu.d JSON + luci-use-menu-d (Lua index() skipped).
-  After menu changes, delete /tmp/luci-indexcache* if stale.
+- LuCI: copies JS views to /www/luci-static/resources/view/glinet_privacy/, menu.d, rpcd ACL; unless --without-luci.
+  Core installs luci-json.sh with glinet-privacy. Clear /tmp/luci-indexcache* if menu is stale after upgrades.
 - Restarts network, firewall, dnsmasq, rpcd, uhttpd
 
 Optional flags

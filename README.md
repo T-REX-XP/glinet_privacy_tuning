@@ -70,7 +70,7 @@ Useful flags: `--without-luci` (skip LuCI files; default is to install them), `-
 
 **Piping the script** (`curl … | sh`) requires **`GLINET_PRIVACY_TARBALL_URL`** pointing at a **source tree** archive (must contain **`package/glinet-privacy/files`**), or **`GLINET_PRIVACY_SRC`**.
 
-**LuCI** on **ucode**-first GL.iNet images (**4.x**) needs the **`luci-lua-runtime`** package for Lua controllers. **`install.sh`** installs it when LuCI is enabled and **aborts** if **`opkg`** cannot install it. Use **`--without-luci`** for CLI-only. Default LuCI install uses **Lua `index()`** menu registration; set **`GLINET_PRIVACY_LUCI_MENU_JSON=1`** for **`menu.d`** JSON menu.
+**LuCI** is implemented as **JavaScript** views (LuCI **`view`** API) plus **`/usr/libexec/glinet-privacy/luci-json.sh`** for status JSON (**`rpcd`** **`file.exec`**). **`luci-lua-runtime`** is **not** required. Use **`--without-luci`** for CLI-only.
 
 ## Remove (uninstall on the router)
 

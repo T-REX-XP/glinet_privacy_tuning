@@ -1,8 +1,11 @@
 {
 	"luci-app-glinet-privacy": {
-		"description": "GL.iNet Privacy LuCI — UCI read/write scoped to packages this app commits; network/firewall/dhcp read-only for status probes.",
+		"description": "GL.iNet Privacy LuCI (JS views) — UCI read/write scoped to packages this app commits; network/firewall/dhcp read-only for status; file.exec for luci-json.sh helpers.",
 		"read": {
-			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp", "glvpn"]
+			"uci": ["privacy", "rotate_imei", "glinet_privacy", "network", "firewall", "dhcp", "glvpn"],
+			"file": {
+				"/usr/libexec/glinet-privacy/luci-json.sh": ["exec"]
+			}
 		},
 		"write": {
 			"uci": ["privacy", "rotate_imei", "glinet_privacy", "glvpn"]

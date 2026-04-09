@@ -14,6 +14,14 @@ Version numbers follow **semantic versioning** (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## 1.3.0 (2026-04-08)
+
+### Changed
+
+- **LuCI stack** — Replaced **Lua** controllers, **`.htm`** templates, and **`luci-lua-runtime`** with **JavaScript** views under **`htdocs/luci-static/resources/view/glinet_privacy/`** (LuCI **`view`** + **`menu.d`**). Status and probes are served by **`/usr/libexec/glinet-privacy/luci-json.sh`** (**`jshn`**) invoked from the browser via **`fs.exec`**; **`rpcd`** ACL grants **`file.exec`** for that script only. **`install.sh`** installs JS + **`menu.d`** to **`/www/...`** and removes legacy Lua paths. **Minor UX**: overview uses separate **Save** per **`form.Map`** plus a **Run apply scripts** button; parity with the old single-POST flow can be refined later.
+
+---
+
 ## 1.2.29 (2026-04-08)
 
 ### Changed
